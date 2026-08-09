@@ -1,6 +1,6 @@
 {
   "name": "firefox-addon-startpage",
-  "version": "1.14.3",
+  "version": "1.14.4",
   "private": true,
   "license": "GPL-3.0-or-later",
   "engines": {

@@ -2,6 +2,14 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.14.4] — Screenshot Mode, shared scrollbar/contrast fixes, storage-quota fix
+
+- New **Screenshot Mode** (Developer Options → DevPanel): forces every widget with a mock/demo data path (Calendar, Outlook Calendar/Mail, Bookmarks, Bookmark Search, the mock-gated Obsidian widgets) to show that fake data with no "preview data" badge — including inside a real loaded extension, where those paths otherwise never trigger. Built for taking clean store/marketing screenshots without exposing real accounts, calendars, or bookmarks. Bookmarks' mock path is a deliberate exception to its usual "never fake real bookmarks" rule, specifically for this purpose
+- Unified every widget's scrollbar (Calendar, Outlook Calendar/Mail, the mock-gated Obsidian widgets, Bookmark/Obsidian search popouts, Notes, Obsidian Quick Capture, and Obsidian markdown code blocks) onto the single shared `.sg-scroll-thin` style — several had either no custom scrollbar at all (native Chromium scrollbar) or a hand-rolled near-duplicate that didn't track the same theme variables
+- Fixed low-contrast secondary text in dark mode: `--text-muted` (widget titles, hints, the To-Do checkbox border, and 25+ other consumers) was `#64748b`, roughly half the contrast of its light-mode counterpart against widget backgrounds — brightened to `#94a3b8`
+- Fixed `Uncaught (in promise) Error: This request exceeds the MAX_WRITE_OPERATIONS_PER_MINUTE quota` — `chrome.storage.sync` allows 120 writes/minute, and neither the shared `useStorage` hook nor `BackgroundContext`'s hand-rolled persistence debounced writes, so dragging a slider or gradient color picker could fire far more writes than that in a few seconds. Both now debounce through a new shared `lib/debounce.ts` utility (~400ms), coalescing a whole drag gesture into one write
+- Fixed the Currency widget having no padding at all (unlike other widgets, it never picked up the Display Settings "Padding" slider treatment) and a bug where changing the base currency to one already selected as a target left a self-comparison row (e.g. "USD/USD") with no way to deselect it
+
 ## [1.14.3] — Fix RSS feed encoding, privacy policy corrections
 
 - Fixed the RSS Feed widget mangling non-ASCII characters (German umlauts especially — `ü`/`ö`/`ä` turning into `�`) on feeds served as ISO-8859-1/windows-1252 without an explicit charset in the HTTP `Content-Type` header. `res.text()` always decodes as UTF-8 in that case — it never looks at the XML prolog's own `encoding=` attribute — so the fetch now reads raw bytes and picks a decoder from the HTTP header's charset, then the prolog's, defaulting to UTF-8 only if neither says otherwise
