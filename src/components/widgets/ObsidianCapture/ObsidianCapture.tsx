@@ -310,7 +310,7 @@ export default function ObsidianCapture({ data, widgetId }: Props) {
   return (
     <div className="sg-obsc">
       <textarea
-        className="sg-obsc-input"
+        className="sg-obsc-input sg-scroll-thin"
         style={{ fontSize: data.fontSize ?? 13 }}
         value={text}
         placeholder={t('widget.obsidianCapture.placeholder')}

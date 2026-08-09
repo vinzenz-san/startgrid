@@ -96,7 +96,12 @@
   overflow-x: auto;
   white-space: pre;
   scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
 }
+.sg-md-pre::-webkit-scrollbar       { height: 4px; }
+.sg-md-pre::-webkit-scrollbar-track { background: transparent; }
+.sg-md-pre::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+.sg-md-pre::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 .sg-md-link {
   color: var(--accent);

@@ -114,7 +114,7 @@ export default function Notes({ data, onUpdateData, widgetId }: Props) {
   return (
     <div className="sg-notes-wrap">
       <textarea
-        className="sg-notes"
+        className="sg-notes sg-scroll-thin"
         style={{ fontSize: data.fontSize ?? 13 }}
         value={content}
         placeholder={t('widget.notes.placeholder')}
