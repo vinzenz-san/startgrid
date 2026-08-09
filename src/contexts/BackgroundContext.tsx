@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 import { storage } from '../lib/storage';
 import { storageLocal } from '../lib/storageLocal';
+import { debounce, type Debounced } from '../lib/debounce';
 import { BackgroundConfig, DEFAULT_BG } from '../types/background';
 import { resolveBackgroundCss } from '../components/Background/providers';
 import { useSettings } from './SettingsContext';
@@ -124,6 +125,10 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
   const [wikimediaImageUrl, setWikimediaImageUrlRaw] = useState<string | null>(readFastWikimediaUrl);
   const [loaded, setLoaded]                 = useState(false);
   const lastSaved                           = useRef('');
+  const debouncedSyncSave                   = useRef<Debounced<[BackgroundConfig]> | null>(null);
+  if (!debouncedSyncSave.current) {
+    debouncedSyncSave.current = debounce((cfg: BackgroundConfig) => storage.set(SYNC_KEY, cfg), 400);
+  }
 
   const setUnsplashImageUrl = (url: string | null) => {
     setUnsplashImageUrlRaw(url);
@@ -167,14 +172,20 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  // Persist config changes to storage.sync + localStorage fast-path
+  // Persist config changes to storage.sync + localStorage fast-path.
+  // storage.sync writes are debounced — chrome.storage.sync enforces
+  // MAX_WRITE_OPERATIONS_PER_MINUTE (120/min), and a continuous control like
+  // the gradient color pickers can fire far more config changes than that
+  // per minute while dragging. The localStorage fast-path write stays
+  // immediate since it's local, not quota-limited, and is what avoids the
+  // first-paint flash on next load.
   useEffect(() => {
     if (!loaded) return;
     const serialized = JSON.stringify(config);
     if (serialized === lastSaved.current) return;
     lastSaved.current = serialized;
-    storage.set(SYNC_KEY, config);
     writeFastConfig(config);
+    debouncedSyncSave.current!(config);
   }, [config, loaded]);
 
   const setConfig = (cfg: BackgroundConfig) => {
