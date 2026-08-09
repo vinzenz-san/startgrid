@@ -6,6 +6,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { storageLocal } from '../../../lib/storageLocal';
+import { isScreenshotMode } from '../../../lib/permissions';
 import type { CalendarEvent, CalendarViewStatus } from './calendarEvent.types';
 
 export interface ProviderCalendarState {
@@ -63,7 +64,7 @@ export function useProviderCalendar<TListEntry>(config: CalendarProviderConfig<T
     try {
       let events: CalendarEvent[];
 
-      if (!isExtension) {
+      if (!isExtension || isScreenshotMode()) {
         events = await config.mockEvents();
       } else {
         const token = await config.getValidToken();
@@ -119,7 +120,7 @@ export function useProviderCalendar<TListEntry>(config: CalendarProviderConfig<T
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { ...state, refresh, isMock: !isExtension };
+  return { ...state, refresh, isMock: !isExtension || isScreenshotMode() };
 }
 
 export interface ProviderCalendarListState<TListEntry> {

@@ -7,6 +7,7 @@ import { useOutlookCalendar, useOutlookCalendarList } from './useOutlookCalendar
 import { useMsAuth } from '../../../hooks/useMsAuth';
 import { SettingsRow, Dropdown, SettingsSwitch } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
+import { isScreenshotMode } from '../../../lib/permissions';
 import { LOCALES } from '../../../i18n';
 import {
   IconRefresh, IconConnect, IconDisconnect, SkeletonGroup,
@@ -184,8 +185,8 @@ export default function OutlookCalendar({ data }: Props) {
           <IconRefresh spinning={isLoading}/>
         </button>
       </div>
-      <div className="sg-cal-body">
-        {isMock && (
+      <div className="sg-cal-body sg-scroll-thin">
+        {isMock && !isScreenshotMode() && (
           <div className="sg-cal-preview-badge">{t('widget.outlookCalendar.previewBadge')}</div>
         )}
         {isStale && !isLoading && (

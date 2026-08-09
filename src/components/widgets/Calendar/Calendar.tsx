@@ -7,6 +7,7 @@ import { useCalendar, useGoogleCalendarList } from './useCalendar';
 import { useGoogleAuth } from '../../../hooks/useGoogleAuth';
 import { SettingsRow, Dropdown, SettingsSwitch } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
+import { isScreenshotMode } from '../../../lib/permissions';
 import { LOCALES } from '../../../i18n';
 import {
   IconRefresh, IconConnect, IconDisconnect, SkeletonGroup,
@@ -184,8 +185,8 @@ export default function Calendar({ data, onUpdateData: _onUpdateData }: Props) {
           <IconRefresh spinning={isLoading}/>
         </button>
       </div>
-      <div className="sg-cal-body">
-        {isMock && (
+      <div className="sg-cal-body sg-scroll-thin">
+        {isMock && !isScreenshotMode() && (
           <div className="sg-cal-preview-badge">{t('widget.calendar.previewBadge')}</div>
         )}
         {isStale && !isLoading && (

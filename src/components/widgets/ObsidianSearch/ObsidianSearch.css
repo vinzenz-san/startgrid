@@ -75,12 +75,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   padding: 4px 0;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(128, 128, 128, 0.25) transparent;
 }
-
-.sg-obss-float-body::-webkit-scrollbar       { width: 5px; }
-.sg-obss-float-body::-webkit-scrollbar-thumb { background: rgba(128, 128, 128, 0.25); border-radius: 3px; }
 
 /* ── Result rows ─────────────────────────────────────────────────────────── */
 

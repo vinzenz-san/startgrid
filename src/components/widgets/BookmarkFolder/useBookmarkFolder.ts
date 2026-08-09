@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { BmNode } from './bookmarks.mock';
 import { MOCK_TREE, flattenNodes, findNode } from './bookmarks.mock';
-import { isExtensionEnv, hasBookmarksPermission, requestBookmarksPermission } from '../../../lib/permissions';
+import { isExtensionEnv, isScreenshotMode, hasBookmarksPermission, requestBookmarksPermission } from '../../../lib/permissions';
 
 async function getBrowser() {
   const { default: browser } = await import('webextension-polyfill');
@@ -29,15 +29,16 @@ export function useBookmarkFolder() {
     return ok;
   }, []);
 
-  const canUseRealBookmarks = isExtensionEnv && granted === true;
-  const checkingPermission  = isExtensionEnv && granted === null;
-  const needsPermission     = isExtensionEnv && granted === false;
-  // Mock data is a dev/preview stand-in only — inside the real extension we
-  // never fabricate a fake bookmark tree, since that's indistinguishable
-  // from someone's actual bookmarks and defeats the point of the permission
-  // prompt. While checking/ungranted in an extension, callers just get an
-  // empty result; the UI shows the checking/prompt state instead.
-  const useMockData = !isExtensionEnv;
+  // Mock data is normally a dev/preview stand-in only — inside the real
+  // extension we don't fabricate a fake bookmark tree, since that's
+  // indistinguishable from someone's actual bookmarks and defeats the point
+  // of the permission prompt. Screenshot Mode is the deliberate exception:
+  // it exists specifically so store screenshots can be taken from a real
+  // loaded extension without exposing the user's actual bookmarks.
+  const canUseRealBookmarks = isExtensionEnv && granted === true && !isScreenshotMode();
+  const checkingPermission  = isExtensionEnv && granted === null && !isScreenshotMode();
+  const needsPermission     = isExtensionEnv && granted === false && !isScreenshotMode();
+  const useMockData = !isExtensionEnv || isScreenshotMode();
 
   async function getChildren(folderId: string): Promise<BmNode[]> {
     if (canUseRealBookmarks) {

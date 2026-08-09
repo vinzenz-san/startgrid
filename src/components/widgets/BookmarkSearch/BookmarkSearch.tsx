@@ -8,6 +8,7 @@ import { SettingsSwitch } from '../../shared/Form';
 import { useBookmarkFolder } from '../BookmarkFolder/useBookmarkFolder';
 import type { BmNode } from '../BookmarkFolder/bookmarks.mock';
 import { useSettings } from '../../../contexts/SettingsContext';
+import { isScreenshotMode } from '../../../lib/permissions';
 import './BookmarkSearch.css';
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -274,8 +275,8 @@ export default function BookmarkSearch({ data }: Props) {
       )}
 
       {/* Results body */}
-      <div className="sg-bks-float-body">
-        {bookmarks.isMock && (
+      <div className="sg-bks-float-body sg-scroll-thin">
+        {bookmarks.isMock && !isScreenshotMode() && (
           <div className="sg-bks-preview-badge">{t('widget.bookmarkSearch.previewBadge')}</div>
         )}
         {bookmarks.needsPermission ? (

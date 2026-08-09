@@ -2,7 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import { getFile, ObsidianError, type ObsidianErrorCode } from '../../../lib/obsidianApi';
 import { getVaultIndex, pickRandom } from '../../../lib/obsidianIndex';
 import { parseMarkdown, stripInline, type MdBlock } from '../../../lib/obsidianMarkdown';
-import { isExtensionEnv } from '../../../lib/permissions';
+import { isExtensionEnv, isScreenshotMode } from '../../../lib/permissions';
 
 export interface RandomState {
   /** 'indexing' is the cold-cache walk — slow enough to deserve its own state. */
@@ -42,7 +42,7 @@ export function useObsidianRandom() {
     busyRef.current = true;
 
     try {
-      if (!isExtensionEnv) {
+      if (!isExtensionEnv || isScreenshotMode()) {
         setState(s => ({ ...s, status: 'loading' }));
         await new Promise(r => setTimeout(r, 350));
         const keys = Object.keys(MOCK_NOTES);
@@ -92,7 +92,7 @@ export function useObsidianRandom() {
     }
   }, []);
 
-  return { ...state, shuffle, isMock: !isExtensionEnv };
+  return { ...state, shuffle, isMock: !isExtensionEnv || isScreenshotMode() };
 }
 
 /** First non-heading line of a note, flattened — the excerpt shown when the

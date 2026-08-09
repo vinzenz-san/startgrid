@@ -4,6 +4,7 @@ import { useObsidianNote } from './useObsidianNote';
 import { useObsidian } from '../../../hooks/useObsidian';
 import { SettingsRow, SettingsSlider } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
+import { isScreenshotMode } from '../../../lib/permissions';
 import { normalizeVaultPath, vaultPathToTitle } from '../../../lib/obsidianPath';
 import { sliceSection } from '../../../lib/obsidianMarkdown';
 import { openInObsidian } from '../../../lib/obsidianApi';
@@ -163,8 +164,8 @@ export default function ObsidianNote({ data }: Props) {
         </div>
       </div>
 
-      <div className="sg-cal-body sg-obsn" style={{ fontSize: data.fontSize ?? 13 }}>
-        {isMock && <div className="sg-cal-preview-badge">{t('widget.obsidian.previewBadge')}</div>}
+      <div className="sg-cal-body sg-obsn sg-scroll-thin" style={{ fontSize: data.fontSize ?? 13 }}>
+        {isMock && !isScreenshotMode() && <div className="sg-cal-preview-badge">{t('widget.obsidian.previewBadge')}</div>}
         {isStale && !isLoading && <div className="sg-cal-stale-banner">{t('widget.obsidianNote.stale')}</div>}
 
         {editing ? (

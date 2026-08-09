@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { getFile, putFile, saveNoteIfUnchanged, ObsidianError, type ObsidianErrorCode } from '../../../lib/obsidianApi';
 import { parseMarkdown, toggleTaskLine, type MdBlock } from '../../../lib/obsidianMarkdown';
-import { isExtensionEnv } from '../../../lib/permissions';
+import { isExtensionEnv, isScreenshotMode } from '../../../lib/permissions';
 import { storageLocal } from '../../../lib/storageLocal';
 
 export type DailyStatus = 'idle' | 'loading' | 'success' | 'error';
@@ -79,7 +79,7 @@ export function useObsidianDaily() {
     setState(s => ({ ...s, status: 'loading', errorCode: null, staleConflict: false }));
 
     try {
-      const source = isExtensionEnv ? await getFile(path) : await fetchMock();
+      const source = (isExtensionEnv && !isScreenshotMode()) ? await getFile(path) : await fetchMock();
       setState({
         status: 'success',
         source,
@@ -135,8 +135,8 @@ export function useObsidianDaily() {
    */
   const toggleTask = useCallback(async (block: Extract<MdBlock, { kind: 'task' }>) => {
     const path = pathRef.current;
-    if (!path || !isExtensionEnv) {
-      // Preview build: reflect the toggle locally so the widget still demos.
+    if (!path || !isExtensionEnv || isScreenshotMode()) {
+      // Preview build (or Screenshot Mode): reflect the toggle locally so the widget still demos.
       setState(s => ({
         ...s,
         blocks: s.blocks.map(b =>
@@ -187,7 +187,7 @@ export function useObsidianDaily() {
    */
   const saveEdit = useCallback(async (expectedSource: string, newSource: string) => {
     const path = pathRef.current;
-    if (!path || !isExtensionEnv) {
+    if (!path || !isExtensionEnv || isScreenshotMode()) {
       setState(s => ({ ...s, source: newSource, blocks: parseMarkdown(newSource) }));
       return true;
     }
@@ -222,7 +222,7 @@ export function useObsidianDaily() {
 
   /** Create today's note when it doesn't exist yet. */
   const createNote = useCallback(async (path: string, initial = '') => {
-    if (!isExtensionEnv) return;
+    if (!isExtensionEnv || isScreenshotMode()) return;
     setWriting(true);
     try {
       await putFile(path, initial);
@@ -238,5 +238,5 @@ export function useObsidianDaily() {
     }
   }, [refresh]);
 
-  return { ...state, writing, refresh, toggleTask, createNote, saveEdit, isMock: !isExtensionEnv };
+  return { ...state, writing, refresh, toggleTask, createNote, saveEdit, isMock: !isExtensionEnv || isScreenshotMode() };
 }

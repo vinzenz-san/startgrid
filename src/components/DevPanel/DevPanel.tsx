@@ -6,6 +6,7 @@ import { useWeatherEffect } from '../../contexts/WeatherEffectContext';
 import { SettingsSwitch, Dropdown } from '../shared/Form';
 import type { WeatherEffectType } from '../../lib/weatherEffectMap';
 import { APP_VERSION } from '../../lib/appVersion';
+import { isScreenshotMode, setScreenshotMode } from '../../lib/permissions';
 import './DevPanel.css';
 
 const isExtension = typeof chrome !== 'undefined' && !!chrome.storage;
@@ -224,6 +225,7 @@ function DevPanelInner({ position, onPositionChange }: Props) {
 
   const [stats,   setStats]   = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [screenshotMode, setScreenshotModeState] = useState(isScreenshotMode);
 
   const refresh = useCallback(() => {
     setLoading(true);
@@ -286,6 +288,18 @@ function DevPanelInner({ position, onPositionChange }: Props) {
           <span className="dev-badge ok">{liveEffectType}</span>
         </div>
       )}
+
+      <div className="dev-row">
+        <span className="dev-label" title="Forces widgets to show mock/fake data (no live accounts or real bookmarks) with no preview-data badge, for taking clean store/marketing screenshots. Reloads the page.">Screenshot Mode</span>
+        <SettingsSwitch
+          checked={screenshotMode}
+          onChange={v => {
+            setScreenshotMode(v);
+            setScreenshotModeState(v);
+            window.location.reload();
+          }}
+        />
+      </div>
 
       <div className="dev-divider" />
 

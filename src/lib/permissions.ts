@@ -29,6 +29,31 @@ const browserPromise = isExtensionEnvRaw
 
 export const isExtensionEnv = isExtensionEnvRaw;
 
+// ── Screenshot mode ──────────────────────────────────────────────────────────
+//
+// Dev-only override (Developer Options → DevPanel) for taking clean store/
+// marketing screenshots without using real accounts, calendars, bookmarks, or
+// vault data. Every widget that has a mock/demo data path (Calendar, Outlook
+// Calendar/Mail, Bookmarks, Bookmark Search, the mock-gated Obsidian widgets)
+// switches to it while this is on — including inside a real loaded extension,
+// where those paths otherwise never trigger — with no "preview data" badge,
+// so the screenshot doesn't advertise itself as fake. Persisted to plain
+// localStorage since it's a local dev aid: never synced, and — because it
+// only takes effect once Developer Options is deliberately enabled — never a
+// risk of silently masking a real user's own data.
+const SCREENSHOT_MODE_KEY = 'sg:screenshotMode';
+
+export function isScreenshotMode(): boolean {
+  try { return localStorage.getItem(SCREENSHOT_MODE_KEY) === '1'; } catch { return false; }
+}
+
+export function setScreenshotMode(enabled: boolean): void {
+  try {
+    if (enabled) localStorage.setItem(SCREENSHOT_MODE_KEY, '1');
+    else localStorage.removeItem(SCREENSHOT_MODE_KEY);
+  } catch { /* ignore */ }
+}
+
 export async function hasBookmarksPermission(): Promise<boolean> {
   if (!browserPromise) return false;
   try {

@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { getFile, saveNoteIfUnchanged, ObsidianError, type ObsidianErrorCode } from '../../../lib/obsidianApi';
 import { parseMarkdown, type MdBlock } from '../../../lib/obsidianMarkdown';
-import { isExtensionEnv } from '../../../lib/permissions';
+import { isExtensionEnv, isScreenshotMode } from '../../../lib/permissions';
 import { storageLocal } from '../../../lib/storageLocal';
 
 export interface NoteState {
@@ -64,7 +64,7 @@ export function useObsidianNote() {
 
     try {
       let source: string;
-      if (isExtensionEnv) {
+      if (isExtensionEnv && !isScreenshotMode()) {
         source = await getFile(path);
       } else {
         await new Promise(r => setTimeout(r, 450));
@@ -118,7 +118,7 @@ export function useObsidianNote() {
    */
   const saveEdit = useCallback(async (expectedSource: string, newSource: string) => {
     const path = pathRef.current;
-    if (!path || !isExtensionEnv) {
+    if (!path || !isExtensionEnv || isScreenshotMode()) {
       setState(s => ({ ...s, source: newSource, blocks: parseMarkdown(newSource) }));
       return true;
     }
@@ -151,5 +151,5 @@ export function useObsidianNote() {
     }
   }, [refresh]);
 
-  return { ...state, writing, refresh, saveEdit, isMock: !isExtensionEnv };
+  return { ...state, writing, refresh, saveEdit, isMock: !isExtensionEnv || isScreenshotMode() };
 }

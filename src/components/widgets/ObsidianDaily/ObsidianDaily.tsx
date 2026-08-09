@@ -4,6 +4,7 @@ import { useObsidianDaily } from './useObsidianDaily';
 import { useObsidian } from '../../../hooks/useObsidian';
 import { SettingsRow, SettingsSwitch, SettingsSlider } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
+import { isScreenshotMode } from '../../../lib/permissions';
 import { DEFAULT_DAILY_TEMPLATE, resolvePathTemplate, vaultPathToTitle } from '../../../lib/obsidianPath';
 import { sliceSection, type MdBlock } from '../../../lib/obsidianMarkdown';
 import MarkdownView from '../shared/MarkdownView';
@@ -175,8 +176,8 @@ export default function ObsidianDaily({ data }: Props) {
         </div>
       </div>
 
-      <div className="sg-cal-body sg-obsd" style={{ fontSize: data.fontSize ?? 13 }}>
-        {isMock && <div className="sg-cal-preview-badge">{t('widget.obsidian.previewBadge')}</div>}
+      <div className="sg-cal-body sg-obsd sg-scroll-thin" style={{ fontSize: data.fontSize ?? 13 }}>
+        {isMock && !isScreenshotMode() && <div className="sg-cal-preview-badge">{t('widget.obsidian.previewBadge')}</div>}
         {isStale && !isLoading && <div className="sg-cal-stale-banner">{t('widget.obsidianDaily.stale')}</div>}
 
         {editing ? (

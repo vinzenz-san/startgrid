@@ -4,6 +4,7 @@ import { SettingsRow, SegmentedControl, SettingsSlider, SettingsSwitch, Dropdown
 import { useBookmarkFolder } from './useBookmarkFolder';
 import type { BmNode } from './bookmarks.mock';
 import { useSettings } from '../../../contexts/SettingsContext';
+import { isScreenshotMode } from '../../../lib/permissions';
 import type { TranslationKey } from '../../../i18n';
 import './BookmarkFolder.css';
 
@@ -523,7 +524,7 @@ export default function BookmarkFolder({ data, onUpdateData }: Props) {
 
       {/* Body */}
       <div className="sg-bf-body sg-scroll-thin">
-        {bookmarks.isMock && (
+        {bookmarks.isMock && !isScreenshotMode() && (
           <div className="sg-bf-preview-badge">{t('widget.bookmarkFolder.previewBadge')}</div>
         )}
         {bookmarks.needsPermission ? (

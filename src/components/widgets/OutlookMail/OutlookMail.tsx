@@ -5,6 +5,7 @@ import { useOutlookMail } from './useOutlookMail';
 import { useMsAuth } from '../../../hooks/useMsAuth';
 import { SettingsRow, SettingsSwitch } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
+import { isScreenshotMode } from '../../../lib/permissions';
 import { LOCALES } from '../../../i18n';
 import './OutlookMail.css';
 
@@ -182,8 +183,8 @@ export default function OutlookMail({ data }: Props) {
           <IconRefresh spinning={isLoading}/>
         </button>
       </div>
-      <div className="sg-cal-body">
-        {isMock && (
+      <div className="sg-cal-body sg-scroll-thin">
+        {isMock && !isScreenshotMode() && (
           <div className="sg-cal-preview-badge">{t('widget.outlookMail.previewBadge')}</div>
         )}
         {isStale && !isLoading && (

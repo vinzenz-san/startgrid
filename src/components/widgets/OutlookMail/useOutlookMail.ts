@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import type { OutlookMailState, MailMessage } from './outlookMail.types';
 import { getValidMsToken } from '../../../lib/msAuth';
 import { storageLocal } from '../../../lib/storageLocal';
+import { isScreenshotMode } from '../../../lib/permissions';
 
 interface MessagesCache {
   messages: MailMessage[];
@@ -115,7 +116,7 @@ export function useOutlookMail() {
     try {
       let messages: MailMessage[];
 
-      if (!isExtension) {
+      if (!isExtension || isScreenshotMode()) {
         messages = await fetchMockMessages(unreadOnly);
       } else {
         const token = await getValidMsToken();
@@ -159,5 +160,5 @@ export function useOutlookMail() {
     }
   }, []);
 
-  return { ...state, refresh, isMock: !isExtension };
+  return { ...state, refresh, isMock: !isExtension || isScreenshotMode() };
 }

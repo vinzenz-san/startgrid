@@ -4,6 +4,7 @@ import { useObsidianRandom, firstLines } from './useObsidianRandom';
 import { useObsidian } from '../../../hooks/useObsidian';
 import { SettingsRow, Dropdown, SettingsSwitch, SettingsSlider, ActionButton } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
+import { isScreenshotMode } from '../../../lib/permissions';
 import { vaultPathToTitle } from '../../../lib/obsidianPath';
 import { openInObsidian } from '../../../lib/obsidianApi';
 import { clearVaultIndex } from '../../../lib/obsidianIndex';
@@ -149,8 +150,8 @@ export default function ObsidianRandom({ data }: Props) {
         </div>
       </div>
 
-      <div className="sg-cal-body sg-obsr" style={{ fontSize: data.fontSize ?? 13 }}>
-        {isMock && <div className="sg-cal-preview-badge">{t('widget.obsidian.previewBadge')}</div>}
+      <div className="sg-cal-body sg-obsr sg-scroll-thin" style={{ fontSize: data.fontSize ?? 13 }}>
+        {isMock && !isScreenshotMode() && <div className="sg-cal-preview-badge">{t('widget.obsidian.previewBadge')}</div>}
 
         {notConfigured ? (
           <ObsidianStatus code="NOT_CONFIGURED"/>

@@ -6,7 +6,7 @@ import { SettingsSlider } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { useObsidian } from '../../../hooks/useObsidian';
 import { simpleSearch, openInObsidian, ObsidianError, type SearchHit, type ObsidianErrorCode } from '../../../lib/obsidianApi';
-import { isExtensionEnv } from '../../../lib/permissions';
+import { isExtensionEnv, isScreenshotMode } from '../../../lib/permissions';
 import { vaultPathToTitle } from '../../../lib/obsidianPath';
 import ObsidianConnect from '../shared/ObsidianConnect';
 import ObsidianStatus from '../shared/ObsidianStatus';
@@ -96,7 +96,7 @@ export default function ObsidianSearch({ data }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const searchRef    = useRef<HTMLInputElement>(null);
 
-  const isMock        = !isExtensionEnv;
+  const isMock        = !isExtensionEnv || isScreenshotMode();
   const notConfigured = !isMock && !checking && !isReady;
   const hasQuery      = query.trim().length > 0;
 
@@ -182,8 +182,8 @@ export default function ObsidianSearch({ data }: Props) {
       style={floatingStyles}
       onPointerDown={e => e.stopPropagation()}
     >
-      <div className="sg-obss-float-body">
-        {isMock && <div className="sg-cal-preview-badge">{t('widget.obsidian.previewBadge')}</div>}
+      <div className="sg-obss-float-body sg-scroll-thin">
+        {isMock && !isScreenshotMode() && <div className="sg-cal-preview-badge">{t('widget.obsidian.previewBadge')}</div>}
 
         {notConfigured ? (
           <ObsidianStatus code="NOT_CONFIGURED"/>
