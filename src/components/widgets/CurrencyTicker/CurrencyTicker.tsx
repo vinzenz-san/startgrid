@@ -51,7 +51,7 @@ export function CurrencyTickerSettings({ data, onUpdateData }: SettingsProps) {
         <Dropdown
           options={codes.map(code => ({ value: code, label: currencies ? `${code} — ${currencies[code]}` : code }))}
           value={base}
-          onChange={v => onUpdateData({ baseCurrency: v })}
+          onChange={v => onUpdateData({ baseCurrency: v, targetCurrencies: targets.filter(c => c !== v) })}
           menuWidth="auto"
         />
       </SettingsRow>
@@ -90,7 +90,10 @@ interface Props {
 export default function CurrencyTicker({ data }: Props) {
   const { t } = useSettings();
   const base = data.baseCurrency ?? 'EUR';
-  const targets = data.targetCurrencies ?? ['USD', 'GBP'];
+  // Defensive: a target equal to the base can only mean stale saved data
+  // (e.g. the base was changed after this target was already selected) —
+  // never something intentional to render as a self-comparison row.
+  const targets = (data.targetCurrencies ?? ['USD', 'GBP']).filter(c => c !== base);
 
   const { rates, isFetching, error, isStale, refetch } = useCurrencyTicker({
     baseCurrency: base,
