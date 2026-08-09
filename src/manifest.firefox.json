@@ -12,8 +12,8 @@
       "id": "startgrid@local",
       "strict_min_version": "142.0",
       "data_collection_permissions": {
-        "required": ["locationInfo", "personallyIdentifyingInfo"],
-        "optional": ["bookmarksInfo"]
+        "required": ["none"],
+        "optional": ["locationInfo", "personallyIdentifyingInfo", "bookmarksInfo"]
       }
     }
   },
