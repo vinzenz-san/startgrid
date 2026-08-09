@@ -2,6 +2,12 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.14.5] — Removed device geolocation, reduced AMO data collection declaration
+
+- Removed the "📍 Use Current Location" button from the Weather widget and from the background weather effect's location picker — both now set a location only by searching for a place name, same as they already supported. StartGrid no longer calls `navigator.geolocation` anywhere, so the browser's location-permission prompt for this extension is a thing of the past
+- Firefox's AMO listing no longer declares `locationInfo` as a data type StartGrid can collect, reflecting the above; `personallyIdentifyingInfo` and `bookmarksInfo` remain declared as optional (opt-in) collection, correcting an unrelated listing bug where both had been marked required instead of optional
+- Updated the privacy policy's Location section to describe search-by-name only
+
 ## [1.14.4] — Screenshot Mode, shared scrollbar/contrast fixes, storage-quota fix
 
 - New **Screenshot Mode** (Developer Options → DevPanel): forces every widget with a mock/demo data path (Calendar, Outlook Calendar/Mail, Bookmarks, Bookmark Search, the mock-gated Obsidian widgets) to show that fake data with no "preview data" badge — including inside a real loaded extension, where those paths otherwise never trigger. Built for taking clean store/marketing screenshots without exposing real accounts, calendars, or bookmarks. Bookmarks' mock path is a deliberate exception to its usual "never fake real bookmarks" rule, specifically for this purpose
