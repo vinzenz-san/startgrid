@@ -2,6 +2,10 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.14.6] — Fix Bookmark Folder icon overrides being wiped on reopen
+
+- Fixed per-link icon overrides (custom icon, white badge) in the Bookmark Folder widget silently reverting the next time the new tab page opened. The widget's "self-heal" logic — meant to prune overrides for bookmarks that were actually deleted — ran against a transient empty children list returned while the `bookmarks` permission check was still resolving, wiping every override before the real bookmark list had a chance to load. It now waits for that permission check to settle before pruning
+
 ## [1.14.5] — Removed device geolocation, reduced AMO data collection declaration
 
 - Removed the "📍 Use Current Location" button from the Weather widget and from the background weather effect's location picker — both now set a location only by searching for a place name, same as they already supported. StartGrid no longer calls `navigator.geolocation` anywhere, so the browser's location-permission prompt for this extension is a thing of the past

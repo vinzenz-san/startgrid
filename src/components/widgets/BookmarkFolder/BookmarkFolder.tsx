@@ -470,8 +470,10 @@ export default function BookmarkFolder({ data, onUpdateData }: Props) {
         // Self-heal: a root-level bookmark that was deleted (or moved) elsewhere
         // leaves a dead iconOverrides entry behind — prune it the next time the
         // root folder's children are actually fetched, rather than letting stale
-        // entries accumulate indefinitely.
-        if (currentId === rootFolderId && data.iconOverrides) {
+        // entries accumulate indefinitely. Skipped while the bookmarks permission
+        // is still being checked, since getChildren() returns [] in that window —
+        // pruning against that placeholder empty list would wipe every override.
+        if (currentId === rootFolderId && bookmarks.permissionState !== 'checking' && data.iconOverrides) {
           const validIds = new Set(children.map(c => c.id));
           const entries  = Object.entries(data.iconOverrides);
           const pruned   = entries.filter(([id]) => validIds.has(id));
