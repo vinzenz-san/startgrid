@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { SettingsRow, SettingsSwitch, ActionButton } from '../shared/Form';
+import { SettingsRow, SettingsSwitch } from '../shared/Form';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useWeatherEffect } from '../../contexts/WeatherEffectContext';
 import { geocodeCity, type GeocodeResult } from '../../lib/openMeteoApi';
@@ -16,9 +16,6 @@ export default function WeatherEffectSettings() {
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const [locating, setLocating] = useState(false);
-  const [locateError, setLocateError] = useState<string | null>(null);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -44,26 +41,6 @@ export default function WeatherEffectSettings() {
     setLocation(r.latitude, r.longitude, label);
     setQuery('');
     setResults([]);
-  };
-
-  const useCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      setLocateError(t('widget.weather.locationDenied'));
-      return;
-    }
-    setLocating(true);
-    setLocateError(null);
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        setLocating(false);
-        setLocation(pos.coords.latitude, pos.coords.longitude, undefined);
-      },
-      () => {
-        setLocating(false);
-        setLocateError(t('widget.weather.locationDenied'));
-      },
-      { timeout: 10_000 },
-    );
   };
 
   return (
@@ -101,11 +78,6 @@ export default function WeatherEffectSettings() {
       {hasLocation && locationName && (
         <div className="sg-weather-current-location">{locationName}</div>
       )}
-
-      <ActionButton variant="ghost" onClick={useCurrentLocation} disabled={locating}>
-        {locating ? t('widget.weather.locating') : t('widget.weather.useCurrentLocation')}
-      </ActionButton>
-      {locateError && <div className="sg-weather-search-error">{locateError}</div>}
 
       {!hasLocation && <p className="bg-sync-warning">{t('weatherEffect.noLocation')}</p>}
     </div>

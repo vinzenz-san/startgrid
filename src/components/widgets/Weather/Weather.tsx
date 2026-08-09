@@ -49,9 +49,6 @@ export function WeatherSettings({ data, onUpdateData }: SettingsProps) {
   const [searchError, setSearchError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [locating, setLocating] = useState(false);
-  const [locateError, setLocateError] = useState<string | null>(null);
-
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     const q = query.trim();
@@ -81,31 +78,6 @@ export function WeatherSettings({ data, onUpdateData }: SettingsProps) {
     });
     setQuery('');
     setResults([]);
-  };
-
-  const useCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      setLocateError(t('widget.weather.locationDenied'));
-      return;
-    }
-    setLocating(true);
-    setLocateError(null);
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        setLocating(false);
-        onUpdateData({
-          locationName: undefined,
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-          timezone: undefined,
-        });
-      },
-      () => {
-        setLocating(false);
-        setLocateError(t('widget.weather.locationDenied'));
-      },
-      { timeout: 10_000 },
-    );
   };
 
   return (
@@ -142,11 +114,6 @@ export function WeatherSettings({ data, onUpdateData }: SettingsProps) {
       {data.locationName && (
         <div className="sg-weather-current-location">{data.locationName}</div>
       )}
-
-      <ActionButton variant="ghost" onClick={useCurrentLocation} disabled={locating}>
-        {locating ? t('widget.weather.locating') : t('widget.weather.useCurrentLocation')}
-      </ActionButton>
-      {locateError && <div className="sg-weather-search-error">{locateError}</div>}
 
       <SettingsRow label={t('widget.weather.units')}>
         <Dropdown
