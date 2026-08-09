@@ -14,7 +14,7 @@
   --surface-hover: #232741;
   --border: #2d3148;
   --text: #e2e8f0;
-  --text-muted: #64748b;
+  --text-muted: #94a3b8;
   --accent: #6366f1;
   --accent-hover: #818cf8;
   --danger: #ef4444;
@@ -134,7 +134,7 @@ html[data-scheme="dark"] .sg-widget:not([data-theme="light"]),
 }
 .sg-widget[data-theme="dark"] {
   --text:       #e2e8f0;
-  --text-muted: #64748b;
+  --text-muted: #94a3b8;
 }
 
 /* ════════════════════════════════════════════════════ */
