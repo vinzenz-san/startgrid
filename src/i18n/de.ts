@@ -63,6 +63,10 @@ export const de: Record<TranslationKey, string> = {
   'widgets.presets':             'Voreinstellungen',
   'widgets.matchGlobalColor':    '⬡ An globale Widget-Farbe anpassen',
   'widgets.resetToGlobal':       '↺ Auf Global zurücksetzen',
+  'widgets.crashedTitle':        'Widget abgestürzt',
+  'widgets.crashedDesc':         'Dieses Widget hat einen Fehler verursacht und wird nicht mehr angezeigt.',
+  'widgets.crashedReload':       'Neu laden',
+  'widgets.crashedRemove':       'Entfernen',
 
   'grid.sectionTitle': 'Raster',
   'grid.columns':      'Spalten',

@@ -52,6 +52,38 @@
   gap: 10px;
 }
 
+.dev-row--col {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.dev-crash-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.dev-crash-controls > *:first-child { flex: 1; }
+
+.dev-crash-btn {
+  font-size: 10px;
+  font-family: monospace;
+  color: var(--danger);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.12);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.dev-crash-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.55);
+}
+
 .dev-label { color: var(--text-muted); }
 
 .dev-badge {

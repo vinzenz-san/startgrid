@@ -7,6 +7,8 @@ import { SettingsSwitch, Dropdown } from '../shared/Form';
 import type { WeatherEffectType } from '../../lib/weatherEffectMap';
 import { APP_VERSION } from '../../lib/appVersion';
 import { isScreenshotMode, setScreenshotMode } from '../../lib/permissions';
+import { triggerCrash } from '../../lib/devCrashState';
+import { WIDGET_TYPE_LABEL_KEYS } from '../widgets/registry';
 import './DevPanel.css';
 
 const isExtension = typeof chrome !== 'undefined' && !!chrome.storage;
@@ -226,6 +228,7 @@ function DevPanelInner({ position, onPositionChange }: Props) {
   const [stats,   setStats]   = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [screenshotMode, setScreenshotModeState] = useState(isScreenshotMode);
+  const [crashTargetId, setCrashTargetId] = useState('');
 
   const refresh = useCallback(() => {
     setLoading(true);
@@ -300,6 +303,29 @@ function DevPanelInner({ position, onPositionChange }: Props) {
           }}
         />
       </div>
+
+      {loaded && widgets.length > 0 && (
+        <div className="dev-row dev-row--col">
+          <span className="dev-label">Crash Widget</span>
+          <div className="dev-crash-controls">
+            <Dropdown
+              options={widgets.map(w => ({
+                value: w.id,
+                label: `${t(WIDGET_TYPE_LABEL_KEYS[w.type])} (${w.id.slice(0, 6)})`,
+              }))}
+              value={crashTargetId || widgets[0].id}
+              onChange={v => setCrashTargetId(v)}
+              menuWidth="auto"
+            />
+            <button
+              className="dev-crash-btn"
+              onClick={() => triggerCrash(crashTargetId || widgets[0].id)}
+            >
+              Trigger Crash
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="dev-divider" />
 

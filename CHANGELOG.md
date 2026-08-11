@@ -2,6 +2,11 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.14.7] — Widget crash isolation + Dev Panel crash testing
+
+- Widgets are now individually isolated behind a React error boundary: if a widget's own render throws, only that widget shows an inline "Widget crashed" fallback (Reload / Remove) instead of taking down the whole new-tab page
+- Dev Panel gained a **Crash Widget** control (dropdown of active widgets + Trigger Crash button) to simulate a widget throwing on its next render, for exercising the new error boundary without needing a real bug
+
 ## [1.14.6] — Fix Bookmark Folder icon overrides being wiped on reopen
 
 - Fixed per-link icon overrides (custom icon, white badge) in the Bookmark Folder widget silently reverting the next time the new tab page opened. The widget's "self-heal" logic — meant to prune overrides for bookmarks that were actually deleted — ran against a transient empty children list returned while the `bookmarks` permission check was still resolving, wiping every override before the real bookmark list had a chance to load. It now waits for that permission check to settle before pruning

@@ -61,6 +61,10 @@ export const en = {
   'widgets.presets':             'Presets',
   'widgets.matchGlobalColor':    '⬡ Match global widget color',
   'widgets.resetToGlobal':       '↺ Reset to Global',
+  'widgets.crashedTitle':        'Widget crashed',
+  'widgets.crashedDesc':         'This widget hit an error and stopped rendering.',
+  'widgets.crashedReload':       'Reload',
+  'widgets.crashedRemove':       'Remove',
 
   'grid.sectionTitle': 'Grid',
   'grid.columns':      'Columns',

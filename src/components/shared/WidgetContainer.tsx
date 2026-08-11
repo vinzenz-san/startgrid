@@ -11,6 +11,7 @@ import { COLOR_PRESETS } from '../../lib/presets';
 import { dragState } from '../../lib/dragState';
 import type { Widget } from '../../types/widget';
 import { WIDGET_REGISTRY, WIDGET_TYPE_LABEL_KEYS } from '../widgets/registry';
+import WidgetErrorBoundary, { CrashProbe } from './WidgetErrorBoundary';
 import { SettingsSlider } from './Form';
 import { SettingsRow, SettingsSwitch } from './Form';
 import SwatchPicker from './SwatchPicker';
@@ -449,7 +450,11 @@ export default function WidgetContainer({ widget }: Props) {
         )}
 
         <div className="sg-widget-body">
-          {entry.renderComponent(widget.data, handleUpdateData, settingsOpen, widget.id)}
+          <WidgetErrorBoundary widgetId={widget.id} onRemove={() => removeWidget(widget.id)} t={t}>
+            <CrashProbe widgetId={widget.id}>
+              {entry.renderComponent(widget.data, handleUpdateData, settingsOpen, widget.id)}
+            </CrashProbe>
+          </WidgetErrorBoundary>
         </div>
 
         {isEditMode && (
