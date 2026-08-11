@@ -146,21 +146,18 @@ html.sg-glow-all-widgets .sg-widget {
 .sg-grid-wrapper--pinned-left  { margin-left: 340px; }
 
 .sg-grid {
-  display: grid;
-  position: relative; /* anchors .sg-grid-glow-overlay below */
+  position: relative; /* anchors .sg-grid-glow-overlay and RGL's absolutely-positioned items below */
   /* Column count + cell size are user-configurable (GridConfigContext) —
      --grid-cols/--cell-w/--cell-h/--gap are injected as runtime custom
      properties there, with static fallbacks in index.css for pre-hydration.
-     Track size is cell + gap (the "pitch" between column/row starts) rather
-     than a bare cell size — gap is applied via each widget's own margin
-     (see .sg-widget) instead of the grid `gap` property, so every widget
-     gets an equal inset on all 4 sides instead of CSS Grid's `gap` only
-     ever showing up on the trailing (right/bottom) side of each cell. */
-  grid-template-columns: repeat(var(--grid-cols), calc(var(--cell-w) + var(--gap)));
-  grid-auto-rows: calc(var(--cell-h) + var(--gap));
-  gap: 0;
-  padding: calc(var(--gap) / 2);
-  align-content: start;
+     react-grid-layout (RGLGrid.tsx) now owns item-to-item spacing via its own
+     `margin` config (equal to --gap), so this element's own padding is the
+     full --gap (not half) — the outer edge-to-widget inset and the
+     inter-widget gap both end up equal to --gap, matching the pre-RGL
+     symmetric-inset system exactly (see RGLGrid.tsx's innerWidth comment for
+     the full derivation). */
+  padding: var(--gap);
+  box-sizing: border-box;
   /* Strictly content-driven height (Grid.tsx computes --content-rows —
      exactly the bottom-most occupied widget row when idle, +5 rows of
      headroom while editing or mid-drag) — no min-height: 100% floor. That
@@ -182,6 +179,18 @@ html.sg-glow-all-widgets .sg-widget {
      children of this element (Grid.tsx), so they track wherever it ends up
      centered to automatically — no separate alignment needed for them. */
   margin: 0 auto;
+}
+
+/* First paint has no "previous" position to animate from (storage load isn't
+   a layout change) — react-grid-layout's default stylesheet unconditionally
+   transitions every item's transform/width/height, so without this the
+   initial mount can visibly animate widgets sliding into place. Only the CSS
+   transition is gated here — widget content itself always renders
+   immediately, this never blocks it. Suppressed until RGLGrid.tsx flips this
+   class on ~100ms after mount, just long enough to cover first paint. */
+.sg-grid .react-grid-item { transition: none; }
+.sg-grid.sg-grid--animated .react-grid-item.cssTransforms:not(.react-draggable-dragging):not(.resizing) {
+  transition: transform 200ms ease, width 200ms ease, height 200ms ease;
 }
 
 /* Edit-mode: dot-grid background */
@@ -294,19 +303,16 @@ html.sg-grid-glow-hover .sg-grid-glow-overlay {
 }
 
 
-/* ── Drop ghost ──────────────────────────────────── */
-.sg-drop-ghost {
+/* ── Drag placeholder ────────────────────────────────
+   react-grid-layout renders its own drop-preview element with this class
+   (replaces the old hand-rolled .sg-drop-ghost) — restyled to match. RGL
+   doesn't distinguish a valid/invalid drop target the way the old manual
+   drag implementation did (RGLGrid.tsx runs with noCompactor — free custom
+   positioning, no auto-reflow — so a drop just places the widget wherever
+   it's released), so there's no invalid-state variant here anymore. */
+.react-grid-item.react-grid-placeholder {
   border-radius: var(--radius);
   background: rgba(99, 102, 241, 0.12);
   border: 2px dashed var(--accent);
-  pointer-events: none;
-  transition: grid-column 0.05s, grid-row 0.05s;
-  /* Match .sg-widget's own symmetric gap-inset margin so the drop preview
-     lines up with where the real widget will actually render. */
-  margin: calc(var(--gap) / 2);
-}
-
-.sg-drop-ghost--invalid {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: var(--danger);
+  opacity: 1;
 }

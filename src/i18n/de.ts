@@ -208,6 +208,7 @@ export const de: Record<TranslationKey, string> = {
   'widgets.type.obsidianSearch': 'Obsidian Vault-Suche',
   'widgets.type.obsidianRandom': 'Obsidian Zufallsnotiz',
   'widgets.type.placeholder':    'Platzhalter',
+  'widgets.type.invisibleSpacer': 'Unsichtbarer Platzhalter',
   'widgets.type.greeting':       'Begrüßung',
   'widgets.type.weather':        'Wetter',
   'widgets.type.rssFeed':        'RSS-Feed',

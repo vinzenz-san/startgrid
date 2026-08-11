@@ -1,6 +1,6 @@
 {
   "name": "firefox-addon-startpage",
-  "version": "1.14.7",
+  "version": "1.15.0",
   "private": true,
   "license": "GPL-3.0-or-later",
   "engines": {
@@ -32,6 +32,7 @@
     "leaflet": "^1.9.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-grid-layout": "^2.2.4",
     "webextension-polyfill": "^0.12.0"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { WidgetDataMap, WidgetType, ClockData, QuicklinksData, BookmarksData, BookmarkSearchData, CalendarData, OutlookCalendarData, OutlookMailData, NotesData, ObsidianCaptureData, ObsidianDailyData, ObsidianNoteData, ObsidianSearchData, ObsidianRandomData, GreetingData, WeatherData, RssFeedData, TodoData, CurrencyTickerData, RainRadarData, PlaceholderData } from '../../types/widget';
+import type { WidgetDataMap, WidgetType, ClockData, QuicklinksData, BookmarksData, BookmarkSearchData, CalendarData, OutlookCalendarData, OutlookMailData, NotesData, ObsidianCaptureData, ObsidianDailyData, ObsidianNoteData, ObsidianSearchData, ObsidianRandomData, GreetingData, WeatherData, RssFeedData, TodoData, CurrencyTickerData, RainRadarData, PlaceholderData, SpacerData } from '../../types/widget';
 import type { TranslationKey } from '../../i18n';
 import Clock, { ClockSettings } from './Clock/Clock';
 import Quicklinks, { QuicklinksSettings } from './Quicklinks/Quicklinks';
@@ -21,6 +21,7 @@ import TodoList, { TodoListSettings } from './TodoList/TodoList';
 import CurrencyTicker, { CurrencyTickerSettings } from './CurrencyTicker/CurrencyTicker';
 import RainRadar, { RainRadarSettings } from './RainRadar/RainRadar';
 import WidgetPlaceholder from '../shared/WidgetPlaceholder';
+import SpacerWidget from './SpacerWidget/SpacerWidget';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -278,6 +279,16 @@ const _registry = {
     renderSettings:  null,
   } satisfies TypedEntry<PlaceholderData>,
 
+  'invisible-spacer': {
+    label:         'Invisible Spacer',
+    icon:          '▫️',
+    defaultSize:   { w: 1, h: 1 },
+    defaultData:   {} satisfies SpacerData,
+    titleBehavior: 'none',
+    renderComponent: () => <SpacerWidget />,
+    renderSettings:  null,
+  } satisfies TypedEntry<SpacerData>,
+
 
 } satisfies { [K in WidgetType]: TypedEntry<WidgetDataMap[K]> };
 
@@ -310,9 +321,10 @@ export const WIDGET_TYPE_LABEL_KEYS: Record<WidgetType, TranslationKey> = {
   currencyTicker: 'widgets.type.currencyTicker',
   rainRadar:      'widgets.type.rainRadar',
   placeholder:    'widgets.type.placeholder',
+  'invisible-spacer': 'widgets.type.invisibleSpacer',
 };
 
 // Ordered list for the "Add Widget" menu (excludes placeholder handled separately if desired).
 export const WIDGET_MENU_TYPES: WidgetType[] = [
-  'clock', 'quicklinks', 'bookmarks', 'bookmarkSearch', 'calendar', 'outlookCalendar', 'outlookMail', 'notes', 'obsidianCapture', 'obsidianDaily', 'obsidianNote', 'obsidianSearch', 'obsidianRandom', 'greeting', 'weather', 'rssFeed', 'todoList', 'currencyTicker', 'rainRadar', 'placeholder',
+  'clock', 'quicklinks', 'bookmarks', 'bookmarkSearch', 'calendar', 'outlookCalendar', 'outlookMail', 'notes', 'obsidianCapture', 'obsidianDaily', 'obsidianNote', 'obsidianSearch', 'obsidianRandom', 'greeting', 'weather', 'rssFeed', 'todoList', 'currencyTicker', 'rainRadar', 'invisible-spacer', 'placeholder',
 ];

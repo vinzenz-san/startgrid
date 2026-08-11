@@ -187,6 +187,12 @@ export interface PlaceholderData {
   title?: string;
 }
 
+// Purely a layout filler — transparent/non-interactive in view mode, no
+// content or settings of its own. Distinct from PlaceholderData (a
+// dev-only "empty slot" debug widget that always shows an icon/title/hint).
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface SpacerData {}
+
 export interface GreetingData {
   userName?: string;
   useCustomQuote?: boolean;
@@ -287,6 +293,7 @@ export interface WidgetDataMap {
   currencyTicker:  CurrencyTickerData;
   rainRadar:       RainRadarData;
   placeholder:     PlaceholderData;
+  'invisible-spacer': SpacerData;
 }
 
 export type WidgetType = keyof WidgetDataMap;
@@ -335,4 +342,5 @@ export type Widget =
   | (WidgetBase & { type: 'todoList';       data: TodoData })
   | (WidgetBase & { type: 'currencyTicker'; data: CurrencyTickerData })
   | (WidgetBase & { type: 'rainRadar';      data: RainRadarData })
-  | (WidgetBase & { type: 'placeholder';    data: PlaceholderData });
+  | (WidgetBase & { type: 'placeholder';    data: PlaceholderData })
+  | (WidgetBase & { type: 'invisible-spacer'; data: SpacerData });

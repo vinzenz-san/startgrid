@@ -3,12 +3,10 @@ import { createPortal } from 'react-dom';
 import { useFloating, flip, shift, offset, autoUpdate } from '@floating-ui/react';
 import { useEditMode } from '../../contexts/EditModeContext';
 import { useWidgets } from '../../contexts/WidgetContext';
-import { useGridConfig } from '../../contexts/GridConfigContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import { darkenHex, mixHex, getAdaptiveColor } from '../../lib/colorUtils';
 import { COLOR_PRESETS } from '../../lib/presets';
-import { dragState } from '../../lib/dragState';
 import type { Widget } from '../../types/widget';
 import { WIDGET_REGISTRY, WIDGET_TYPE_LABEL_KEYS } from '../widgets/registry';
 import WidgetErrorBoundary, { CrashProbe } from './WidgetErrorBoundary';
@@ -23,16 +21,11 @@ interface Props { widget: Widget; }
 export default function WidgetContainer({ widget }: Props) {
   const { isEditMode } = useEditMode();
   const { removeWidget, updateWidget } = useWidgets();
-  const { gridConfig } = useGridConfig();
   const { globalColor, globalColorScheme, globalOpacity, globalDim, globalGradientIntensity, globalPresetId, widgetShadowOpacity, globalGlassIntensity } = useTheme();
   const { colorScheme, enableCustomContextMenu, disableWidgetGlow, t } = useSettings();
   const elRef = useRef<HTMLDivElement>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [resizePreview, setResizePreview] = useState<{ w: number; h: number } | null>(null);
   const [removeConfirmOpen, setRemoveConfirmOpen] = useState(false);
-
-  const displayW = resizePreview?.w ?? widget.w;
-  const displayH = resizePreview?.h ?? widget.h;
 
   // ── Floating panel positioning ────────────────────────────────────────────
   // Declared before the orphan-guard early return below (rather than in its
@@ -76,13 +69,7 @@ export default function WidgetContainer({ widget }: Props) {
   // ── Orphan guard — unknown / removed widget type ──────────────────────────
   if (!entry) {
     return (
-      <div
-        className="sg-widget sg-widget--orphan"
-        style={{
-          gridColumn: `${widget.col} / span ${widget.w}`,
-          gridRow:    `${widget.row} / span ${widget.h}`,
-        }}
-      >
+      <div className="sg-widget sg-widget--orphan">
         <div className="sg-widget-orphan-body">
           <span className="sg-widget-orphan-icon">⚠</span>
           <span className="sg-widget-orphan-title">Missing Widget</span>
@@ -107,54 +94,6 @@ export default function WidgetContainer({ widget }: Props) {
   const showHeader      = entry.titleBehavior === 'optional' && showCustomTitle;
   const titlePlaceholder = entry.resolveDynamicTitle?.(widget.data) ?? entry.defaultTitle ?? t(WIDGET_TYPE_LABEL_KEYS[widget.type]);
   const resolvedTitle    = widget.customTitle || titlePlaceholder;
-
-  // ── Drag to move ──────────────────────────────────────────────────────────
-
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-    const rect = elRef.current!.getBoundingClientRect();
-    dragState.widgetId = widget.id;
-    dragState.offCol = Math.max(0, Math.floor((e.clientX - rect.left) / ((rect.width  + gridConfig.gap) / widget.w)));
-    dragState.offRow = Math.max(0, Math.floor((e.clientY - rect.top)  / ((rect.height + gridConfig.gap) / widget.h)));
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', widget.id);
-    requestAnimationFrame(() => elRef.current?.classList.add('dragging'));
-  };
-
-  const handleDragEnd = () => {
-    elRef.current?.classList.remove('dragging');
-    dragState.widgetId = '';
-  };
-
-  // ── Pointer-drag resize ───────────────────────────────────────────────────
-
-  const handleResizeStart = (e: React.PointerEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const handle = e.currentTarget;
-    handle.setPointerCapture(e.pointerId);
-    const startX = e.clientX, startY = e.clientY;
-    const startW = widget.w, startH = widget.h;
-    const { columns, cellWidth, cellHeight, gap } = gridConfig;
-    const maxW = columns + 1 - widget.col;
-    const stepW = cellWidth  + gap;
-    const stepH = cellHeight + gap;
-
-    const calc = (ev: PointerEvent) => ({
-      w: Math.max(1, Math.min(maxW, Math.round((startW * stepW - gap + ev.clientX - startX + gap / 2) / stepW))),
-      h: Math.max(1,              Math.round((startH * stepH - gap + ev.clientY - startY + gap / 2) / stepH)),
-    });
-
-    const onMove = (ev: PointerEvent) => setResizePreview(calc(ev));
-    const onUp   = (ev: PointerEvent) => {
-      handle.removeEventListener('pointermove', onMove);
-      handle.removeEventListener('pointerup', onUp);
-      const { w, h } = calc(ev);
-      updateWidget(widget.id, { w, h });
-      setResizePreview(null);
-    };
-    handle.addEventListener('pointermove', onMove);
-    handle.addEventListener('pointerup', onUp);
-  };
 
   // ── Custom context menu ───────────────────────────────────────────────────
 
@@ -408,17 +347,11 @@ export default function WidgetContainer({ widget }: Props) {
           settingsOpen ? 'sg-widget--settings-active' : '',
           settingsOpen && !disableWidgetGlow ? 'sg-widget--glow' : '',
           (widget.data as { allowOverflow?: boolean }).allowOverflow ? 'sg-widget--overflow' : '',
+          widget.type === 'invisible-spacer' && !isEditMode ? 'sg-widget--spacer' : '',
         ].filter(Boolean).join(' ')}
         data-theme={overrideEnabled ? widget.localColorScheme : undefined}
-        draggable={isEditMode && !resizePreview}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
         onContextMenu={handleContextMenu}
-        style={{
-          gridColumn: `${widget.col} / span ${displayW}`,
-          gridRow:    `${widget.row} / span ${displayH}`,
-          ...localOverrideStyle,
-        }}
+        style={localOverrideStyle}
       >
         {hasSettings && (
           <button
@@ -433,7 +366,10 @@ export default function WidgetContainer({ widget }: Props) {
 
         {isEditMode && (
           <div className="sg-widget-controls" draggable={false} onDragStart={e => e.stopPropagation()}>
-            <span className="sg-widget-size">{displayW}×{displayH}</span>
+            <div className="sg-widget-controls-info">
+              <span className="sg-widget-name">{t(WIDGET_TYPE_LABEL_KEYS[widget.type])}</span>
+              <span className="sg-widget-size">{widget.w}×{widget.h}</span>
+            </div>
             <div className="sg-widget-actions">
               <button className="sg-widget-action danger"
                 onPointerDown={e => e.stopPropagation()}
@@ -456,14 +392,6 @@ export default function WidgetContainer({ widget }: Props) {
             </CrashProbe>
           </WidgetErrorBoundary>
         </div>
-
-        {isEditMode && (
-          <div className="sg-widget-resize"
-            onPointerDown={handleResizeStart}
-            draggable={false}
-            onDragStart={e => e.stopPropagation()}
-            title="Resize" />
-        )}
       </div>
 
       {floatingPanel}

@@ -5,11 +5,11 @@
   background: none;
   border-radius: var(--radius);
   overflow: hidden;
-  /* Grid track size is cell + gap (see .sg-grid) — this margin eats the gap
-     back on all 4 sides, so widgets get a symmetric inset instead of CSS
-     Grid's `gap` property, which only ever shows up trailing (right/bottom)
-     a cell, never leading (left/top). */
-  margin: calc(var(--gap) / 2);
+  /* react-grid-layout (RGLGrid.tsx) positions and sizes the wrapping
+     .react-grid-item itself, gap-inset included via its own margin config —
+     this element just fills that box. */
+  width: 100%;
+  height: 100%;
   border: 1px solid rgba(255, 255, 255, calc(0.06 * var(--widget-bg-opacity, 1)));
   box-shadow: 0 4px 20px rgba(0, 0, 0, calc(var(--widget-shadow-opacity, 75) / 100 * var(--widget-bg-opacity, 1) * 0.40)),
               0 1px 6px  rgba(0, 0, 0, calc(var(--widget-shadow-opacity, 75) / 100 * var(--widget-bg-opacity, 1) * 0.24)),
@@ -28,6 +28,26 @@
    context. */
 .sg-widget--overflow {
   overflow: visible;
+}
+
+/* Invisible Spacer widget, view mode only (edit mode keeps full chrome so it
+   can still be dragged/resized/removed like any other widget) — strips the
+   card look entirely so it reads as blank space, not an empty card.
+   !important guards against .sg-widget's own border/box-shadow (both driven
+   by --widget-* custom properties that stay live even without an explicit
+   per-widget override — see localOverrideStyle in WidgetContainer.tsx)
+   leaking through from base cascade order alone. */
+.sg-widget--spacer {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  pointer-events: none;
+}
+.sg-widget--spacer::before,
+.sg-widget--spacer::after {
+  content: none !important;
+  background: none !important;
+  box-shadow: none !important;
 }
 
 /* An earlier attempt set z-index: -1 directly on .sg-widget--overflow to
@@ -92,7 +112,9 @@
   box-shadow: 0 0 0 4px var(--edit-ring);
 }
 
-.sg-widget.dragging {
+/* react-grid-layout adds react-draggable-dragging to the .react-grid-item
+   wrapper it controls (RGLGrid.tsx), not to .sg-widget itself. */
+.react-grid-item.react-draggable-dragging .sg-widget {
   opacity: 0.25;
   cursor: grabbing;
 }
@@ -136,7 +158,12 @@ html[data-scheme="light"] .sg-widget:not([data-theme="dark"]) .sg-widget-gear:no
   color: #94a3b8;
 }
 
-/* ── Controls bar ────────────────────────────────── */
+/* ── Controls bar ─────────────────────────────────
+   Dark by default; [data-scheme="light"] below swaps it to a light bar to
+   match the app's global light/dark toggle (same pattern as .sg-bottom-bar
+   in Grid.css) — .sg-widget-name/.sg-widget-size already read var(--text)/
+   var(--text-muted), which index.css redefines per scheme, so only this
+   bar's own background/border needed an explicit light counterpart. */
 .sg-widget-controls {
   position: absolute;
   top: 0;
@@ -147,12 +174,41 @@ html[data-scheme="light"] .sg-widget:not([data-theme="dark"]) .sg-widget-gear:no
   justify-content: space-between;
   padding: 3px 6px;
   background: rgba(15, 17, 23, 0.82);
+  border-bottom: 1px solid var(--border);
   backdrop-filter: blur(4px);
   z-index: 20;
   cursor: default;
 }
 
+/* Mirrors index.css's html[data-scheme]/.sg-widget[data-theme] combinatorial
+   pattern for the same reason: a widget can force its own local theme
+   independently of the page-wide scheme (WidgetContainer.tsx's Appearance
+   panel), and this bar's background needs to follow whichever one actually
+   wins for that widget, not just the global toggle. */
+html[data-scheme="light"] .sg-widget:not([data-theme="dark"]) .sg-widget-controls,
+.sg-widget[data-theme="light"] .sg-widget-controls {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.sg-widget-controls-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sg-widget-name {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
 .sg-widget-size {
+  flex-shrink: 0;
   font-size: 10px;
   font-family: monospace;
   color: var(--text-muted);
@@ -410,31 +466,52 @@ html[data-scheme="light"] .sg-widget:not([data-theme="dark"]) .sg-widget-gear:no
 }
 
 
-/* ── Resize handle ───────────────────────────────── */
-.sg-widget-resize {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 18px;
-  height: 18px;
-  cursor: se-resize;
-  /* Visual: two diagonal lines in the corner */
-  background:
-    linear-gradient(135deg,
-      transparent 40%,
-      var(--border) 40%, var(--border) 55%,
-      transparent 55%),
-    linear-gradient(135deg,
-      transparent 60%,
-      var(--border) 60%, var(--border) 75%,
-      transparent 75%);
-  opacity: 0.5;
-  transition: opacity 0.15s;
-  border-radius: 0 0 var(--radius) 0;
-  z-index: 25;
+/* ── Resize handle ─────────────────────────────────
+   react-grid-layout injects its own .react-resizable-handle onto the
+   .react-grid-item wrapper (RGLGrid.tsx) — the base opacity/hover behavior
+   comes from react-grid-layout/css/styles.css, this recolors the corner
+   grip to match the app's border color instead of the library's hardcoded
+   black, and forces an explicit, comfortable size/stacking. !important here
+   isn't decorative — RGL's own stylesheet and this file load in whichever
+   order the bundler's module graph happens to produce, so without it the
+   library's own 20px/opacity-only rule can win the cascade unpredictably.
+   overflow: visible on .react-grid-item guards against the handle's
+   enlarged hit zone getting clipped by the item wrapper's own box; .sg-widget
+   itself sits as a sibling of the handle (not an ancestor, see RGLGrid.tsx —
+   the handle is appended onto the same wrapper div .sg-widget renders
+   inside of, not inside .sg-widget), so .sg-widget's own overflow: hidden
+   was never actually able to clip it, but this makes that guarantee
+   explicit rather than incidental. */
+.react-grid-item {
+  overflow: visible !important;
+}
+.react-grid-item > .react-resizable-handle {
+  width: 20px !important;
+  height: 20px !important;
+  z-index: 10 !important;
+  overflow: visible !important;
 }
 
-.sg-widget-resize:hover { opacity: 1; }
+/* Two diagonal grip lines in the corner — replaces RGL's own default
+   ::after glyph (a small border-right/border-bottom corner) entirely,
+   filling the full handle box instead of a small inset corner so it reads
+   clearly at a glance during edit mode. */
+.react-grid-item > .react-resizable-handle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: none;
+  background-image:
+    linear-gradient(135deg, transparent 40%, var(--border) 40%, var(--border) 55%, transparent 55%),
+    linear-gradient(135deg, transparent 60%, var(--border) 60%, var(--border) 75%, transparent 75%);
+}
+
+.react-grid-item > .react-resizable-handle::before {
+  content: '';
+  position: absolute;
+  inset: -2px; /* 20px visible handle + 2px each side = 24px hit zone */
+  z-index: 10;
+}
 
 /* ── Orphan / unsupported widget ─────────────────── */
 .sg-widget--orphan {

@@ -2,6 +2,15 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.15.0] — Grid layout engine migrated to react-grid-layout
+
+- Replaced the hand-rolled CSS Grid + native-HTML5-drag layout system with `react-grid-layout`: smoother drag/resize, live "rubber-band" displacement of neighboring widgets while dragging (vertical auto-compaction, `preventCollision: false`), and a drag-start layout snapshot that restores every displaced widget back to its exact starting position if a drag is cancelled or dropped back on its origin cell
+- Fixed the resize-handle hitbox being too small and hard to grab precisely — now an explicit 20×20px visible grip with a 24×24px invisible hit zone, with clearer diagonal grip-line styling
+- Fixed the widget-crash and "Missing Widget" fallback cards' header/background colors not adapting to Light Mode
+- Edit mode's per-widget header now shows the widget's localized type name (e.g. "Outlook Mail") next to its w×h size badge, not just the size
+- New **Invisible Spacer** widget — a purely transparent layout filler (no background/border/shadow in view mode, dashed placeholder outline with a label in edit mode) for deliberately leaving gaps in a layout
+- Fixed the Calendar, Outlook Calendar, and Outlook Mail widgets' mock/preview data taking a visible ~650ms to appear even with no real network call — a leftover artificial `setTimeout` meant to simulate network latency was firing even for already-known static mock data; removed from all three
+
 ## [1.14.7] — Widget crash isolation + Dev Panel crash testing
 
 - Widgets are now individually isolated behind a React error boundary: if a widget's own render throws, only that widget shows an inline "Widget crashed" fallback (Reload / Remove) instead of taking down the whole new-tab page

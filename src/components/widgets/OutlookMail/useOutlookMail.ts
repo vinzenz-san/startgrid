@@ -88,8 +88,9 @@ const MOCK_MESSAGES: MailMessage[] = [
     receivedDateTime: minutesAgo(720), isRead: true, bodyPreview: 'Your plan will renew automatically on the 30th.', webLink: BASE_LINK },
 ];
 
+// No artificial delay — MOCK_MESSAGES is a static array, already known
+// synchronously at import time.
 async function fetchMockMessages(unreadOnly: boolean): Promise<MailMessage[]> {
-  await new Promise(r => setTimeout(r, 650));
   return unreadOnly ? MOCK_MESSAGES.filter(m => !m.isRead) : MOCK_MESSAGES;
 }
 

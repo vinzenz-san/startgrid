@@ -206,6 +206,7 @@ export const en = {
   'widgets.type.obsidianSearch': 'Obsidian Vault Search',
   'widgets.type.obsidianRandom': 'Obsidian Random Note',
   'widgets.type.placeholder':    'Placeholder',
+  'widgets.type.invisibleSpacer': 'Invisible Spacer',
   'widgets.type.greeting':       'Greeting',
   'widgets.type.weather':        'Weather',
   'widgets.type.rssFeed':        'RSS Feed',
