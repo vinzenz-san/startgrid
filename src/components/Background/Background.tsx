@@ -63,7 +63,7 @@ function useIsNightTime(start: string, end: string): boolean {
   return isNight;
 }
 
-// Dual-layer cross-fade (Tabliss-style double buffer): two absolutely-stacked
+// Dual-layer cross-fade (a double buffer): two absolutely-stacked
 // layers hold the current and incoming background CSS; swapping which one is
 // "active" (opacity 1) drives the fade via the shared .sg-bg-layer transition.
 // Image-backed values are preloaded through a detached Image() before the

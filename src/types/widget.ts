@@ -1,4 +1,4 @@
-/** Shared rich-text styling block — TablissNG-parity "Font Settings" panel,
+/** Shared rich-text styling block — a "Font Settings" panel,
  *  reusable across any widget by giving that widget's data type an optional
  *  `fontSettings?: FontSettings` field. Resolved into CSS via
  *  lib/fontStyle.ts's resolveFontStyle(). */
@@ -15,7 +15,7 @@ export interface FontSettings {
   textOutlineSize?:    number;  // advanced only
 }
 
-/** Shared TablissNG-parity "Display Settings" — Font Size / Scale / Rotation
+/** Shared "Display Settings" — Font Size / Scale / Rotation
  *  (Position and Custom CSS Class are deliberately not part of this app's
  *  version). Reusable the same way as FontSettings: any widget data type
  *  adds `displaySettings?: DisplaySettings`. Resolved via

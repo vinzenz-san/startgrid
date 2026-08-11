@@ -16,7 +16,7 @@ interface Props {
 const WEIGHT_OPTIONS = ['', '100', '300', '400', '500', '700', '900'] as const;
 
 /**
- * Generic, per-widget "Font Settings" block — TablissNG parity (Font family,
+ * Generic, per-widget "Font Settings" block (Font family,
  * Weight, Italic, Underline, Colour + Use Accent Color, Text outline). Any
  * widget data type that adds `fontSettings?: FontSettings` can render this
  * inside its own <DetailedSettings title={t('widget.fontSettings.title')}>.

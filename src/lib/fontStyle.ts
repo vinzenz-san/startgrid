@@ -24,8 +24,8 @@ export function resolveFontStyle(fs: FontSettings | undefined): CSSProperties {
       const size = fs.textOutlineSize ?? 1;
       style.WebkitTextStroke = `${size}px ${outlineColor}`;
     } else {
-      // Basic mode: a fixed-size 4-direction text-shadow — matches TablissNG's
-      // "can only have one size" basic-outline description, size input ignored.
+      // Basic mode: a fixed-size 4-direction text-shadow — a "can only have
+      // one size" basic outline, size input ignored.
       style.textShadow = [
         `-1px -1px 0 ${outlineColor}`,
         `1px -1px 0 ${outlineColor}`,

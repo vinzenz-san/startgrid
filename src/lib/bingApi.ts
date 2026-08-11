@@ -1,6 +1,6 @@
 // Pure network helper — fetches Bing's daily wallpaper via the community
-// mirror at bing.npanuhin.me (same source TablissNG uses) rather than Bing's
-// own HPImageArchive.aspx endpoint. Bing's own endpoint doesn't send an
+// mirror at bing.npanuhin.me rather than Bing's own HPImageArchive.aspx
+// endpoint. Bing's own endpoint doesn't send an
 // Access-Control-Allow-Origin header, so a direct fetch() from an extension
 // page is blocked by ordinary CORS regardless of host_permissions; the
 // mirror sends `access-control-allow-origin: *`, so no background-script

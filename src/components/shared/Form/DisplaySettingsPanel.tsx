@@ -14,7 +14,7 @@ interface Props {
 }
 
 /**
- * Generic "Display Settings" block — TablissNG parity for Font Size / Scale /
+ * Generic "Display Settings" block — Font Size / Scale /
  * Rotation, plus a StartGrid-specific Padding control (lets a widget's own
  * text sit closer to its box edge than the fixed 12px default). Reusable
  * the same way as FontSettingsPanel: any widget adds

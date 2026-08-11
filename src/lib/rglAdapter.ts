@@ -6,9 +6,7 @@ import type { Widget } from '../types/widget';
  *  overlap, preventCollision off — dragging into another widget pushes it
  *  out of the way, and the vertical compactor pulls displaced widgets back
  *  up into their own gaps as the dragged item moves past them, producing
- *  the "rubber-band" elastic-snap feel (Renewed Tab's WidgetGrid.tsx uses
- *  the same compactType: "vertical" + preventCollision: false pairing for
- *  its non-fullPage mode). A final commit still runs through vertical
+ *  the "rubber-band" elastic-snap feel. A final commit still runs through vertical
  *  compaction too — a widget dropped in an open gap gets pulled up to fill
  *  it rather than staying at the exact dropped row, which is the deliberate
  *  trade this compaction mode makes for the elastic-drag feel; the
@@ -19,8 +17,7 @@ export const dragCompactor = getCompactor('vertical', false, false);
 /** Full Page Grid mode's drag compactor: widgets stay exactly where dropped
  *  and never get pushed out of the way by another widget being dragged over
  *  them — the tradeoff the "Full Page Grid" warning text calls out (see
- *  SettingsPanel.tsx). RenewedTab's WidgetGrid.tsx makes the same
- *  compactType: null trade for its fullPage mode. */
+ *  SettingsPanel.tsx). */
 export const fullPageDragCompactor = noCompactor;
 
 /** StartGrid's stored `{ col, row }` is 1-based; RGL's `{ x, y }` is 0-based.
