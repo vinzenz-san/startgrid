@@ -62,8 +62,12 @@ const _registry = {
   clock: {
     label:         'Clock',
     icon:          '🕐',
-    defaultSize:   { w: 2, h: 2 },
-    defaultData:   { format: '24h', showSeconds: true, showDate: true } satisfies ClockData,
+    defaultSize:   { w: 4, h: 2 },
+    defaultData:   {
+      format: '24h', showSeconds: false, showDate: false, allowOverflow: true,
+      fontSettings: { fontWeight: 500 },
+      displaySettings: { scale: 1.5, fontSize: 60 },
+    } satisfies ClockData,
     titleBehavior: 'none',
     renderComponent: (data, onUpdateData) => <Clock data={data} onUpdateData={onUpdateData} />,
     renderSettings:  (data, onUpdateData) => <ClockSettings data={data} onUpdateData={onUpdateData} />,
@@ -97,8 +101,8 @@ const _registry = {
   bookmarkSearch: {
     label:         'Bookmark Search',
     icon:          '🔍',
-    defaultSize:   { w: 2, h: 1 },
-    defaultData:   { maxResults: 10 } satisfies BookmarkSearchData,
+    defaultSize:   { w: 4, h: 1 },
+    defaultData:   { maxResults: 10, googleFallback: true } satisfies BookmarkSearchData,
     titleBehavior: 'none',
     renderComponent: (data, onUpdateData) => <BookmarkSearch data={data} onUpdateData={onUpdateData} />,
     renderSettings:  (data, onUpdateData) => <BookmarkSearchSettings data={data} onUpdateData={onUpdateData} />,

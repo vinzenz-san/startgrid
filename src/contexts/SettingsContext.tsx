@@ -37,6 +37,11 @@ export interface AppSettings {
   /** APP_VERSION at the time the tour was last finished/skipped. Only
    *  consulted on the non-extension (docs/preview) build. */
   widgetTourSeenVersion:   string;
+  /** Default true. Shows the floating Edit History panel during edit mode
+   *  (last 5 undoable layout/grid changes, with a Ctrl+Z hint). The panel's
+   *  own close button just flips this same setting off — it's one switch
+   *  reachable from two places, not two separate dismiss mechanisms. */
+  editHistoryPanelEnabled: boolean;
 }
 
 export const SETTINGS_DEFAULTS = {
@@ -52,6 +57,7 @@ export const SETTINGS_DEFAULTS = {
   disableBackgroundBlur:   false,
   widgetTourSeen:          false,
   widgetTourSeenVersion:   '',
+  editHistoryPanelEnabled: true,
 } as const satisfies AppSettings;
 
 
@@ -84,6 +90,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     disableBackgroundBlur:   (settings ?? SETTINGS_DEFAULTS).disableBackgroundBlur   ?? SETTINGS_DEFAULTS.disableBackgroundBlur,
     widgetTourSeen:          (settings ?? SETTINGS_DEFAULTS).widgetTourSeen          ?? SETTINGS_DEFAULTS.widgetTourSeen,
     widgetTourSeenVersion:   (settings ?? SETTINGS_DEFAULTS).widgetTourSeenVersion   ?? SETTINGS_DEFAULTS.widgetTourSeenVersion,
+    editHistoryPanelEnabled: (settings ?? SETTINGS_DEFAULTS).editHistoryPanelEnabled ?? SETTINGS_DEFAULTS.editHistoryPanelEnabled,
   };
 
   // Inject --accent / --accent-hover CSS variables globally

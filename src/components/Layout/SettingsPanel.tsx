@@ -18,6 +18,7 @@ import { useEditMode } from '../../contexts/EditModeContext';
 import { useWidgets } from '../../contexts/WidgetContext';
 import { useGridConfig } from '../../contexts/GridConfigContext';
 import { useApplyGridConfig } from '../../hooks/useApplyGridConfig';
+import { useEditHistory } from '../../contexts/EditHistoryContext';
 import { compactWidgets } from '../../lib/gridUtils';
 import { DEFAULT_BG } from '../../types/background';
 import AddWidgetMenu from '../shared/AddWidgetMenu';
@@ -50,7 +51,7 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
   const {
     colorScheme, accentColor, language, developerOptionsEnabled,
     enableCustomContextMenu, settingsPinned, elementInspectorEnabled, updateSettings, t,
-    disableGridGlow, disableWidgetGlow, disableBackgroundBlur,
+    disableGridGlow, disableWidgetGlow, disableBackgroundBlur, editHistoryPanelEnabled,
   } = useSettings();
   const panelRef = useRef<HTMLDivElement>(null);
   const { config, setConfig } = useBackground();
@@ -58,6 +59,7 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
   const { widgets, updateWidget, replaceAllWidgets } = useWidgets();
   const { gridConfig } = useGridConfig();
   const { applyGridConfig } = useApplyGridConfig();
+  const { pushHistory } = useEditHistory();
   const [devConfirmOpen,   setDevConfirmOpen]   = useState(false);
   // Developer Options stays hidden from the settings list until unlocked by
   // tapping the app title 7 times within 2s of each other (same pattern as
@@ -78,6 +80,37 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [pickerOpen,       setPickerOpen]       = useState(false);
   const accentSwatchRef = useRef<HTMLButtonElement>(null);
+
+  // .sg-glow-all-widgets/.sg-blur-all-widgets (toggled below via raw
+  // onMouseEnter/onMouseLeave on the Widgets/Background section wrappers)
+  // can get stuck on: leaving edit mode via the Ctrl+E shortcut can close or
+  // reflow this sidebar out from under the cursor without the browser ever
+  // firing a mouseleave on it (the element moved, the pointer didn't), so
+  // the hover-driven class removal never runs. Since neither effect makes
+  // sense once editing stops, force both off whenever isEditMode goes false
+  // as a backstop independent of whatever DOM element the hover started on.
+  useEffect(() => {
+    if (!isEditMode) {
+      document.documentElement.classList.remove('sg-glow-all-widgets');
+      document.documentElement.classList.remove('sg-blur-all-widgets');
+    }
+  }, [isEditMode]);
+
+  // Same stuck-hover-class problem, different trigger: applying a layout
+  // preset, resetting/compacting the grid, etc. all call replaceAllWidgets,
+  // which changes this section's content height and can reflow the wrapper
+  // out from under a stationary cursor (still mid-hover) with no mouseleave
+  // firing to clean up after itself. Clearing on every `widgets` identity
+  // change is a cheap, always-safe backstop — a real mouseenter simply
+  // re-adds the class on the next actual hover.
+  const widgetsRef = useRef(widgets);
+  useEffect(() => {
+    if (widgetsRef.current !== widgets) {
+      widgetsRef.current = widgets;
+      document.documentElement.classList.remove('sg-glow-all-widgets');
+      document.documentElement.classList.remove('sg-blur-all-widgets');
+    }
+  }, [widgets]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importError, setImportError] = useState<string | null>(null);
@@ -103,9 +136,9 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
     e.target.value = '';
   }
 
-  // Live "how many columns fit" hint for the Columns slider — recalculated on
-  // resize (same intent as RenewedTab's WidgetGrid.tsx column-fit hint, using
-  // this project's own cellWidth/gap instead of a fixed cell size).
+  // Live "how many columns fit" hint for the Columns slider — recalculated
+  // on resize, using this project's own cellWidth/gap instead of a fixed
+  // cell size.
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   useEffect(() => {
     const onResize = () => setWindowWidth(window.innerWidth);
@@ -118,14 +151,17 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
   // applyGridConfig already handles the rescale/repack orchestration, so this
   // is just a patch-and-commit helper over the current live config.
   const handleGridChange = (patch: Partial<GridConfig>) => {
+    pushHistory('editHistory.changedGridSettings');
     applyGridConfig({ ...gridConfig, ...patch });
   };
 
   const handleResetGrid = () => {
+    pushHistory('editHistory.resetGrid');
     applyGridConfig(DEFAULT_GRID_CONFIG);
   };
 
   const handleCompactGrid = () => {
+    pushHistory('editHistory.compactedGrid');
     replaceAllWidgets(compactWidgets(widgets, gridConfig.columns));
   };
 
@@ -236,16 +272,6 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
             onMouseLeave={() => document.documentElement.classList.remove('sg-glow-all-widgets')}
           >
           <PanelSection title={t('widgets.sectionTitle')} collapsible persistenceKey="widgets">
-            {/* Lock / Unlock */}
-            <SettingsRow label={isEditMode ? t('widgets.layoutUnlocked') : t('widgets.layoutLocked')}>
-              <ActionButton variant="ghost" active={isEditMode} fullWidth={false} onClick={toggleEditMode}>
-                {isEditMode ? t('widgets.lock') : t('widgets.unlock')}
-              </ActionButton>
-            </SettingsRow>
-
-            {/* Layout presets */}
-            <LayoutPresets />
-
             {/* Add Widget */}
             <AddWidgetMenu />
 
@@ -295,6 +321,18 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
                 onChange={v => setGlobalDim(v)}
               />
             </DetailedSettings>
+
+            <DetailedSettings title={t('widgets.layoutSectionTitle')}>
+              {/* Lock / Unlock */}
+              <SettingsRow label={isEditMode ? t('widgets.layoutUnlocked') : t('widgets.layoutLocked')}>
+                <ActionButton variant="ghost" active={isEditMode} fullWidth={false} onClick={toggleEditMode}>
+                  {isEditMode ? t('widgets.lock') : t('widgets.unlock')}
+                </ActionButton>
+              </SettingsRow>
+
+              {/* Layout presets */}
+              <LayoutPresets />
+            </DetailedSettings>
           </PanelSection>
           </div>
 
@@ -338,6 +376,13 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
               step={1}
               valueFormatter={v => `${v}px`}
             />
+            <SettingsRow label={t('grid.verticalCenter')}>
+              <SettingsSwitch
+                checked={gridConfig.verticalCenter}
+                onChange={v => handleGridChange({ verticalCenter: v })}
+                label={t('grid.verticalCenter')}
+              />
+            </SettingsRow>
             <SettingsRow label={t('grid.fullPageGrid')}>
               <SettingsSwitch
                 checked={gridConfig.fullPageGrid}
@@ -403,6 +448,12 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
               <SettingsSwitch
                 checked={disableBackgroundBlur}
                 onChange={v => updateSettings({ disableBackgroundBlur: v })}
+              />
+            </SettingsRow>
+            <SettingsRow label={t('settings.editHistoryPanelEnabled')}>
+              <SettingsSwitch
+                checked={editHistoryPanelEnabled}
+                onChange={v => updateSettings({ editHistoryPanelEnabled: v })}
               />
             </SettingsRow>
 

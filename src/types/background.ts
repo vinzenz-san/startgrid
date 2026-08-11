@@ -60,7 +60,7 @@ export interface BingConfig extends BackgroundShared {
   showTitle?: boolean; // default false — overlay Bing's daily wallpaper title
 }
 
-// ─── Placeholder Tabliss-parity providers (not yet implemented) ───────────
+// ─── Placeholder providers (not yet implemented) ───────────────────────────
 export interface AstronomyConfig extends BackgroundShared {
   mode: 'astronomy';
   value: string; // unused placeholder; kept for storage shape uniformity
@@ -72,8 +72,8 @@ export interface ColorGradientConfig extends BackgroundShared {
   value: string;             // unused; kept for storage shape uniformity with other modes
   gradientType?: 'linear' | 'radial'; // default 'linear'
   angle?: number;             // 0-360, default 135 — linear only
-  from?: string;               // hex, default '#3498db'
-  to?: string;                 // hex, default '#9b59b6'
+  from?: string;               // hex, default '#ffffff'
+  to?: string;                 // hex, default '#000000'
 }
 
 export interface OnlineImageConfig extends BackgroundShared {
@@ -101,9 +101,15 @@ export type BackgroundConfig =
 export type BackgroundMode = BackgroundConfig['mode'];
 
 // ─── Defaults ──────────────────────────────────────────────────────────────
-export const DEFAULT_BG: BingConfig = {
-  mode: 'bing',
+// First-run and post-factory-reset default (BackgroundContext falls back to
+// this when storage is empty), and what "Reset Appearance" restores.
+export const DEFAULT_BG: ColorGradientConfig = {
+  mode: 'colourGradient',
   value: '',
+  gradientType: 'linear',
+  angle: 135,
+  from: '#ffffff',
+  to: '#000000',
 };
 
 // ─── Editor grouping ───────────────────────────────────────────────────────

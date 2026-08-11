@@ -606,7 +606,7 @@ export default function BackgroundEditor() {
             <button
               ref={gradFromBtnRef}
               className="bg-color-swatch"
-              style={{ background: grad.from ?? '#3498db' }}
+              style={{ background: grad.from ?? '#ffffff' }}
               onClick={() => setGradPickerOpen('from')}
             />
           </SettingsRow>
@@ -615,7 +615,7 @@ export default function BackgroundEditor() {
             <button
               ref={gradToBtnRef}
               className="bg-color-swatch"
-              style={{ background: grad.to ?? '#9b59b6' }}
+              style={{ background: grad.to ?? '#000000' }}
               onClick={() => setGradPickerOpen('to')}
             />
           </SettingsRow>
@@ -902,14 +902,14 @@ export default function BackgroundEditor() {
       {grad && (
         <>
           <CustomColorPicker
-            value={grad.from ?? '#3498db'}
+            value={grad.from ?? '#ffffff'}
             onChange={hex => setConfig({ ...grad, from: hex })}
             anchorRef={gradFromBtnRef}
             open={gradPickerOpen === 'from'}
             onClose={() => setGradPickerOpen(null)}
           />
           <CustomColorPicker
-            value={grad.to ?? '#9b59b6'}
+            value={grad.to ?? '#000000'}
             onChange={hex => setConfig({ ...grad, to: hex })}
             anchorRef={gradToBtnRef}
             open={gradPickerOpen === 'to'}

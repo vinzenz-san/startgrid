@@ -5,6 +5,7 @@ import { useEditMode } from '../../contexts/EditModeContext';
 import { useWidgets } from '../../contexts/WidgetContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useSettings } from '../../contexts/SettingsContext';
+import { useEditHistory } from '../../contexts/EditHistoryContext';
 import { darkenHex, mixHex, getAdaptiveColor } from '../../lib/colorUtils';
 import { COLOR_PRESETS } from '../../lib/presets';
 import type { Widget } from '../../types/widget';
@@ -21,6 +22,7 @@ interface Props { widget: Widget; }
 export default function WidgetContainer({ widget }: Props) {
   const { isEditMode } = useEditMode();
   const { removeWidget, updateWidget } = useWidgets();
+  const { pushHistory } = useEditHistory();
   const { globalColor, globalColorScheme, globalOpacity, globalDim, globalGradientIntensity, globalPresetId, widgetShadowOpacity, globalGlassIntensity } = useTheme();
   const { colorScheme, enableCustomContextMenu, disableWidgetGlow, t } = useSettings();
   const elRef = useRef<HTMLDivElement>(null);
@@ -407,7 +409,7 @@ export default function WidgetContainer({ widget }: Props) {
               <button className="sg-modal-confirm-btn sg-modal-confirm-btn--cancel" onClick={() => setRemoveConfirmOpen(false)}>
                 Cancel
               </button>
-              <button className="sg-modal-confirm-btn sg-modal-confirm-btn--confirm" onClick={() => { setRemoveConfirmOpen(false); removeWidget(widget.id); }}>
+              <button className="sg-modal-confirm-btn sg-modal-confirm-btn--confirm" onClick={() => { setRemoveConfirmOpen(false); pushHistory('editHistory.removedWidget'); removeWidget(widget.id); }}>
                 Remove
               </button>
             </div>

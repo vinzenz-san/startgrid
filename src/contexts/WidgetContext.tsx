@@ -1,42 +1,15 @@
 import { createContext, useContext, type ReactNode } from 'react';
 import { useStorage } from '../hooks/useStorage';
 import type { Widget } from '../types/widget';
+import { applyPreset } from '../lib/gridPresets';
+import { DEFAULT_GRID_CONFIG } from '../types/grid';
 
-const DEFAULT_WIDGETS: Widget[] = [
-  {
-    id: 'default-quicklinks',
-    type: 'quicklinks',
-    col: 1, row: 1, w: 2, h: 2,
-    data: {
-      links: [
-        { id: 'ql-github', url: 'https://github.com', title: 'GitHub', showTitle: true, iconSource: 'auto' },
-      ],
-      layout: 'grid',
-      iconSize: 30,
-      showTitles: true,
-    },
-  },
-  {
-    id: 'default-clock',
-    type: 'clock',
-    col: 3, row: 1, w: 4, h: 1,
-    data: {
-      format: '24h',
-      showSeconds: false,
-      showDate: true,
-      fontSettings: { fontWeight: 700 },
-    },
-  },
-  {
-    id: 'default-notes',
-    type: 'notes',
-    col: 7, row: 1, w: 2, h: 2,
-    data: {
-      content: '',
-      storageMode: 'synced',
-    },
-  },
-];
+// First-run layout, and what a factory reset (BackupRestore.tsx's
+// performFactoryReset — clears storage, so useStorage falls back to this
+// same default) lands on. Built from the Focus preset itself (LayoutPresets.tsx)
+// rather than a hand-duplicated widget list, so it can't drift out of sync
+// with what "Focus" actually produces.
+const DEFAULT_WIDGETS: Widget[] = applyPreset('focus', DEFAULT_GRID_CONFIG.columns);
 
 interface WidgetContextType {
   widgets: Widget[];

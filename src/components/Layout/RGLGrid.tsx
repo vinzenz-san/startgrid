@@ -5,6 +5,7 @@ import 'react-grid-layout/css/styles.css';
 import { useEditMode } from '../../contexts/EditModeContext';
 import { useWidgets } from '../../contexts/WidgetContext';
 import { useGridConfig } from '../../contexts/GridConfigContext';
+import { useEditHistory } from '../../contexts/EditHistoryContext';
 import { widgetsToLayout, diffLayoutChanges, dragCompactor, fullPageDragCompactor } from '../../lib/rglAdapter';
 import WidgetContainer from '../shared/WidgetContainer';
 
@@ -17,6 +18,7 @@ export default function RGLGrid({ contentRows, disableGridGlow }: Props) {
   const { isEditMode } = useEditMode();
   const { widgets, updateWidget, loaded } = useWidgets();
   const { gridConfig } = useGridConfig();
+  const { pushHistory } = useEditHistory();
   const { columns, cellWidth, cellHeight, gap, fullPageGrid } = gridConfig;
 
   // RGL's own item-to-item spacing (gridConfig.margin below) replaces the old
@@ -86,7 +88,12 @@ export default function RGLGrid({ contentRows, disableGridGlow }: Props) {
   const dragSnapshotRef = useRef<Layout | null>(null);
 
   const handleDragStart = (startLayout: Layout) => {
+    pushHistory('editHistory.movedWidget');
     dragSnapshotRef.current = startLayout.map(item => ({ ...item }));
+  };
+
+  const handleResizeStart = () => {
+    pushHistory('editHistory.resizedWidget');
   };
 
   const handleDragStop = (finalLayout: Layout, oldItem: LayoutItem | null, newItem: LayoutItem | null) => {
@@ -142,6 +149,7 @@ export default function RGLGrid({ contentRows, disableGridGlow }: Props) {
             onLayoutChange={handleLayoutChange}
             onDragStart={handleDragStart}
             onDragStop={handleDragStop}
+            onResizeStart={handleResizeStart}
           >
             {widgets.map(widget => (
               <div key={widget.id} className="sg-widget-item">

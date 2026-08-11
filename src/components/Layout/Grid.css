@@ -145,6 +145,14 @@ html.sg-glow-all-widgets .sg-widget {
 .sg-grid-wrapper--pinned-right { margin-right: 340px; }
 .sg-grid-wrapper--pinned-left  { margin-left: 340px; }
 
+/* GridConfig.verticalCenter (default on) — centers the grid box vertically
+   within the wrapper when its content is shorter than the viewport, instead
+   of sitting flush at the top (the wrapper's default align-items: stretch
+   has no visible effect here since .sg-grid always sets an explicit height,
+   so without this it just renders at the cross-axis start = top). Renewed
+   Tab centers sparse layouts (e.g. its Focus preset) the same way. */
+.sg-grid-wrapper--center-vertical { align-items: center; }
+
 /* Plain width:100% measuring host for RGLGrid.tsx's useContainerWidth — kept
    separate from .sg-grid itself so Full Page Grid mode has a stable,
    non-self-referential element to measure (see RGLGrid.tsx comment). Always

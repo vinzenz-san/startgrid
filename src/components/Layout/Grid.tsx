@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useEditMode } from '../../contexts/EditModeContext';
 import { useWidgets } from '../../contexts/WidgetContext';
 import { useSettings } from '../../contexts/SettingsContext';
+import { useGridConfig } from '../../contexts/GridConfigContext';
 import RGLGrid from './RGLGrid';
 import AddWidgetMenu from '../shared/AddWidgetMenu';
 import ThemeToggle from '../shared/ThemeToggle';
@@ -11,6 +12,7 @@ import WidgetTour from '../shared/WidgetTour';
 import CommandPalette from '../shared/CommandPalette';
 import DevPanel, { type DevPanelPos } from '../DevPanel/DevPanel';
 import InspectorHistoryPanel from '../DevPanel/InspectorHistoryPanel';
+import EditHistoryPanel from '../shared/EditHistoryPanel';
 import { ElementInspectorProvider } from '../../contexts/ElementInspectorContext';
 import { isExtension } from '../../lib/storage';
 import { APP_VERSION } from '../../lib/appVersion';
@@ -19,9 +21,11 @@ import './Grid.css';
 export default function Grid() {
   const { isEditMode, toggleEditMode } = useEditMode();
   const { widgets, loaded } = useWidgets();
+  const { gridConfig } = useGridConfig();
   const {
     developerOptionsEnabled, settingsPinned, elementInspectorEnabled,
     disableGridGlow, widgetTourSeen, widgetTourSeenVersion, t,
+    editHistoryPanelEnabled,
     loaded: settingsLoaded,
   } = useSettings();
   const [settingsPanelOpen, setSettingsPanelOpen] = useState(false);
@@ -151,7 +155,7 @@ export default function Grid() {
       <CommandPalette />
 
       <main
-        className={`sg-grid-wrapper${settingsPinned ? ' sg-grid-wrapper--pinned-right' : ''}`}
+        className={`sg-grid-wrapper${settingsPinned ? ' sg-grid-wrapper--pinned-right' : ''}${gridConfig.verticalCenter ? ' sg-grid-wrapper--center-vertical' : ''}`}
         onClick={() => { if (!settingsPinned) setSettingsPanelOpen(false); }}
       >
         <RGLGrid contentRows={contentRows} disableGridGlow={disableGridGlow} />
@@ -160,6 +164,9 @@ export default function Grid() {
       {developerOptionsEnabled && <DevPanel position={devPanelPos} onPositionChange={setDevPanelPos} />}
       {developerOptionsEnabled && elementInspectorEnabled && devPanelPos && (
         <InspectorHistoryPanel devPanelPos={devPanelPos} />
+      )}
+      {isEditMode && editHistoryPanelEnabled && (
+        <EditHistoryPanel devPanelPos={developerOptionsEnabled ? devPanelPos : null} />
       )}
     </div>
     </ElementInspectorProvider>
