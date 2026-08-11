@@ -1,4 +1,4 @@
-import { getCompactor, type Layout } from 'react-grid-layout';
+import { getCompactor, noCompactor, type Layout } from 'react-grid-layout';
 import type { Widget } from '../types/widget';
 
 /** Vertical auto-compaction during live drag, with displacement allowed:
@@ -15,6 +15,13 @@ import type { Widget } from '../types/widget';
  *  drag-start snapshot + revert-on-return-to-origin logic in RGLGrid.tsx is
  *  what stops a cancelled drag from leaving neighbors permanently shifted. */
 export const dragCompactor = getCompactor('vertical', false, false);
+
+/** Full Page Grid mode's drag compactor: widgets stay exactly where dropped
+ *  and never get pushed out of the way by another widget being dragged over
+ *  them — the tradeoff the "Full Page Grid" warning text calls out (see
+ *  SettingsPanel.tsx). RenewedTab's WidgetGrid.tsx makes the same
+ *  compactType: null trade for its fullPage mode. */
+export const fullPageDragCompactor = noCompactor;
 
 /** StartGrid's stored `{ col, row }` is 1-based; RGL's `{ x, y }` is 0-based.
  *  This is the only place that conversion happens — everything else (storage,

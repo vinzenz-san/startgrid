@@ -145,6 +145,15 @@ html.sg-glow-all-widgets .sg-widget {
 .sg-grid-wrapper--pinned-right { margin-right: 340px; }
 .sg-grid-wrapper--pinned-left  { margin-left: 340px; }
 
+/* Plain width:100% measuring host for RGLGrid.tsx's useContainerWidth — kept
+   separate from .sg-grid itself so Full Page Grid mode has a stable,
+   non-self-referential element to measure (see RGLGrid.tsx comment). Always
+   fills whatever width .sg-grid-wrapper's flex box gives it, regardless of
+   .sg-grid's own (possibly auto/collapsed) width. */
+.sg-grid-measure {
+  width: 100%;
+}
+
 .sg-grid {
   position: relative; /* anchors .sg-grid-glow-overlay and RGL's absolutely-positioned items below */
   /* Column count + cell size are user-configurable (GridConfigContext) —
@@ -179,6 +188,18 @@ html.sg-glow-all-widgets .sg-widget {
      children of this element (Grid.tsx), so they track wherever it ends up
      centered to automatically — no separate alignment needed for them. */
   margin: 0 auto;
+}
+
+/* Full Page Grid mode (GridConfig.fullPageGrid): stretch the grid box to the
+   wrapper's full width instead of sizing to columns*cellWidth, and drop the
+   wrapper's centering margin/padding so the grid reaches every edge. RGLGrid
+   measures this element's real width via useContainerWidth once static width
+   is removed here — the calc() below only handles height, which stays
+   content-driven the same way as the non-full-page grid. */
+.sg-grid.sg-grid--full-page {
+  width: auto;
+  margin: 0;
+  padding: 0;
 }
 
 /* First paint has no "previous" position to animate from (storage load isn't

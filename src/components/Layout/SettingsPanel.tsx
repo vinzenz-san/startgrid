@@ -77,24 +77,7 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
   }
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [pickerOpen,       setPickerOpen]       = useState(false);
-  // Draft grid geometry — sliders edit this local copy so dragging doesn't
-  // trigger a rescale/repack on every tick; the user commits explicitly via
-  // the confirm dialog below.
-  const [draftGrid,        setDraftGrid]        = useState<GridConfig>(gridConfig);
-  const [gridConfirmOpen,  setGridConfirmOpen]  = useState(false);
   const accentSwatchRef = useRef<HTMLButtonElement>(null);
-
-  // gridConfig starts at DEFAULT_GRID_CONFIG (useStorage's synchronous
-  // initial value) and only reflects the real saved config once storage.get()
-  // resolves asynchronously — draftGrid's useState above captures whatever
-  // gridConfig was AT MOUNT TIME, which is that default, not the eventual
-  // real value. Re-sync whenever gridConfig changes (hydration completing,
-  // a cross-device sync update, or this panel's own apply/reset) so the
-  // sliders always reflect the true current config rather than getting
-  // stuck at defaults until manually touched.
-  useEffect(() => {
-    setDraftGrid(gridConfig);
-  }, [gridConfig]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importError, setImportError] = useState<string | null>(null);
@@ -120,19 +103,26 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
     e.target.value = '';
   }
 
-  const gridDraftDirty = draftGrid.columns !== gridConfig.columns
-    || draftGrid.cellWidth !== gridConfig.cellWidth
-    || draftGrid.cellHeight !== gridConfig.cellHeight
-    || draftGrid.gap !== gridConfig.gap;
+  // Live "how many columns fit" hint for the Columns slider — recalculated on
+  // resize (same intent as RenewedTab's WidgetGrid.tsx column-fit hint, using
+  // this project's own cellWidth/gap instead of a fixed cell size).
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const onResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  const maxFitColumns = Math.max(1, Math.floor((windowWidth + gridConfig.gap) / (gridConfig.cellWidth + gridConfig.gap)));
 
-  const confirmApplyGrid = () => {
-    applyGridConfig(draftGrid);
-    setGridConfirmOpen(false);
+  // Every grid control applies immediately (no separate Apply/confirm step) —
+  // applyGridConfig already handles the rescale/repack orchestration, so this
+  // is just a patch-and-commit helper over the current live config.
+  const handleGridChange = (patch: Partial<GridConfig>) => {
+    applyGridConfig({ ...gridConfig, ...patch });
   };
 
   const handleResetGrid = () => {
     applyGridConfig(DEFAULT_GRID_CONFIG);
-    setDraftGrid(DEFAULT_GRID_CONFIG);
   };
 
   const handleCompactGrid = () => {
@@ -316,13 +306,14 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
           <PanelSection title={t('grid.sectionTitle')} collapsible persistenceKey="grid">
             <SettingsSlider
               label={t('grid.columns')}
-              value={draftGrid.columns}
-              onChange={v => setDraftGrid(g => ({ ...g, columns: v }))}
+              value={gridConfig.columns}
+              onChange={v => handleGridChange({ columns: v })}
               min={4}
               max={64}
               step={1}
               valueFormatter={v => String(v)}
             />
+            <p className="bg-sync-warning">{t('grid.columnsFitHint', { count: maxFitColumns, width: windowWidth })}</p>
             {/* Single square-cell control — writes the same value to both
                 cellWidth and cellHeight so the grid stays 1:1. The schema
                 still carries them as independent fields (see grid.ts) for
@@ -331,8 +322,8 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
                 moment it's touched, brings cellHeight into sync with it. */}
             <SettingsSlider
               label={t('grid.cellSize')}
-              value={draftGrid.cellWidth}
-              onChange={v => setDraftGrid(g => ({ ...g, cellWidth: v, cellHeight: v }))}
+              value={gridConfig.cellWidth}
+              onChange={v => handleGridChange({ cellWidth: v, cellHeight: v })}
               min={10}
               max={200}
               step={5}
@@ -340,18 +331,23 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
             />
             <SettingsSlider
               label={t('grid.gap')}
-              value={draftGrid.gap}
-              onChange={v => setDraftGrid(g => ({ ...g, gap: v }))}
+              value={gridConfig.gap}
+              onChange={v => handleGridChange({ gap: v })}
               min={0}
               max={40}
               step={1}
               valueFormatter={v => `${v}px`}
             />
+            <SettingsRow label={t('grid.fullPageGrid')}>
+              <SettingsSwitch
+                checked={gridConfig.fullPageGrid}
+                onChange={v => handleGridChange({ fullPageGrid: v })}
+                label={t('grid.fullPageGrid')}
+              />
+            </SettingsRow>
+            <p className="sg-grid-experimental-warning">{t('grid.fullPageGridWarning')}</p>
             <p className="bg-sync-warning">{t('grid.note')}</p>
             <p className="sg-grid-experimental-warning">{t('grid.experimentalWarning')}</p>
-            <ActionButton variant="ghost" disabled={!gridDraftDirty} onClick={() => setGridConfirmOpen(true)}>
-              {t('grid.apply')}
-            </ActionButton>
             <ActionButton variant="danger" onClick={handleResetGrid}>
               {t('grid.reset')}
             </ActionButton>
@@ -507,14 +503,6 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
         confirmLabel={t('dev.confirm.confirm')}
       />
 
-      <ConfirmDialog
-        open={gridConfirmOpen}
-        onClose={() => setGridConfirmOpen(false)}
-        onConfirm={confirmApplyGrid}
-        title={t('grid.confirm.title')}
-        body={t('grid.confirm.body')}
-        confirmLabel={t('grid.confirm.confirm')}
-      />
     </div>
   );
 }
