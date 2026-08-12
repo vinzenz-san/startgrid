@@ -16,7 +16,7 @@
   color: var(--text);
   font-family: system-ui, -apple-system, sans-serif;
   line-height: 1.55;
-  padding: 10px 12px;
+  padding: var(--sg-widget-inset);
   overflow-y: auto;
 }
 

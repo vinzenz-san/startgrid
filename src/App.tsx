@@ -1,6 +1,7 @@
 import { EditModeProvider } from './contexts/EditModeContext';
 import { WidgetProvider } from './contexts/WidgetContext';
 import { GridConfigProvider } from './contexts/GridConfigContext';
+import { EditHistoryProvider } from './contexts/EditHistoryContext';
 import { BackgroundProvider } from './contexts/BackgroundContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { SettingsProvider } from './contexts/SettingsContext';
@@ -18,9 +19,11 @@ export default function App() {
             <EditModeProvider>
               <WidgetProvider>
                 <GridConfigProvider>
-                  <Background />
-                  <WeatherEffect />
-                  <Grid />
+                  <EditHistoryProvider>
+                    <Background />
+                    <WeatherEffect />
+                    <Grid />
+                  </EditHistoryProvider>
                 </GridConfigProvider>
               </WidgetProvider>
             </EditModeProvider>

@@ -136,8 +136,9 @@ const MOCK_EVENTS: OutlookEvent[] = [
     colorId: 'Purple category', location: 'Teams', htmlLink: BASE_LINK },
 ];
 
+// No artificial delay — MOCK_EVENTS is a static array, already known
+// synchronously at import time.
 async function fetchMockEvents(): Promise<OutlookEvent[]> {
-  await new Promise(r => setTimeout(r, 650));
   return MOCK_EVENTS;
 }
 

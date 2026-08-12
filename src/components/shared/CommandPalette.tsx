@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useWidgets } from '../../contexts/WidgetContext';
 import { useGridConfig } from '../../contexts/GridConfigContext';
 import { useSettings } from '../../contexts/SettingsContext';
+import { useEditHistory } from '../../contexts/EditHistoryContext';
 import { WIDGET_MENU_TYPES, WIDGET_REGISTRY, WIDGET_TYPE_LABEL_KEYS } from '../widgets/registry';
 import { buildNewWidget } from '../../lib/gridUtils';
 import type { WidgetType } from '../../types/widget';
@@ -16,6 +17,7 @@ import './CommandPalette.css';
 export default function CommandPalette() {
   const { widgets, addWidget } = useWidgets();
   const { gridConfig } = useGridConfig();
+  const { pushHistory } = useEditHistory();
   const { developerOptionsEnabled, t } = useSettings();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -47,6 +49,7 @@ export default function CommandPalette() {
   }, [types, query, t]);
 
   function addAndClose(type: WidgetType) {
+    pushHistory('editHistory.addedWidget');
     addWidget(buildNewWidget(widgets, gridConfig.columns, type));
     setOpen(false);
   }

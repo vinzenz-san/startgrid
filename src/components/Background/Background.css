@@ -1,6 +1,6 @@
 /* Dual-layer cross-fade: two stacked layers, opacity-toggled by Background.tsx
-   to fade the incoming background in over the outgoing one (Tabliss-style
-   double buffer) rather than snapping between background-image values, which
+   to fade the incoming background in over the outgoing one (a double buffer)
+   rather than snapping between background-image values, which
    CSS `transition: background` can't animate for url()-based sources. */
 /* Blur/brightness (luminosity) are applied per-layer via inline style in
    Background.tsx, so the shared transition covers them for free. */
@@ -45,7 +45,7 @@
 .sg-bg-attribution a:hover { text-decoration-color: rgba(255 255 255 / 0.8); }
 
 /* APOD title — more prominent than the small/muted Unsplash attribution
-   badge above, matching TablissNG's bolder, brighter presentation. Same
+   badge above: a bolder, brighter presentation. Same
    corner position/spacing (inherited from .sg-bg-attribution); only the
    typography changes. */
 .sg-apod-title-active {

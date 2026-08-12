@@ -8,9 +8,12 @@ import { resolveFontStyle } from '../../../lib/fontStyle';
 import { resolveDisplayStyle } from '../../../lib/displayStyle';
 import './Greeting.css';
 
-// Greeting's old "M" text-size tier was 22px — used as the Display Settings
-// Font Size slider's resting default so migrating widgets don't visually jump.
-const DEFAULT_FONT_SIZE = 22;
+// Default Font Size slider value — sized to roughly match a ~180%-of-base
+// relative scale (a fixed, non-measured default, same spirit as a plain CSS
+// font-size: 180% rule), not derived from the widget's box like Clock's
+// FitText. Still fully overridable via the slider; this is just where a
+// fresh Greeting starts. Was 22px ("M" tier) before this bump.
+const DEFAULT_FONT_SIZE = 28;
 
 type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night';
 
@@ -104,6 +107,7 @@ export function GreetingSettings({ data, onUpdateData }: SettingsProps) {
         <DisplaySettingsPanel
           value={data.displaySettings}
           defaultFontSize={DEFAULT_FONT_SIZE}
+          showPadding={false}
           onChange={patch => onUpdateData({ displaySettings: { ...data.displaySettings, ...patch } })}
         />
       </DetailedSettings>
@@ -148,7 +152,11 @@ export default function Greeting({ data }: Props) {
   }
 
   const fontStyle = resolveFontStyle(data.fontSettings);
-  const { wrapper, fontSize } = resolveDisplayStyle(data.displaySettings, DEFAULT_FONT_SIZE);
+  // padding is intentionally dropped from `wrapper` here — Greeting's outer
+  // inset is fixed to --sg-widget-inset (Greeting.css), not user-adjustable
+  // (DisplaySettingsPanel's Padding slider is hidden for this widget via
+  // showPadding={false} above); only the scale/rotate transform still applies.
+  const { wrapper: { padding: _padding, ...wrapper }, fontSize } = resolveDisplayStyle(data.displaySettings, DEFAULT_FONT_SIZE);
 
   return (
     <div className={`sg-greeting sg-greeting--align-${alignment}`} style={wrapper}>

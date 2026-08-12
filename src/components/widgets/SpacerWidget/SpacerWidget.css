@@ -1,0 +1,44 @@
+.sg-spacer {
+  width: 100%;
+  height: 100%;
+}
+
+/* Belt-and-braces alongside WidgetContainer.css's .sg-widget--spacer
+   overrides — this element itself never paints anything in view mode.
+   Scoped to :not(--edit) so these !importants can't also block the edit-mode
+   dashed outline below. */
+.sg-spacer:not(.sg-spacer--edit) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.sg-spacer--edit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+  text-align: center;
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  border-radius: var(--radius);
+  box-sizing: border-box;
+}
+
+[data-scheme="light"] .sg-spacer--edit {
+  border-color: rgba(0, 0, 0, 0.18);
+}
+
+.sg-spacer-icon {
+  font-size: 16px;
+  line-height: 1;
+  opacity: 0.5;
+}
+
+.sg-spacer-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  opacity: 0.6;
+  line-height: 1.4;
+}

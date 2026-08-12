@@ -7,8 +7,11 @@
   justify-content: center;
   gap: 6px;
   position: relative;
-  /* padding comes from the wrapper's inline style (resolveDisplayStyle) —
-     see the Padding slider in Display Settings */
+  /* Fixed — no Display Settings padding control anymore (see FitText.tsx's
+     doc comment: nothing here is user-configurable by design).
+     --sg-widget-inset (index.css). */
+  padding: var(--sg-widget-inset);
+  box-sizing: border-box;
   user-select: none;
   text-align: center;
 }
@@ -23,18 +26,25 @@
 .sg-clock--align-top    { justify-content: flex-start; }
 .sg-clock--align-bottom { justify-content: flex-end; }
 
+/* FitText's own wrapper (see FitText.tsx) is given this class — it fills
+   whatever vertical space is left after the date row (flex: 1 in this
+   column layout), and these inheritable properties cascade down into
+   FitText's inner span, which only ever sets its own font-size/line-height/
+   font-weight inline (font-weight passed as a prop from Clock.tsx, not set
+   here, so it stays the single source of truth the aspect-ratio probe
+   measurement also uses — see FitText's fontWeight prop doc comment). */
 .sg-clock-time {
-  font-size: 42px;
-  font-weight: 200;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
   letter-spacing: 0.04em;
   color: var(--text);
   font-variant-numeric: tabular-nums;
-  line-height: 1;
-  transition: font-size 0.15s, font-weight 0.15s, color 0.15s;
 }
 
+/* 20pt (~26.67px, rounded) — fixed, not auto-fit like the time text. */
 .sg-clock-date {
-  font-size: 15px;
+  font-size: 27px;
   color: var(--text);
   font-weight: 400;
   letter-spacing: 0.01em;

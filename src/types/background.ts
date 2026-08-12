@@ -46,7 +46,7 @@ export interface UnsplashConfig extends BackgroundShared {
   topics?: string[];         // Unsplash topic ids
   collectionId?: string;     // Unsplash collection id, used when source === 'collection'
   source?: 'official' | 'topics' | 'search' | 'collection';
-  rotationInterval?: number; // seconds between photo changes; 0 = fetch fresh every new tab, default 900
+  rotationInterval?: number; // seconds between photo changes; 0 = fetch fresh every new tab, default 86400 (1 day)
   showAttribution?: boolean; // default true
   // attribution data cached alongside the image url
   photographerName?: string;
@@ -60,7 +60,7 @@ export interface BingConfig extends BackgroundShared {
   showTitle?: boolean; // default false — overlay Bing's daily wallpaper title
 }
 
-// ─── Placeholder Tabliss-parity providers (not yet implemented) ───────────
+// ─── Placeholder providers (not yet implemented) ───────────────────────────
 export interface AstronomyConfig extends BackgroundShared {
   mode: 'astronomy';
   value: string; // unused placeholder; kept for storage shape uniformity
@@ -101,9 +101,18 @@ export type BackgroundConfig =
 export type BackgroundMode = BackgroundConfig['mode'];
 
 // ─── Defaults ──────────────────────────────────────────────────────────────
-export const DEFAULT_BG: BingConfig = {
-  mode: 'bing',
+// First-run and post-factory-reset default (BackgroundContext falls back to
+// this when storage is empty), and what "Reset Appearance" restores. The
+// grid's edit-mode dot-grid/glow overlay (Grid.css) carries its own
+// dark+light outline now, so this can be a real color pair instead of
+// white/black picked purely to dodge that overlay's contrast.
+export const DEFAULT_BG: ColorGradientConfig = {
+  mode: 'colourGradient',
   value: '',
+  gradientType: 'linear',
+  angle: 135,
+  from: '#3498db',
+  to: '#9b59b6',
 };
 
 // ─── Editor grouping ───────────────────────────────────────────────────────

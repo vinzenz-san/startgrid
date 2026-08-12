@@ -1,4 +1,4 @@
-/** Shared rich-text styling block — TablissNG-parity "Font Settings" panel,
+/** Shared rich-text styling block — a "Font Settings" panel,
  *  reusable across any widget by giving that widget's data type an optional
  *  `fontSettings?: FontSettings` field. Resolved into CSS via
  *  lib/fontStyle.ts's resolveFontStyle(). */
@@ -15,7 +15,7 @@ export interface FontSettings {
   textOutlineSize?:    number;  // advanced only
 }
 
-/** Shared TablissNG-parity "Display Settings" — Font Size / Scale / Rotation
+/** Shared "Display Settings" — Font Size / Scale / Rotation
  *  (Position and Custom CSS Class are deliberately not part of this app's
  *  version). Reusable the same way as FontSettings: any widget data type
  *  adds `displaySettings?: DisplaySettings`. Resolved via
@@ -37,8 +37,6 @@ export interface ClockData {
    *  vertical placement (the widget's flex-direction is column, so these
    *  map to align-items vs justify-content respectively). Default 'center'. */
   alignment?: WidgetAlignment;
-  fontSettings?: FontSettings;
-  displaySettings?: DisplaySettings;
   /** Let the rendered text spill past the widget's own box instead of being
    *  clipped — useful for a large clock font. Default false. */
   allowOverflow?: boolean;
@@ -187,6 +185,12 @@ export interface PlaceholderData {
   title?: string;
 }
 
+// Purely a layout filler — transparent/non-interactive in view mode, no
+// content or settings of its own. Distinct from PlaceholderData (a
+// dev-only "empty slot" debug widget that always shows an icon/title/hint).
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface SpacerData {}
+
 export interface GreetingData {
   userName?: string;
   useCustomQuote?: boolean;
@@ -287,11 +291,12 @@ export interface WidgetDataMap {
   currencyTicker:  CurrencyTickerData;
   rainRadar:       RainRadarData;
   placeholder:     PlaceholderData;
+  'invisible-spacer': SpacerData;
 }
 
 export type WidgetType = keyof WidgetDataMap;
 
-interface WidgetBase {
+export interface WidgetBase {
   id: string;
   col: number;
   row: number;
@@ -335,4 +340,5 @@ export type Widget =
   | (WidgetBase & { type: 'todoList';       data: TodoData })
   | (WidgetBase & { type: 'currencyTicker'; data: CurrencyTickerData })
   | (WidgetBase & { type: 'rainRadar';      data: RainRadarData })
-  | (WidgetBase & { type: 'placeholder';    data: PlaceholderData });
+  | (WidgetBase & { type: 'placeholder';    data: PlaceholderData })
+  | (WidgetBase & { type: 'invisible-spacer'; data: SpacerData });

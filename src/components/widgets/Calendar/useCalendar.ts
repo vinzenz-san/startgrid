@@ -114,8 +114,10 @@ const MOCK_EVENTS: CalendarEvent[] = [
     colorId: '6', htmlLink: BASE_LINK },
 ];
 
+// No artificial delay — MOCK_EVENTS is a static array, already known
+// synchronously at import time. An async signature is kept only because
+// CalendarProviderConfig.mockEvents must match the real fetch's shape.
 async function fetchMockEvents(): Promise<CalendarEvent[]> {
-  await new Promise(r => setTimeout(r, 650));
   return MOCK_EVENTS;
 }
 

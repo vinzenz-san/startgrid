@@ -39,12 +39,12 @@ export function findFreePosition(widgets: Widget[], columns: number, w: number, 
  *  the same findFreePosition + registry-defaults assembly. Caller still owns
  *  actually calling addWidget() with the result. */
 export function buildNewWidget(widgets: Widget[], columns: number, type: WidgetType): Omit<Widget, 'id'> {
-  const { defaultSize, defaultData } = WIDGET_REGISTRY[type];
+  const { defaultSize, defaultData, defaultStyle } = WIDGET_REGISTRY[type];
   const { col, row } = findFreePosition(widgets, columns, defaultSize.w, defaultSize.h);
   // defaultData is `unknown` here — WidgetEntry type-erases it for dynamic
   // lookup by `type` (see registry.tsx), each entry's own `satisfies` check
   // already guarantees it actually matches `type`.
-  return { type, col, row, w: defaultSize.w, h: defaultSize.h, data: defaultData } as Omit<Widget, 'id'>;
+  return { type, col, row, w: defaultSize.w, h: defaultSize.h, data: defaultData, ...defaultStyle } as Omit<Widget, 'id'>;
 }
 
 /** Like findFreePosition, but searches outward from a preferred (col, row)

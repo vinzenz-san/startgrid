@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import type { ClockData, WidgetAlignment } from '../../../types/widget';
-import { SettingsRow, SettingsSwitch, Dropdown, FontSettingsPanel, DisplaySettingsPanel } from '../../shared/Form';
+import { SettingsRow, SettingsSwitch, Dropdown } from '../../shared/Form';
 import { DetailedSettings } from '../../Layout/DetailedSettings';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { LOCALES } from '../../../i18n';
-import { resolveFontStyle } from '../../../lib/fontStyle';
-import { resolveDisplayStyle } from '../../../lib/displayStyle';
+import FitText from '../../shared/FitText';
 import './Clock.css';
 
 // undefined timeZone (the Intl default) means "use the system/local timezone".
@@ -136,20 +135,6 @@ export function ClockSettings({ data, onUpdateData }: SettingsProps) {
           <SettingsSwitch checked={data.allowOverflow ?? false} onChange={v => onUpdateData({ allowOverflow: v })} />
         </SettingsRow>
       </DetailedSettings>
-
-      <DetailedSettings title={t('widget.displaySettings.title')}>
-        <DisplaySettingsPanel
-          value={data.displaySettings}
-          onChange={patch => onUpdateData({ displaySettings: { ...data.displaySettings, ...patch } })}
-        />
-      </DetailedSettings>
-
-      <DetailedSettings title={t('widget.fontSettings.title')}>
-        <FontSettingsPanel
-          value={data.fontSettings}
-          onChange={patch => onUpdateData({ fontSettings: { ...data.fontSettings, ...patch } })}
-        />
-      </DetailedSettings>
     </div>
   );
 }
@@ -176,16 +161,10 @@ export default function Clock({ data }: Props) {
     weekday: 'long', month: 'long', day: 'numeric', timeZone: resolveTimeZone(timezone),
   }).format(now);
 
-  // Applied directly to the text elements, not the wrapper: .sg-clock-time /
-  // .sg-clock-date each carry their own explicit color/font-weight CSS, which
-  // would silently win over anything merely inherited from a parent style.
-  const fontStyle = resolveFontStyle(data.fontSettings);
-  const { wrapper, fontSize: timeFontSize, dateFontSize } = resolveDisplayStyle(data.displaySettings);
-
   return (
-    <div className={`sg-clock sg-clock--align-${alignment}`} style={wrapper}>
-      <div className="sg-clock-time" style={{ ...fontStyle, fontSize: timeFontSize }}>{formatTime(now, format, showSeconds, timezone)}</div>
-      {showDate && <div className="sg-clock-date" style={{ ...fontStyle, fontSize: dateFontSize }}>{dateStr}</div>}
+    <div className={`sg-clock sg-clock--align-${alignment}`}>
+      <FitText className="sg-clock-time" widthFactor={0.85} fontWeight={600}>{formatTime(now, format, showSeconds, timezone)}</FitText>
+      {showDate && <div className="sg-clock-date">{dateStr}</div>}
     </div>
   );
 }

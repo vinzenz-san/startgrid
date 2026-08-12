@@ -129,6 +129,30 @@ html.sg-glow-all-widgets .sg-widget {
 }
 [data-scheme="light"] .sg-idle-icon:hover { color: var(--accent); }
 
+/* Edit-mode scrim — a full-viewport semi-transparent dark wash, sitting
+   above the real background (Background.css, z-index -1/-2) but below the
+   grid/widgets (.sg-grid-wrapper, z-index 0, painted later in DOM order so
+   it wins the tie at the same z-index). Boosts contrast for the grid
+   overlay (dot-grid + glow lines below, both accent-colored) against
+   whatever hue the background happens to be, without outlining each line
+   individually or being confined to just the grid's own box — covers the
+   whole screen so the effect reads as one consistent dimming rather than a
+   rectangle cut out around the grid. Edit-mode only, same reasoning as the
+   overlay itself: hovering a settings row (the other time the glow lines
+   can show) shouldn't dim the entire screen just for a preview. */
+.sg-edit-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.sg-root--edit .sg-edit-scrim {
+  opacity: 1;
+}
+
 /* ── Grid ────────────────────────────────────────── */
 .sg-grid-wrapper {
   flex: 1;
@@ -145,22 +169,44 @@ html.sg-glow-all-widgets .sg-widget {
 .sg-grid-wrapper--pinned-right { margin-right: 340px; }
 .sg-grid-wrapper--pinned-left  { margin-left: 340px; }
 
+/* GridConfig.verticalCenter (default on) — centers the grid box vertically
+   within the wrapper when its content is shorter than the viewport, instead
+   of sitting flush at the top (the wrapper's default align-items: stretch
+   has no visible effect here since .sg-grid always sets an explicit height,
+   so without this it just renders at the cross-axis start = top).
+   `safe center` (not plain `center`) matters once content grows taller than
+   the viewport (e.g. adding enough widgets in edit mode, where contentRows
+   also briefly grows by +5 rows of headroom) — plain center overflows
+   equally on both sides of the centered box, and a flex/grid container can't
+   scroll to reach the part that overflows past the start edge, silently
+   cutting off whatever's at the top with no way to scroll up to it. `safe`
+   falls back to start-alignment specifically when centering would make
+   content inaccessible like that, so nothing gets stranded above the
+   viewport. */
+.sg-grid-wrapper--center-vertical { align-items: safe center; }
+
+/* Plain width:100% measuring host for RGLGrid.tsx's useContainerWidth — kept
+   separate from .sg-grid itself so Full Page Grid mode has a stable,
+   non-self-referential element to measure (see RGLGrid.tsx comment). Always
+   fills whatever width .sg-grid-wrapper's flex box gives it, regardless of
+   .sg-grid's own (possibly auto/collapsed) width. */
+.sg-grid-measure {
+  width: 100%;
+}
+
 .sg-grid {
-  display: grid;
-  position: relative; /* anchors .sg-grid-glow-overlay below */
+  position: relative; /* anchors .sg-grid-glow-overlay and RGL's absolutely-positioned items below */
   /* Column count + cell size are user-configurable (GridConfigContext) —
      --grid-cols/--cell-w/--cell-h/--gap are injected as runtime custom
      properties there, with static fallbacks in index.css for pre-hydration.
-     Track size is cell + gap (the "pitch" between column/row starts) rather
-     than a bare cell size — gap is applied via each widget's own margin
-     (see .sg-widget) instead of the grid `gap` property, so every widget
-     gets an equal inset on all 4 sides instead of CSS Grid's `gap` only
-     ever showing up on the trailing (right/bottom) side of each cell. */
-  grid-template-columns: repeat(var(--grid-cols), calc(var(--cell-w) + var(--gap)));
-  grid-auto-rows: calc(var(--cell-h) + var(--gap));
-  gap: 0;
-  padding: calc(var(--gap) / 2);
-  align-content: start;
+     react-grid-layout (RGLGrid.tsx) now owns item-to-item spacing via its own
+     `margin` config (equal to --gap), so this element's own padding is the
+     full --gap (not half) — the outer edge-to-widget inset and the
+     inter-widget gap both end up equal to --gap, matching the pre-RGL
+     symmetric-inset system exactly (see RGLGrid.tsx's innerWidth comment for
+     the full derivation). */
+  padding: var(--gap);
+  box-sizing: border-box;
   /* Strictly content-driven height (Grid.tsx computes --content-rows —
      exactly the bottom-most occupied widget row when idle, +5 rows of
      headroom while editing or mid-drag) — no min-height: 100% floor. That
@@ -184,11 +230,28 @@ html.sg-glow-all-widgets .sg-widget {
   margin: 0 auto;
 }
 
-/* Edit-mode: dot-grid background */
-.sg-root--edit .sg-grid {
-  background-image: radial-gradient(circle, rgba(99,102,241,0.2) 1px, transparent 1px);
-  background-size: calc((100% - var(--gap)) / var(--grid-cols)) calc(var(--cell-h) + var(--gap));
-  background-position: calc(var(--gap) + (100% - var(--gap)) / (var(--grid-cols) * 2)) calc(var(--gap) + var(--cell-h) / 2);
+/* Full Page Grid mode (GridConfig.fullPageGrid): stretch the grid box to the
+   wrapper's full width instead of sizing to columns*cellWidth, and drop the
+   wrapper's centering margin/padding so the grid reaches every edge. RGLGrid
+   measures this element's real width via useContainerWidth once static width
+   is removed here — the calc() below only handles height, which stays
+   content-driven the same way as the non-full-page grid. */
+.sg-grid.sg-grid--full-page {
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+
+/* First paint has no "previous" position to animate from (storage load isn't
+   a layout change) — react-grid-layout's default stylesheet unconditionally
+   transitions every item's transform/width/height, so without this the
+   initial mount can visibly animate widgets sliding into place. Only the CSS
+   transition is gated here — widget content itself always renders
+   immediately, this never blocks it. Suppressed until RGLGrid.tsx flips this
+   class on ~100ms after mount, just long enough to cover first paint. */
+.sg-grid .react-grid-item { transition: none; }
+.sg-grid.sg-grid--animated .react-grid-item.cssTransforms:not(.react-draggable-dragging):not(.resizing) {
+  transition: transform 200ms ease, width 200ms ease, height 200ms ease;
 }
 
 /* ── Grid glow overlay ─────────────────────────────
@@ -229,6 +292,15 @@ html.sg-glow-all-widgets .sg-widget {
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
+}
+
+/* Edit-mode dot-grid background — back on .sg-grid itself (contrast for this
+   and the glow lines below now comes from .sg-edit-scrim, a full-viewport
+   dark wash — see its own comment further down). */
+.sg-root--edit .sg-grid {
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--accent) 20%, transparent) 1px, transparent 1px);
+  background-size: calc((100% - var(--gap)) / var(--grid-cols)) calc(var(--cell-h) + var(--gap));
+  background-position: calc(var(--gap) + (100% - var(--gap)) / (var(--grid-cols) * 2)) calc(var(--gap) + var(--cell-h) / 2);
 }
 
 .sg-grid-glow-overlay {
@@ -294,19 +366,16 @@ html.sg-grid-glow-hover .sg-grid-glow-overlay {
 }
 
 
-/* ── Drop ghost ──────────────────────────────────── */
-.sg-drop-ghost {
+/* ── Drag placeholder ────────────────────────────────
+   react-grid-layout renders its own drop-preview element with this class
+   (replaces the old hand-rolled .sg-drop-ghost) — restyled to match. RGL
+   doesn't distinguish a valid/invalid drop target the way the old manual
+   drag implementation did (RGLGrid.tsx runs with noCompactor — free custom
+   positioning, no auto-reflow — so a drop just places the widget wherever
+   it's released), so there's no invalid-state variant here anymore. */
+.react-grid-item.react-grid-placeholder {
   border-radius: var(--radius);
   background: rgba(99, 102, 241, 0.12);
   border: 2px dashed var(--accent);
-  pointer-events: none;
-  transition: grid-column 0.05s, grid-row 0.05s;
-  /* Match .sg-widget's own symmetric gap-inset margin so the drop preview
-     lines up with where the real widget will actually render. */
-  margin: calc(var(--gap) / 2);
-}
-
-.sg-drop-ghost--invalid {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: var(--danger);
+  opacity: 1;
 }

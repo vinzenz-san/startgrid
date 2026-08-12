@@ -11,6 +11,17 @@ export interface GridConfig {
   cellWidth: number;
   cellHeight: number;
   gap: number;
+  // Stretches the grid to fill the full container width instead of sizing
+  // itself to columns*cellWidth (see RGLGrid.tsx) — a "Full Page Grid" mode.
+  // Widgets don't get pushed out of the way while dragging in this mode (no
+  // live compaction target to displace into), hence the experimental-warning
+  // copy in SettingsPanel.tsx.
+  fullPageGrid: boolean;
+  // Vertically centers the grid box within .sg-grid-wrapper when it's
+  // shorter than the viewport, instead of top-anchoring it — makes sparse
+  // layouts (e.g. the Focus preset) sit centered in the window. Default
+  // true; toggled off keeps the previous top-anchored behavior.
+  verticalCenter: boolean;
 }
 
 // Matches the previous hardcoded values exactly, so existing installs get a
@@ -20,9 +31,14 @@ export interface GridConfig {
 // both ranges, and neither this type nor the rescale/repack logic in
 // gridRescale.ts/gridUtils.ts assume any narrower bounds, so the wider
 // slider limits need no other code changes to "just work".
+// cellWidth/cellHeight default to 50px — at 15 columns, the old 120px
+// default (960px+ wide box, sized for the previous 8-column default)
+// rendered wider than most viewports.
 export const DEFAULT_GRID_CONFIG: GridConfig = {
-  columns: 8,
-  cellWidth: 120,
-  cellHeight: 120,
-  gap: 12,
+  columns: 15,
+  cellWidth: 50,
+  cellHeight: 50,
+  gap: 15,
+  fullPageGrid: false,
+  verticalCenter: true,
 };

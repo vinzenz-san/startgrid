@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useWidgets } from '../../contexts/WidgetContext';
 import { useGridConfig } from '../../contexts/GridConfigContext';
 import { useSettings } from '../../contexts/SettingsContext';
+import { useEditHistory } from '../../contexts/EditHistoryContext';
 import { WIDGET_REGISTRY, WIDGET_MENU_TYPES, WIDGET_TYPE_LABEL_KEYS } from '../widgets/registry';
 import { buildNewWidget } from '../../lib/gridUtils';
 import type { WidgetType } from '../../types/widget';
@@ -15,6 +16,7 @@ interface Props { className?: string; }
 export default function AddWidgetMenu({ className }: Props) {
   const { widgets, addWidget } = useWidgets();
   const { gridConfig } = useGridConfig();
+  const { pushHistory } = useEditHistory();
   const { developerOptionsEnabled, t } = useSettings();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -29,6 +31,7 @@ export default function AddWidgetMenu({ className }: Props) {
   }, [open]);
 
   const handleAdd = (type: WidgetType) => {
+    pushHistory('editHistory.addedWidget');
     addWidget(buildNewWidget(widgets, gridConfig.columns, type));
     setOpen(false);
   };

@@ -1,7 +1,10 @@
 .sg-rss-list {
   list-style: none;
   margin: 0;
-  padding: 0;
+  /* --sg-widget-inset (index.css) — items were previously flush against the
+     widget's edges (padding: 0). */
+  padding: var(--sg-widget-inset);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 2px;

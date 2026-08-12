@@ -1,0 +1,93 @@
+.sg-edit-history {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  width: 240px;
+  max-height: 280px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  z-index: 9999;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  user-select: none;
+}
+
+/* When offset beside DevPanel, React sets an inline left/top style — the
+   default bottom-left anchor above must not also apply in that case, or the
+   two positioning systems fight each other. */
+.sg-edit-history[style] {
+  bottom: auto;
+}
+
+.sg-edit-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+.sg-edit-history-title {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.sg-edit-history-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+.sg-edit-history-close:hover {
+  color: var(--accent-hover);
+}
+
+.sg-edit-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  max-height: 160px;
+}
+
+.sg-edit-history-item {
+  font-size: 10px;
+  color: var(--text);
+  padding: 3px 5px;
+  background: var(--surface-hover);
+  border-radius: 4px;
+}
+
+.sg-edit-history-empty {
+  font-size: 10px;
+  font-style: italic;
+  opacity: 0.5;
+}
+
+.sg-edit-history-note {
+  font-size: 9px;
+  opacity: 0.45;
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.sg-edit-history-hint {
+  font-size: 10px;
+  opacity: 0.55;
+  border-top: 1px solid var(--border);
+  padding-top: 6px;
+  text-align: center;
+}

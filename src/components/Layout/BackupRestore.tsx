@@ -58,21 +58,35 @@ async function writeAllStorage(sync: Record<string, unknown>, local: Record<stri
   Object.entries(local).forEach(([k, v]) => localStorage.setItem(`sg-local:${k}`, JSON.stringify(v)));
 }
 
-async function clearAllStorage(): Promise<void> {
-  if (isExtension) {
-    const { default: browser } = await import('webextension-polyfill');
-    await Promise.all([
-      browser.storage.sync.clear(),
-      browser.storage.local.clear(),
-    ]);
-    return;
-  }
+// Sweeps plain window.localStorage of every 'sg:'-prefixed key — the
+// synchronous first-render "fast path" caches (BackgroundContext.tsx's
+// background config/image-URL cache, DevPanel's saved position, Screenshot
+// Mode) live here specifically because they need to be readable before
+// browser.storage's async get() resolves, so they're deliberately outside
+// browser.storage.sync/local entirely. In the non-extension dev build this
+// is also where everything else lives (see the isExtension branch below),
+// but even in a real extension it must run too — otherwise a stale
+// background survives a factory reset because BackgroundContext seeds its
+// initial state from this cache before ever reading the (now-cleared)
+// browser.storage.
+function clearLocalStorageFastPaths(): void {
   const keysToRemove: string[] = [];
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i)!;
     if (k.startsWith('sg:') || k.startsWith('sg-local:')) keysToRemove.push(k);
   }
   keysToRemove.forEach(k => localStorage.removeItem(k));
+}
+
+async function clearAllStorage(): Promise<void> {
+  clearLocalStorageFastPaths();
+  if (isExtension) {
+    const { default: browser } = await import('webextension-polyfill');
+    await Promise.all([
+      browser.storage.sync.clear(),
+      browser.storage.local.clear(),
+    ]);
+  }
 }
 
 // ── Factory reset ──────────────────────────────────────────────────────────

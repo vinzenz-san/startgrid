@@ -1,11 +1,9 @@
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useEditMode } from '../../contexts/EditModeContext';
 import { useWidgets } from '../../contexts/WidgetContext';
-import { useGridConfig } from '../../contexts/GridConfigContext';
 import { useSettings } from '../../contexts/SettingsContext';
-import { dragState } from '../../lib/dragState';
-import { isPositionFree } from '../../lib/gridUtils';
-import WidgetContainer from '../shared/WidgetContainer';
+import { useGridConfig } from '../../contexts/GridConfigContext';
+import RGLGrid from './RGLGrid';
 import AddWidgetMenu from '../shared/AddWidgetMenu';
 import ThemeToggle from '../shared/ThemeToggle';
 import GearIcon from '../shared/icons/GearIcon';
@@ -14,24 +12,22 @@ import WidgetTour from '../shared/WidgetTour';
 import CommandPalette from '../shared/CommandPalette';
 import DevPanel, { type DevPanelPos } from '../DevPanel/DevPanel';
 import InspectorHistoryPanel from '../DevPanel/InspectorHistoryPanel';
+import EditHistoryPanel from '../shared/EditHistoryPanel';
 import { ElementInspectorProvider } from '../../contexts/ElementInspectorContext';
 import { isExtension } from '../../lib/storage';
 import { APP_VERSION } from '../../lib/appVersion';
 import './Grid.css';
 
-interface DropTarget { col: number; row: number; w: number; h: number; valid: boolean; }
-
 export default function Grid() {
   const { isEditMode, toggleEditMode } = useEditMode();
-  const { widgets, updateWidget, loaded } = useWidgets();
+  const { widgets, loaded } = useWidgets();
   const { gridConfig } = useGridConfig();
   const {
     developerOptionsEnabled, settingsPinned, elementInspectorEnabled,
     disableGridGlow, widgetTourSeen, widgetTourSeenVersion, t,
+    editHistoryPanelEnabled,
     loaded: settingsLoaded,
   } = useSettings();
-  const gridRef = useRef<HTMLDivElement>(null);
-  const [dropTarget,        setDropTarget]        = useState<DropTarget | null>(null);
   const [settingsPanelOpen, setSettingsPanelOpen] = useState(false);
   const [devPanelPos,       setDevPanelPos]       = useState<DevPanelPos | null>(null);
   const [tourOpen,          setTourOpen]          = useState(false);
@@ -76,63 +72,18 @@ export default function Grid() {
     setTourOpen(false);
   };
 
-  // .sg-grid's own padding is var(--gap) / 2 (Grid.css — gap is applied via
-  // each widget's own margin rather than the grid `gap` property, so the
-  // container's leading padding is only half a gap; see the symmetric-gap
-  // inset work in WidgetContainer.css). cellWidth itself isn't needed here:
-  // column width is always derived from the container's actual rendered
-  // width / columns (responsive), the same way it worked before gridConfig
-  // existed — only row height (cellHeight) is a fixed value pulled directly
-  // from config.
-  const { columns, cellHeight, gap } = gridConfig;
-
-  const cellFromPoint = (clientX: number, clientY: number) => {
-    const rect = gridRef.current!.getBoundingClientRect();
-    const colW = (rect.width - gap * 2 - gap * (columns - 1)) / columns;
-    return {
-      col: Math.max(1, Math.floor((clientX - rect.left  - gap / 2) / (colW       + gap)) + 1),
-      row: Math.max(1, Math.floor((clientY - rect.top   - gap / 2) / (cellHeight + gap)) + 1),
-    };
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    const widget = widgets.find(w => w.id === dragState.widgetId);
-    if (!widget) return;
-    const { col, row } = cellFromPoint(e.clientX, e.clientY);
-    const targetCol = Math.max(1, Math.min(columns - widget.w + 1, col - dragState.offCol));
-    const targetRow = Math.max(1, row - dragState.offRow);
-    const valid = isPositionFree(widgets, widget.id, targetCol, targetRow, widget.w, widget.h);
-    e.dataTransfer.dropEffect = valid ? 'move' : 'none';
-    setDropTarget({ col: targetCol, row: targetRow, w: widget.w, h: widget.h, valid });
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    if (dropTarget && dragState.widgetId && dropTarget.valid)
-      updateWidget(dragState.widgetId, { col: dropTarget.col, row: dropTarget.row });
-    setDropTarget(null);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    if (!gridRef.current?.contains(e.relatedTarget as Node)) setDropTarget(null);
-  };
-
   // Total rows the grid container (and its glow overlay, which inherits the
   // same --content-rows custom property — see Grid.css) needs to cover.
-  // Outside of editing/dragging, this is strictly the bottom-most occupied
-  // widget row — no buffer — so the container snaps snugly to content and
-  // never shows an idle empty-scroll tail. While editing (or mid-drag),
-  // +5 extra rows are added past whichever is lower, the real content or
-  // the live drag-ghost's own row, so there's immediate headroom to move a
-  // widget further down without the grid resizing under the user's cursor.
+  // Outside of editing, this is strictly the bottom-most occupied widget row
+  // — no buffer — so the container snaps snugly to content and never shows
+  // an idle empty-scroll tail. While editing, +5 extra rows are added past
+  // the real content so there's headroom to drag a widget into open space
+  // below current content. RGLGrid.tsx runs with no auto-compaction
+  // (noCompactor — widgets keep whatever custom position they're dropped
+  // at), so unlike vertical-compaction mode, that headroom is load-bearing:
+  // without it there'd be nowhere past the last row to drop a widget into.
   const widgetsBottomRow = Math.max(0, ...widgets.map(w => w.row + w.h - 1));
-  const dragBottomRow    = dropTarget ? dropTarget.row + dropTarget.h - 1 : 0;
-  const isDragging       = dropTarget !== null;
-
-  const contentRows = (isEditMode || isDragging)
-    ? Math.max(widgetsBottomRow, dragBottomRow) + 5
-    : widgetsBottomRow;
+  const contentRows = isEditMode ? widgetsBottomRow + 5 : widgetsBottomRow;
 
   return (
     <ElementInspectorProvider enabled={developerOptionsEnabled && elementInspectorEnabled}>
@@ -203,49 +154,21 @@ export default function Grid() {
 
       <CommandPalette />
 
+      <div className="sg-edit-scrim" />
+
       <main
-        className={`sg-grid-wrapper${settingsPinned ? ' sg-grid-wrapper--pinned-right' : ''}`}
+        className={`sg-grid-wrapper${settingsPinned ? ' sg-grid-wrapper--pinned-right' : ''}${gridConfig.verticalCenter ? ' sg-grid-wrapper--center-vertical' : ''}`}
         onClick={() => { if (!settingsPinned) setSettingsPanelOpen(false); }}
       >
-        <div
-          ref={gridRef}
-          className="sg-grid"
-          style={{ '--content-rows': contentRows } as React.CSSProperties}
-          onDragOver={isEditMode ? handleDragOver : undefined}
-          onDrop={isEditMode ? handleDrop : undefined}
-          onDragLeave={isEditMode ? handleDragLeave : undefined}
-        >
-          {/* Grid glow overlay — glowing lines along cell boundaries. Shown
-              while editing (see .sg-root--edit rule in Grid.css) or while
-              hovering the Grid settings section (sg-grid-glow-hover class,
-              toggled in SettingsPanel.tsx). Not rendered at all when the
-              user has disabled the effect, rather than just hidden, since
-              this is a persistent preference rather than a transient state.
-              The outer .sg-grid-glow-clip's height formula (Grid.css) reads
-              --content-rows inherited straight from .sg-grid above (CSS
-              custom properties inherit by default) — same row count driving
-              .sg-grid's own real height, so the glow never disagrees with
-              the container it's laid over. It also clips the inner
-              overlay's drop-shadow glow to that exact box so it can never
-              bleed past the grid's true left/right/bottom edges. */}
-          {!disableGridGlow && (
-            <div className="sg-grid-glow-clip">
-              <div className="sg-grid-glow-overlay" />
-            </div>
-          )}
-          {loaded && (widgets ?? []).map(widget => <WidgetContainer key={widget.id} widget={widget} />)}
-          {isEditMode && dropTarget && (
-            <div
-              className={`sg-drop-ghost${dropTarget.valid ? '' : ' sg-drop-ghost--invalid'}`}
-              style={{ gridColumn: `${dropTarget.col} / span ${dropTarget.w}`, gridRow: `${dropTarget.row} / span ${dropTarget.h}` }}
-            />
-          )}
-        </div>
+        <RGLGrid contentRows={contentRows} disableGridGlow={disableGridGlow} />
       </main>
 
       {developerOptionsEnabled && <DevPanel position={devPanelPos} onPositionChange={setDevPanelPos} />}
       {developerOptionsEnabled && elementInspectorEnabled && devPanelPos && (
         <InspectorHistoryPanel devPanelPos={devPanelPos} />
+      )}
+      {isEditMode && editHistoryPanelEnabled && (
+        <EditHistoryPanel devPanelPos={developerOptionsEnabled ? devPanelPos : null} />
       )}
     </div>
     </ElementInspectorProvider>

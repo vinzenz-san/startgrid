@@ -29,6 +29,16 @@
      silently drift apart again. */
   --sg-control-h: 20px;
 
+  /* Single source of truth for a widget's own outer content inset — the
+     space between a widget's box edge and its actual text/list content
+     (distinct from --gap, which is the space *between* widgets). Widgets
+     used to each hand-roll their own padding value independently (Notes:
+     10px 12px, others: 0, 8px, 12px, ad hoc per-section values...), which is
+     how RSS Feed ended up with items flush against its edges while Notes
+     right next to it had a visible inset. New/retrofitted text-based
+     widgets should reference this instead of a new hardcoded value. */
+  --sg-widget-inset: 10px 12px;
+
   /* Widget theme — overridden at runtime by ThemeContext */
 
   --widget-bg-color:      #2a2d3d;

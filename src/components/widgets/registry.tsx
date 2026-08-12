@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { WidgetDataMap, WidgetType, ClockData, QuicklinksData, BookmarksData, BookmarkSearchData, CalendarData, OutlookCalendarData, OutlookMailData, NotesData, ObsidianCaptureData, ObsidianDailyData, ObsidianNoteData, ObsidianSearchData, ObsidianRandomData, GreetingData, WeatherData, RssFeedData, TodoData, CurrencyTickerData, RainRadarData, PlaceholderData } from '../../types/widget';
+import type { WidgetDataMap, WidgetType, WidgetBase, ClockData, QuicklinksData, BookmarksData, BookmarkSearchData, CalendarData, OutlookCalendarData, OutlookMailData, NotesData, ObsidianCaptureData, ObsidianDailyData, ObsidianNoteData, ObsidianSearchData, ObsidianRandomData, GreetingData, WeatherData, RssFeedData, TodoData, CurrencyTickerData, RainRadarData, PlaceholderData, SpacerData } from '../../types/widget';
 import type { TranslationKey } from '../../i18n';
 import Clock, { ClockSettings } from './Clock/Clock';
 import Quicklinks, { QuicklinksSettings } from './Quicklinks/Quicklinks';
@@ -21,6 +21,7 @@ import TodoList, { TodoListSettings } from './TodoList/TodoList';
 import CurrencyTicker, { CurrencyTickerSettings } from './CurrencyTicker/CurrencyTicker';
 import RainRadar, { RainRadarSettings } from './RainRadar/RainRadar';
 import WidgetPlaceholder from '../shared/WidgetPlaceholder';
+import SpacerWidget from './SpacerWidget/SpacerWidget';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -30,6 +31,22 @@ interface TypedEntry<T> {
   icon:        string;
   defaultSize: { w: number; h: number };
   defaultData: T;
+  /** Local-style override (transparency/shadow/glass/gradient/etc.) applied
+   *  to every newly created instance of this widget type — via the Add
+   *  Widget menu, Ctrl+K palette, or a layout preset (buildNewWidget in
+   *  gridUtils.ts and applyPreset in gridPresets.ts both merge this in).
+   *  Existing widgets already on a grid are unaffected by changing this. */
+  defaultStyle?: Partial<WidgetBase>;
+  /** When true, this widget type's local style is permanently fixed to
+   *  defaultStyle: WidgetContainer.tsx ignores the widget's own stored
+   *  bgOpacity/bgShadow/bgGlass/bgGradientIntensity/localOverrideEnabled and
+   *  the global theme settings, always rendering defaultStyle's values
+   *  instead, and hides the "Local Style" appearance section entirely so
+   *  there's no control that would suggest it's actually changeable. Also
+   *  makes it immune to "Reset all widget styles" — that only clears
+   *  localOverrideEnabled/localColorScheme, which locked rendering never
+   *  reads in the first place. */
+  lockedStyle?: boolean;
   devOnly?:    boolean;
   titleBehavior:        'optional' | 'auto' | 'none';
   defaultTitle?:        string;
@@ -46,6 +63,8 @@ export interface WidgetEntry {
   icon:        string;
   defaultSize: { w: number; h: number };
   defaultData: unknown;
+  defaultStyle?: Partial<WidgetBase>;
+  lockedStyle?: boolean;
   devOnly?:    boolean;
   titleBehavior:        'optional' | 'auto' | 'none';
   defaultTitle?:        string;
@@ -61,8 +80,20 @@ const _registry = {
   clock: {
     label:         'Clock',
     icon:          '🕐',
-    defaultSize:   { w: 2, h: 2 },
-    defaultData:   { format: '24h', showSeconds: true, showDate: true } satisfies ClockData,
+    defaultSize:   { w: 4, h: 2 },
+    defaultData:   {
+      format: '24h', showSeconds: false, showDate: false, allowOverflow: true,
+    } satisfies ClockData,
+    // Transparency 100% / Shadow 0% / Glass 0% / Gradient Intensity 0%,
+    // permanently — see TypedEntry.lockedStyle.
+    defaultStyle: {
+      localOverrideEnabled: true,
+      bgOpacity: 0,
+      bgShadow: 0,
+      bgGlass: 0,
+      bgGradientIntensity: 0,
+    },
+    lockedStyle: true,
     titleBehavior: 'none',
     renderComponent: (data, onUpdateData) => <Clock data={data} onUpdateData={onUpdateData} />,
     renderSettings:  (data, onUpdateData) => <ClockSettings data={data} onUpdateData={onUpdateData} />,
@@ -96,8 +127,8 @@ const _registry = {
   bookmarkSearch: {
     label:         'Bookmark Search',
     icon:          '🔍',
-    defaultSize:   { w: 2, h: 1 },
-    defaultData:   { maxResults: 10 } satisfies BookmarkSearchData,
+    defaultSize:   { w: 4, h: 1 },
+    defaultData:   { maxResults: 10, googleFallback: true } satisfies BookmarkSearchData,
     titleBehavior: 'none',
     renderComponent: (data, onUpdateData) => <BookmarkSearch data={data} onUpdateData={onUpdateData} />,
     renderSettings:  (data, onUpdateData) => <BookmarkSearchSettings data={data} onUpdateData={onUpdateData} />,
@@ -208,7 +239,17 @@ const _registry = {
     label:         'Greeting',
     icon:          '👋',
     defaultSize:   { w: 2, h: 1 },
-    defaultData:   { alignment: 'left' } satisfies GreetingData,
+    defaultData:   { alignment: 'center' } satisfies GreetingData,
+    // Transparency 100% / Shadow 0% / Glass 0% / Gradient Intensity 0%,
+    // permanently — see TypedEntry.lockedStyle.
+    defaultStyle: {
+      localOverrideEnabled: true,
+      bgOpacity: 0,
+      bgShadow: 0,
+      bgGlass: 0,
+      bgGradientIntensity: 0,
+    },
+    lockedStyle: true,
     titleBehavior: 'none',
     renderComponent: (data, onUpdateData) => <Greeting data={data} onUpdateData={onUpdateData} />,
     renderSettings:  (data, onUpdateData) => <GreetingSettings data={data} onUpdateData={onUpdateData} />,
@@ -278,6 +319,16 @@ const _registry = {
     renderSettings:  null,
   } satisfies TypedEntry<PlaceholderData>,
 
+  'invisible-spacer': {
+    label:         'Invisible Spacer',
+    icon:          '▫️',
+    defaultSize:   { w: 1, h: 1 },
+    defaultData:   {} satisfies SpacerData,
+    titleBehavior: 'none',
+    renderComponent: () => <SpacerWidget />,
+    renderSettings:  null,
+  } satisfies TypedEntry<SpacerData>,
+
 
 } satisfies { [K in WidgetType]: TypedEntry<WidgetDataMap[K]> };
 
@@ -310,9 +361,10 @@ export const WIDGET_TYPE_LABEL_KEYS: Record<WidgetType, TranslationKey> = {
   currencyTicker: 'widgets.type.currencyTicker',
   rainRadar:      'widgets.type.rainRadar',
   placeholder:    'widgets.type.placeholder',
+  'invisible-spacer': 'widgets.type.invisibleSpacer',
 };
 
 // Ordered list for the "Add Widget" menu (excludes placeholder handled separately if desired).
 export const WIDGET_MENU_TYPES: WidgetType[] = [
-  'clock', 'quicklinks', 'bookmarks', 'bookmarkSearch', 'calendar', 'outlookCalendar', 'outlookMail', 'notes', 'obsidianCapture', 'obsidianDaily', 'obsidianNote', 'obsidianSearch', 'obsidianRandom', 'greeting', 'weather', 'rssFeed', 'todoList', 'currencyTicker', 'rainRadar', 'placeholder',
+  'clock', 'quicklinks', 'bookmarks', 'bookmarkSearch', 'calendar', 'outlookCalendar', 'outlookMail', 'notes', 'obsidianCapture', 'obsidianDaily', 'obsidianNote', 'obsidianSearch', 'obsidianRandom', 'greeting', 'weather', 'rssFeed', 'todoList', 'currencyTicker', 'rainRadar', 'invisible-spacer', 'placeholder',
 ];
