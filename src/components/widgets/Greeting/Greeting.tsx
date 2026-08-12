@@ -107,6 +107,7 @@ export function GreetingSettings({ data, onUpdateData }: SettingsProps) {
         <DisplaySettingsPanel
           value={data.displaySettings}
           defaultFontSize={DEFAULT_FONT_SIZE}
+          showPadding={false}
           onChange={patch => onUpdateData({ displaySettings: { ...data.displaySettings, ...patch } })}
         />
       </DetailedSettings>
@@ -151,7 +152,11 @@ export default function Greeting({ data }: Props) {
   }
 
   const fontStyle = resolveFontStyle(data.fontSettings);
-  const { wrapper, fontSize } = resolveDisplayStyle(data.displaySettings, DEFAULT_FONT_SIZE);
+  // padding is intentionally dropped from `wrapper` here — Greeting's outer
+  // inset is fixed to --sg-widget-inset (Greeting.css), not user-adjustable
+  // (DisplaySettingsPanel's Padding slider is hidden for this widget via
+  // showPadding={false} above); only the scale/rotate transform still applies.
+  const { wrapper: { padding: _padding, ...wrapper }, fontSize } = resolveDisplayStyle(data.displaySettings, DEFAULT_FONT_SIZE);
 
   return (
     <div className={`sg-greeting sg-greeting--align-${alignment}`} style={wrapper}>

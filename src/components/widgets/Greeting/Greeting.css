@@ -3,8 +3,8 @@
   height: 100%;
   display: flex;
   align-items: center;
-  /* padding comes from the wrapper's inline style (resolveDisplayStyle) —
-     see the Padding slider in Display Settings */
+  /* Fixed — no Padding slider anymore (--sg-widget-inset, index.css). */
+  padding: var(--sg-widget-inset);
   box-sizing: border-box;
   user-select: none;
 }

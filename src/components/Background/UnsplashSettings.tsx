@@ -62,7 +62,7 @@ export default function UnsplashSettings() {
 
   const source    = uc.source ?? 'official';
   const topics    = uc.topics ?? [];
-  const interval  = String(uc.rotationInterval ?? 900);
+  const interval  = String(uc.rotationInterval ?? 86400);
   const showAttr  = uc.showAttribution ?? true;
 
   const toggleTopic = (id: string) => {

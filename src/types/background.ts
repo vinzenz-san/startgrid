@@ -46,7 +46,7 @@ export interface UnsplashConfig extends BackgroundShared {
   topics?: string[];         // Unsplash topic ids
   collectionId?: string;     // Unsplash collection id, used when source === 'collection'
   source?: 'official' | 'topics' | 'search' | 'collection';
-  rotationInterval?: number; // seconds between photo changes; 0 = fetch fresh every new tab, default 900
+  rotationInterval?: number; // seconds between photo changes; 0 = fetch fresh every new tab, default 86400 (1 day)
   showAttribution?: boolean; // default true
   // attribution data cached alongside the image url
   photographerName?: string;

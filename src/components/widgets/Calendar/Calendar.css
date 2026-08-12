@@ -14,7 +14,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 36px 6px 10px; /* right padding reserves space for the gear button */
+  padding: 8px 36px 6px 12px; /* right padding reserves space for the gear button; left matches --sg-widget-inset's horizontal (index.css) */
   flex-shrink: 0;
   border-bottom: 1px solid rgba(128, 128, 128, 0.12);
 }
@@ -90,7 +90,7 @@
   text-transform: uppercase;
   letter-spacing: 0.07em;
   opacity: 0.4;
-  padding: 6px 10px 3px;
+  padding: 6px 12px 3px; /* left/right match --sg-widget-inset's horizontal (index.css) */
 }
 
 /* ── Event row ───────────────────────────────────────────────────────────── */
@@ -99,7 +99,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  padding: 5px 10px;
+  padding: 5px 12px; /* left/right match --sg-widget-inset's horizontal (index.css) */
   text-decoration: none;
   color: inherit;
   transition: background 0.1s;
@@ -155,7 +155,7 @@
 /* ── Skeleton loader ──────────────────────────────────────────────────────── */
 
 .sg-cal-skeleton-group {
-  padding: 0 10px 8px;
+  padding: 0 12px 8px; /* left/right match --sg-widget-inset's horizontal (index.css) */
 }
 
 .sg-cal-skeleton {

@@ -199,7 +199,7 @@ export function useUnsplash(
   const fetchedAt = attribution?.fetchedAt ?? 0;
   useEffect(() => {
     if (!isActive || !proxyReady || !fetchedAt) return;
-    const rotation = uc?.rotationInterval ?? 900;
+    const rotation = uc?.rotationInterval ?? 86400;
     // 0 = 'every new tab' — only fetches on (re)mount, never on a recurring timer.
     if (rotation === 0) return;
     const interval = rotation * 1000;

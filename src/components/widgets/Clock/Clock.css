@@ -8,8 +8,9 @@
   gap: 6px;
   position: relative;
   /* Fixed — no Display Settings padding control anymore (see FitText.tsx's
-     doc comment: nothing here is user-configurable by design). */
-  padding: 12px;
+     doc comment: nothing here is user-configurable by design).
+     --sg-widget-inset (index.css). */
+  padding: var(--sg-widget-inset);
   box-sizing: border-box;
   user-select: none;
   text-align: center;

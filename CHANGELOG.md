@@ -2,6 +2,13 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.16.3] — Grid preset rebuild, unified widget spacing, factory-reset fix
+
+- **"Grid" layout preset rebuilt** as a 3-column layout: Clock/Greeting/Bookmark Search full-width, then RSS Feed (pre-filled with a feed URL), Quicklinks (list layout, one pre-filled link with a white badge), and Weather (Berlin, pre-resolved coordinates) stacked above Notes. New `layout` field on `GridPreset` supports fully explicit multi-column positioning, for layouts too irregular for the existing single-column stacking mode
+- Fixed Factory Reset not resetting the background: `BackgroundContext`'s synchronous first-render cache lives in plain `localStorage` (separate from `browser.storage`, by design, for pre-hydration speed), which the reset never cleared — the stale background survived and reappeared instantly on reload. `clearAllStorage()` now sweeps every `sg:`-prefixed `localStorage` key too, in both the extension and dev-preview builds
+- Unsplash's default "show new photo" rotation changed from 15 minutes to 1 day
+- **New unified widget spacing token** (`--sg-widget-inset`, index.css) — previously every widget hand-rolled its own outer content padding independently (Notes: 10px/12px, RSS Feed: none at all, To-Do: none, Calendar: a per-section grab-bag of 8-10px). RSS Feed and To-Do had content sitting flush against their own edges as a result. Notes, RSS Feed, To-Do, and Clock now reference the shared token; Greeting's Padding slider removed (was a separate, independently-adjustable mechanism) in favor of the same fixed token; Calendar's per-section left/right insets aligned to the token's value while keeping their own top/bottom/gear-button-clearance spacing
+
 ## [1.16.2] — Locked-style Clock/Greeting, auto-fit Clock text, grid-overlay contrast fix
 
 - Clock and Greeting now have their local style (Transparency/Shadow/Glass/Gradient Intensity) permanently fixed to 100%/0%/0%/0% — no longer user-editable, immune to global theme settings, and immune to "Reset all widget styles" (new `lockedStyle` registry flag, `WidgetContainer.tsx` ignores stored/global values entirely for these types and hides the Local Style section)

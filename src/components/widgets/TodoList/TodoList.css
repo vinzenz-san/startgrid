@@ -4,6 +4,10 @@
   gap: 8px;
   height: 100%;
   min-height: 0;
+  /* --sg-widget-inset (index.css) — content was previously flush against
+     the widget's edges (no outer padding at all). */
+  padding: var(--sg-widget-inset);
+  box-sizing: border-box;
 }
 
 .sg-todo-add {
