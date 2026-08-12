@@ -11,6 +11,7 @@ import { openInObsidian } from '../../../lib/obsidianApi';
 import { clearVaultIndex } from '../../../lib/obsidianIndex';
 import MarkdownView from '../shared/MarkdownView';
 import ObsidianConnect from '../shared/ObsidianConnect';
+import { DetailedSettings } from '../../Layout/DetailedSettings';
 import ObsidianStatus from '../shared/ObsidianStatus';
 import { IconObsidian, IconShuffle, IconOpenExternal, SkeletonRow } from '../shared/ObsidianIcons';
 import '../shared/obsidian.css';
@@ -78,8 +79,9 @@ export function ObsidianRandomSettings({ data, onUpdateData }: SettingsProps) {
       </ActionButton>
       <p className="sg-obs-hint">{t('widget.obsidianRandom.indexHint')}</p>
 
-      <div className="sg-cal-settings-divider"/>
-      <ObsidianConnect />
+      <DetailedSettings title={t('widget.obsidian.sectionTitle')}>
+        <ObsidianConnect />
+      </DetailedSettings>
     </div>
   );
 }

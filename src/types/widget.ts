@@ -219,6 +219,12 @@ export interface WeatherData {
   openForecastOnClick?: boolean;
   /** Which site to open for the detailed forecast. Default 'google'. */
   forecastProvider?: 'google' | 'windy' | 'wetteronline';
+  /** Show an inline multi-day forecast row below the current conditions —
+   *  independent of openForecastOnClick, which links out to a third-party
+   *  site instead. Default false. */
+  showForecast?: boolean;
+  /** Days of inline forecast to show, including today. 3-7, default 5. */
+  forecastDays?: number;
 }
 
 export interface TodoItem {
@@ -263,6 +269,10 @@ export interface RssFeedData {
   refreshIntervalMin?: number; // default 30
 }
 
+export interface IframeData {
+  url?: string;
+}
+
 // Maps each widget type string to its strongly-typed data interface.
 export interface WidgetDataMap {
   clock:           ClockData;
@@ -284,6 +294,7 @@ export interface WidgetDataMap {
   todoList:        TodoData;
   currencyTicker:  CurrencyTickerData;
   rainRadar:       RainRadarData;
+  iframe:          IframeData;
   placeholder:     PlaceholderData;
   'invisible-spacer': SpacerData;
 }

@@ -77,18 +77,11 @@ export default function ObsidianConnect() {
   }
 
   if (!isExtensionEnv) {
-    return (
-      <div className="sg-cal-settings-section">
-        <span className="sg-cal-settings-label">{t('widget.obsidian.sectionTitle')}</span>
-        <p className="sg-obs-hint">{t('widget.obsidian.previewOnly')}</p>
-      </div>
-    );
+    return <p className="sg-obs-hint">{t('widget.obsidian.previewOnly')}</p>;
   }
 
   return (
     <div className="sg-cal-settings-section">
-      <span className="sg-cal-settings-label">{t('widget.obsidian.sectionTitle')}</span>
-
       {!hasPermission && !checking && (
         <>
           {/* Called straight from the click — lib/permissions.ts explains why

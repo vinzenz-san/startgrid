@@ -83,3 +83,48 @@ export async function fetchCurrentWeather(
     isDay: c.is_day === 1,
   };
 }
+
+export interface DailyForecastDay {
+  date: string; // ISO date, YYYY-MM-DD
+  weatherCode: number;
+  tempMax: number;
+  tempMin: number;
+  precipitationProbability?: number; // 0-100, % — omitted if the API doesn't return it for this day
+}
+
+interface DailyForecastApiResponse {
+  daily?: {
+    time: string[];
+    weather_code: number[];
+    temperature_2m_max: number[];
+    temperature_2m_min: number[];
+    precipitation_probability_max?: number[];
+  };
+}
+
+export async function fetchDailyForecast(
+  lat: number,
+  lon: number,
+  units: 'metric' | 'imperial',
+  days: number,
+): Promise<DailyForecastDay[]> {
+  const params = new URLSearchParams({
+    latitude: String(lat),
+    longitude: String(lon),
+    daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max',
+    temperature_unit: units === 'imperial' ? 'fahrenheit' : 'celsius',
+    forecast_days: String(days),
+  });
+  const res = await fetch(`${FORECAST_ENDPOINT}?${params.toString()}`);
+  if (!res.ok) throw new Error(`Error ${res.status}`);
+  const data = await res.json() as DailyForecastApiResponse;
+  const d = data.daily;
+  if (!d) throw new Error('No daily forecast in response');
+  return d.time.map((date, i) => ({
+    date,
+    weatherCode: d.weather_code[i],
+    tempMax: d.temperature_2m_max[i],
+    tempMin: d.temperature_2m_min[i],
+    precipitationProbability: d.precipitation_probability_max?.[i],
+  }));
+}

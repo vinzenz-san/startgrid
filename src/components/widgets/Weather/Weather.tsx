@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import type { WeatherData, WidgetAlignment } from '../../../types/widget';
-import { SettingsRow, Dropdown, SettingsSwitch, ActionButton } from '../../shared/Form';
+import { SettingsRow, Dropdown, SettingsSwitch, SettingsSlider, ActionButton } from '../../shared/Form';
 import { DisplaySettingsPanel } from '../../shared/Form';
 import { DetailedSettings } from '../../Layout/DetailedSettings';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { useWeather } from '../../../hooks/useWeather';
+import { useWeatherForecast } from '../../../hooks/useWeatherForecast';
 import { geocodeCity, type GeocodeResult } from '../../../lib/openMeteoApi';
 import { getForecastUrl, type ForecastProvider } from '../../../lib/forecastLinks';
 import { getWeatherCodeInfo } from '../../../lib/weatherCodes';
@@ -21,6 +22,7 @@ const CONDITION_SIZE_RATIO  = 13 / 28;
 const SECONDARY_SIZE_RATIO  = 12 / 28;
 
 const SEARCH_DEBOUNCE_MS = 450;
+const DEFAULT_FORECAST_DAYS = 5;
 
 // ── Settings ───────────────────────────────────────────────────────────────
 
@@ -168,6 +170,25 @@ export function WeatherSettings({ data, onUpdateData }: SettingsProps) {
         </SettingsRow>
       )}
 
+      <SettingsRow label={t('widget.weather.showForecast')}>
+        <SettingsSwitch
+          checked={data.showForecast ?? false}
+          onChange={v => onUpdateData({ showForecast: v })}
+        />
+      </SettingsRow>
+
+      {data.showForecast && (
+        <SettingsSlider
+          label={t('widget.weather.forecastDays')}
+          value={data.forecastDays ?? DEFAULT_FORECAST_DAYS}
+          min={3}
+          max={7}
+          step={1}
+          valueFormatter={v => String(v)}
+          onChange={v => onUpdateData({ forecastDays: v })}
+        />
+      )}
+
       <DetailedSettings title={t('widget.displaySettings.title')}>
         <DisplaySettingsPanel
           value={data.displaySettings}
@@ -197,6 +218,16 @@ export default function Weather({ data }: Props) {
     latitude: data.latitude,
     longitude: data.longitude,
     units,
+  });
+
+  const showForecast = data.showForecast ?? false;
+  const forecastDays = data.forecastDays ?? DEFAULT_FORECAST_DAYS;
+  const { forecast } = useWeatherForecast({
+    latitude: data.latitude,
+    longitude: data.longitude,
+    units,
+    days: forecastDays,
+    enabled: showForecast,
   });
 
   const hasLocation = data.latitude !== undefined && data.longitude !== undefined;
@@ -247,30 +278,55 @@ export default function Weather({ data }: Props) {
     ? () => window.open(forecastUrl, '_blank', 'noopener')
     : undefined;
 
+  const dayFormatter = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
+
   return (
     <div
-      className={`sg-weather sg-weather--align-${alignment}${data.allowOverflow ? ' sg-weather--overflow' : ''}${openForecast ? ' sg-weather--clickable' : ''}`}
+      className={`sg-weather sg-weather--align-${alignment}${data.allowOverflow ? ' sg-weather--overflow' : ''}${openForecast ? ' sg-weather--clickable' : ''}${showForecast ? ' sg-weather--with-forecast' : ''}`}
       style={wrapper}
       onPointerDown={onPointerDown}
       onClick={e => { if (openForecast) guardClick(e, openForecast); }}
     >
-      <div className="sg-weather-icon" style={{ fontSize: iconSize }}>{info.icon}</div>
-      <div className="sg-weather-main">
-        <div className="sg-weather-temp" style={{ fontSize: tempSize }}>
-          {temp}{unitSuffix}
-          {isStale && <span className="sg-weather-stale-dot" title={t('widget.weather.stale')} />}
+      <div className="sg-weather-current">
+        <div className="sg-weather-icon" style={{ fontSize: iconSize }}>{info.icon}</div>
+        <div className="sg-weather-main">
+          <div className="sg-weather-temp" style={{ fontSize: tempSize }}>
+            {temp}{unitSuffix}
+            {isStale && <span className="sg-weather-stale-dot" title={t('widget.weather.stale')} />}
+          </div>
+          <div className="sg-weather-condition" style={{ fontSize: conditionSize }}>{t(info.labelKey)}</div>
+          {showFeelsLike && (
+            <div className="sg-weather-feelslike" style={{ fontSize: secondarySize }}>{t('widget.weather.feelsLike', { value: `${feelsLike}${unitSuffix}` })}</div>
+          )}
+          {showLocationName && data.locationName && (
+            // Stored locationName is "City, State, Country" (built for the
+            // settings-panel search results, where the full name disambiguates
+            // similarly-named cities); the widget face only ever shows the city.
+            <div className="sg-weather-location" style={{ fontSize: secondarySize }}>{data.locationName.split(',')[0].trim()}</div>
+          )}
         </div>
-        <div className="sg-weather-condition" style={{ fontSize: conditionSize }}>{t(info.labelKey)}</div>
-        {showFeelsLike && (
-          <div className="sg-weather-feelslike" style={{ fontSize: secondarySize }}>{t('widget.weather.feelsLike', { value: `${feelsLike}${unitSuffix}` })}</div>
-        )}
-        {showLocationName && data.locationName && (
-          // Stored locationName is "City, State, Country" (built for the
-          // settings-panel search results, where the full name disambiguates
-          // similarly-named cities); the widget face only ever shows the city.
-          <div className="sg-weather-location" style={{ fontSize: secondarySize }}>{data.locationName.split(',')[0].trim()}</div>
-        )}
       </div>
+
+      {showForecast && forecast && (
+        <div className="sg-weather-forecast">
+          {forecast.map(day => {
+            const dayInfo = getWeatherCodeInfo(day.weatherCode);
+            // +T00:00 avoids the browser interpreting a bare "YYYY-MM-DD"
+            // as UTC midnight, which can roll over to the wrong local day.
+            const label = dayFormatter.format(new Date(`${day.date}T00:00:00`));
+            return (
+              <div className="sg-weather-forecast-day" key={day.date}>
+                <span className="sg-weather-forecast-day-label">{label}</span>
+                <span className="sg-weather-forecast-day-icon">{dayInfo.icon}</span>
+                <span className="sg-weather-forecast-day-temps">
+                  <span className="sg-weather-forecast-day-max">{Math.round(day.tempMax)}°</span>
+                  <span className="sg-weather-forecast-day-min">{Math.round(day.tempMin)}°</span>
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

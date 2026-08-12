@@ -226,6 +226,13 @@ export const en = {
   'widgets.type.todoList':       'To-Do',
   'widgets.type.currencyTicker': 'Currency',
   'widgets.type.rainRadar':      'Rain Radar',
+  'widgets.type.iframe':         'Iframe',
+
+  // ── Iframe widget ─────────────────────────────────────────────────────────
+  'widget.iframe.url':      'Page URL',
+  'widget.iframe.hint':     'Displays a webpage inside the widget. A bare address (e.g. "example.com") assumes https:// — for an http-only site, type the full "http://" address. Some sites also block being embedded this way and won\'t load.',
+  'widget.iframe.title':    'Embedded page',
+  'widget.iframe.noUrl':    'No URL configured — add one in Settings.',
 
   // ── RSS Feed widget ───────────────────────────────────────────────────────
   'widget.rssFeed.noFeed':           'No feed configured — add a feed URL in Settings.',
@@ -320,6 +327,8 @@ export const en = {
   'widget.weather.forecastProvider.google':       'Google',
   'widget.weather.forecastProvider.windy':        'Windy',
   'widget.weather.forecastProvider.wetteronline': 'WetterOnline',
+  'widget.weather.showForecast': 'Show inline forecast',
+  'widget.weather.forecastDays': 'Forecast days',
   'widget.rainRadar.zoom':     'Map zoom',
   'widget.rainRadar.opacity':  'Radar opacity',
   'widget.rainRadar.error':    'Couldn’t load radar.',
@@ -454,6 +463,18 @@ export const en = {
   'widget.obsidianRandom.rebuildIndex':   'Rebuild vault index',
   'widget.obsidianRandom.indexHint':      'The file list is cached for 6 hours. Rebuild it after moving notes around.',
   'widget.obsidianRandom.truncated':      'Large vault — drawing from a partial index.',
+
+  // ── VaultNotePicker (shared) ─────────────────────────────────────────────
+  'widget.vaultPicker.label':        'Note',
+  'widget.vaultPicker.placeholder':  'Notes/Shopping.md',
+  'widget.vaultPicker.indexing':     'Indexing your vault…',
+  'widget.vaultPicker.rebuildIndex': 'Rebuild vault index',
+  'widget.vaultPicker.openVault':    'Open vault',
+  'widget.vaultPicker.truncated':    'Large vault — showing a partial index.',
+  'widget.vaultPicker.loadError':    'No notes found — check the Obsidian connection below is working (try "Test connection").',
+  'widget.vaultPicker.vaultRoot':    'Vault',
+  'widget.vaultPicker.folderEmpty':  'No notes in this folder.',
+  'widget.vaultPicker.noMatches':    'No matching notes.',
 
   // ── Clock widget ─────────────────────────────────────────────────────────
   'widget.clock.format':        'Format',

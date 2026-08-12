@@ -11,6 +11,7 @@ import { sliceSection, type MdBlock } from '../../../lib/obsidianMarkdown';
 import MarkdownView from '../shared/MarkdownView';
 import NoteEditor from '../shared/NoteEditor';
 import ObsidianConnect from '../shared/ObsidianConnect';
+import { DetailedSettings } from '../../Layout/DetailedSettings';
 import ObsidianStatus from '../shared/ObsidianStatus';
 import { IconObsidian, IconRefresh, IconOpenExternal, IconEdit, SkeletonRow } from '../shared/ObsidianIcons';
 import { openInObsidian } from '../../../lib/obsidianApi';
@@ -88,8 +89,9 @@ export function ObsidianDailySettings({ data, onUpdateData }: SettingsProps) {
         valueFormatter={v => (v ? String(v) : t('widget.obsidianDaily.noLimit'))}
       />
 
-      <div className="sg-cal-settings-divider"/>
-      <ObsidianConnect />
+      <DetailedSettings title={t('widget.obsidian.sectionTitle')}>
+        <ObsidianConnect />
+      </DetailedSettings>
     </div>
   );
 }

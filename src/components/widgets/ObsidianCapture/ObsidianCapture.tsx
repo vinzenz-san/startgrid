@@ -14,6 +14,7 @@ import {
   resolvePathTemplate,
 } from '../../../lib/obsidianPath';
 import ObsidianConnect from '../shared/ObsidianConnect';
+import { DetailedSettings } from '../../Layout/DetailedSettings';
 import '../shared/obsidian.css';
 import './ObsidianCapture.css';
 
@@ -143,9 +144,10 @@ export function ObsidianCaptureSettings({ data, onUpdateData }: SettingsProps) {
         />
       </SettingsRow>
 
-      <div className="sg-cal-settings-divider"/>
-      <p className="sg-obs-hint">{t('widget.obsidianCapture.restNote')}</p>
-      <ObsidianConnect />
+      <DetailedSettings title={t('widget.obsidian.sectionTitle')}>
+        <p className="sg-obs-hint">{t('widget.obsidianCapture.restNote')}</p>
+        <ObsidianConnect />
+      </DetailedSettings>
     </div>
   );
 }

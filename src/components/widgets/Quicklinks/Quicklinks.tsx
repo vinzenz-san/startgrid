@@ -5,6 +5,7 @@ import type { QuickLink, QuicklinksData } from '../../../types/widget';
 import { SettingsRow, SettingsSlider, SettingsSwitch, Dropdown } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { scaledFontSize } from '../../../lib/displayStyle';
+import { normalizeUrl } from '../../../lib/urlUtils';
 import type { TranslationKey } from '../../../i18n';
 import './Quicklinks.css';
 
@@ -58,8 +59,6 @@ function generateId() {
 // ── Single link item ───────────────────────────────────────────────────────
 
 const INTERNAL_URL = /^(about|chrome|edge|moz-extension|file):/i;
-const DANGEROUS_URL = /^(javascript|data):/i;
-const SCHEME_URL = /^[a-z][a-z0-9+.-]*:/i;
 
 function clipboardFallback(url: string, t: TFn) {
   navigator.clipboard.writeText(url).catch(() => {});
@@ -212,10 +211,9 @@ export function QuicklinksSettings({ data, onUpdateData }: SettingsProps) {
   };
 
   const addLink = () => {
-    const url = newUrl.trim();
-    if (!url) return;
-    if (DANGEROUS_URL.test(url)) { alert(t('widget.quicklinks.unsupportedUrlScheme')); return; }
-    const fullUrl = SCHEME_URL.test(url) ? url : `https://${url}`;
+    if (!newUrl.trim()) return;
+    const fullUrl = normalizeUrl(newUrl);
+    if (!fullUrl) { alert(t('widget.quicklinks.unsupportedUrlScheme')); return; }
     onUpdateData({ links: [...data.links, { id: generateId(), url: fullUrl, showTitle: true }] });
     setNewUrl('');
   };

@@ -77,6 +77,67 @@
 
 .sg-weather--clickable { cursor: pointer; }
 
+/* ── Inline forecast ──────────────────────────────── */
+/* The default layout is a single row (icon beside current-conditions text);
+   with a forecast row it becomes a column so the forecast sits underneath
+   instead of squeezing into the same row. */
+.sg-weather--with-forecast {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 10px;
+}
+
+.sg-weather-current {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 0;
+}
+
+.sg-weather--with-forecast.sg-weather--align-center .sg-weather-current { justify-content: center; }
+.sg-weather--with-forecast.sg-weather--align-right   .sg-weather-current { justify-content: flex-end; }
+
+.sg-weather-forecast {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.sg-weather-forecast-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  padding: 4px 2px;
+  border-radius: 6px;
+  background: rgba(128, 128, 128, 0.08);
+}
+
+.sg-weather-forecast-day-label {
+  font-size: calc(10px * var(--sg-font-scale, 1));
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.sg-weather-forecast-day-icon {
+  font-size: calc(16px * var(--sg-font-scale, 1));
+  line-height: 1.2;
+}
+
+.sg-weather-forecast-day-temps {
+  display: flex;
+  gap: 4px;
+  font-size: calc(11px * var(--sg-font-scale, 1));
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.sg-weather-forecast-day-max { color: var(--text); font-weight: 500; }
+.sg-weather-forecast-day-min { color: var(--text-muted); }
+
 /* ── Empty / loading / error states ──────────────── */
 .sg-weather--empty {
   flex-direction: column;

@@ -3,6 +3,7 @@ import type { ObsidianNoteData } from '../../../types/widget';
 import { useObsidianNote } from './useObsidianNote';
 import { useObsidian } from '../../../hooks/useObsidian';
 import { SettingsRow, SettingsSlider } from '../../shared/Form';
+import VaultNotePicker from '../shared/VaultNotePicker';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { isScreenshotMode } from '../../../lib/permissions';
 import { scaledFontSize } from '../../../lib/displayStyle';
@@ -12,6 +13,7 @@ import { openInObsidian } from '../../../lib/obsidianApi';
 import MarkdownView from '../shared/MarkdownView';
 import NoteEditor from '../shared/NoteEditor';
 import ObsidianConnect from '../shared/ObsidianConnect';
+import { DetailedSettings } from '../../Layout/DetailedSettings';
 import ObsidianStatus from '../shared/ObsidianStatus';
 import { IconObsidian, IconRefresh, IconOpenExternal, IconEdit, SkeletonRow } from '../shared/ObsidianIcons';
 import '../shared/obsidian.css';
@@ -31,17 +33,11 @@ export function ObsidianNoteSettings({ data, onUpdateData }: SettingsProps) {
 
   return (
     <div className="sg-obs-settings" onClick={e => e.stopPropagation()}>
-      <SettingsRow label={t('widget.obsidianNote.path')}>
-        <input
-          className="sg-obs-input sg-obs-input--mono"
-          placeholder="Notes/Shopping.md"
-          value={data.path ?? ''}
-          onChange={e => onUpdateData({ path: e.target.value || undefined })}
-          onPointerDown={e => e.stopPropagation()}
-          onMouseDown={e => e.stopPropagation()}
-          onDragStart={e => e.stopPropagation()}
-        />
-      </SettingsRow>
+      <VaultNotePicker
+        label={t('widget.obsidianNote.path')}
+        value={data.path ?? ''}
+        onChange={path => onUpdateData({ path: path || undefined })}
+      />
 
       <SettingsRow label={t('widget.obsidianNote.section')}>
         <input
@@ -71,8 +67,9 @@ export function ObsidianNoteSettings({ data, onUpdateData }: SettingsProps) {
         valueFormatter={v => (v ? `${v} min` : t('widget.obsidianNote.refreshOnLoad'))}
       />
 
-      <div className="sg-cal-settings-divider"/>
-      <ObsidianConnect />
+      <DetailedSettings title={t('widget.obsidian.sectionTitle')}>
+        <ObsidianConnect />
+      </DetailedSettings>
     </div>
   );
 }

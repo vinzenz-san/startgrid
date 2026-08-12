@@ -228,6 +228,13 @@ export const de: Record<TranslationKey, string> = {
   'widgets.type.todoList':       'To-Do',
   'widgets.type.currencyTicker': 'Währung',
   'widgets.type.rainRadar':      'Regenradar',
+  'widgets.type.iframe':         'Iframe',
+
+  // ── Iframe widget ─────────────────────────────────────────────────────────
+  'widget.iframe.url':      'Seiten-URL',
+  'widget.iframe.hint':     'Zeigt eine Webseite im Widget an. Eine reine Adresse (z. B. "example.com") wird als https:// angenommen — für eine reine http-Seite die vollständige "http://"-Adresse eingeben. Manche Seiten blockieren diese Art der Einbettung außerdem und laden dann nicht.',
+  'widget.iframe.title':    'Eingebettete Seite',
+  'widget.iframe.noUrl':    'Keine URL eingerichtet — in den Einstellungen hinzufügen.',
 
   // ── RSS Feed widget ───────────────────────────────────────────────────────
   'widget.rssFeed.noFeed':           'Kein Feed eingerichtet — Feed-URL in den Einstellungen hinzufügen.',
@@ -322,6 +329,8 @@ export const de: Record<TranslationKey, string> = {
   'widget.weather.forecastProvider.google':       'Google',
   'widget.weather.forecastProvider.windy':        'Windy',
   'widget.weather.forecastProvider.wetteronline': 'WetterOnline',
+  'widget.weather.showForecast': 'Vorhersage anzeigen',
+  'widget.weather.forecastDays': 'Vorhersagetage',
   'widget.rainRadar.zoom':     'Kartenzoom',
   'widget.rainRadar.opacity':  'Radar-Deckkraft',
   'widget.rainRadar.error':    'Radar konnte nicht geladen werden.',
@@ -456,6 +465,18 @@ export const de: Record<TranslationKey, string> = {
   'widget.obsidianRandom.rebuildIndex':   'Vault-Index neu aufbauen',
   'widget.obsidianRandom.indexHint':      'Die Dateiliste wird 6 Stunden zwischengespeichert. Nach dem Verschieben von Notizen neu aufbauen.',
   'widget.obsidianRandom.truncated':      'Großer Vault — Auswahl aus einem Teilindex.',
+
+  // ── VaultNotePicker (shared) ─────────────────────────────────────────────
+  'widget.vaultPicker.label':        'Notiz',
+  'widget.vaultPicker.placeholder':  'Notizen/Einkaufsliste.md',
+  'widget.vaultPicker.indexing':     'Vault wird indiziert…',
+  'widget.vaultPicker.rebuildIndex': 'Vault-Index neu aufbauen',
+  'widget.vaultPicker.openVault':    'Vault öffnen',
+  'widget.vaultPicker.truncated':    'Großer Vault — zeigt einen Teilindex.',
+  'widget.vaultPicker.loadError':    'Keine Notizen gefunden — prüfe, ob die Obsidian-Verbindung unten funktioniert ("Verbindung testen").',
+  'widget.vaultPicker.vaultRoot':    'Vault',
+  'widget.vaultPicker.folderEmpty':  'Keine Notizen in diesem Ordner.',
+  'widget.vaultPicker.noMatches':    'Keine passenden Notizen.',
 
   // ── Clock widget ─────────────────────────────────────────────────────────
   'widget.clock.format':        'Format',

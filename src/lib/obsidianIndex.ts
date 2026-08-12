@@ -122,3 +122,56 @@ export function pickRandom(paths: string[], avoid?: string): string | null {
   const pool = avoid ? paths.filter(p => p !== avoid) : paths;
   return pool[Math.floor(Math.random() * pool.length)] ?? paths[0];
 }
+
+/** Case-insensitive substring filter over a vault index, for a note-picker
+ *  combobox — sorted so matches near the start of the filename (not just
+ *  anywhere in the full path) rank first, since that's usually what a user
+ *  typing a note's name is looking for. Capped so a broad query against a
+ *  huge vault doesn't render an unbounded list. */
+export function searchIndex(paths: string[], query: string, limit = 30): string[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  const matches = paths.filter(p => p.toLowerCase().includes(q));
+  const filenameOf = (p: string) => (p.split('/').pop() ?? p).toLowerCase();
+  // -1 (query only found in a folder segment, not the filename) sorts last,
+  // not first — an unmodified indexOf would otherwise rank those above real
+  // filename-prefix matches, since -1 < 0.
+  const rank = (p: string) => { const i = filenameOf(p).indexOf(q); return i === -1 ? Infinity : i; };
+  matches.sort((a, b) => rank(a) - rank(b));
+  return matches.slice(0, limit);
+}
+
+export interface FolderListing {
+  /** Immediate subfolder names at this level (not full paths). */
+  folders: string[];
+  /** Immediate notes at this level. */
+  notes: { name: string; path: string }[];
+}
+
+/** Derives one folder's immediate contents from the flat vault index — there
+ *  is no real folder object anywhere (the index is just a list of `.md`
+ *  paths), so this groups by path segment on demand instead of maintaining
+ *  a separate tree structure. Used for the note-picker's explorer view;
+ *  `folder` is a vault-relative path with no leading/trailing slash, ''
+ *  for the vault root. */
+export function listFolder(paths: string[], folder: string): FolderListing {
+  const prefix = folder ? `${folder}/` : '';
+  const folderSet = new Set<string>();
+  const notes: { name: string; path: string }[] = [];
+
+  for (const path of paths) {
+    if (!path.startsWith(prefix)) continue;
+    const rest = path.slice(prefix.length);
+    const slash = rest.indexOf('/');
+    if (slash === -1) {
+      notes.push({ name: rest, path });
+    } else {
+      folderSet.add(rest.slice(0, slash));
+    }
+  }
+
+  return {
+    folders: [...folderSet].sort((a, b) => a.localeCompare(b)),
+    notes: notes.sort((a, b) => a.name.localeCompare(b.name)),
+  };
+}

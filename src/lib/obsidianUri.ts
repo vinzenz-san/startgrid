@@ -44,6 +44,14 @@ export function buildOpenUri(vault: string, file: string): string {
   return buildUri('open', { vault, file });
 }
 
+/** Open the vault itself (no `file`) — Obsidian has no literal "index" page,
+ *  so this is the closest equivalent: it focuses the app on whatever note
+ *  was last open there, with the file explorer sidebar available to browse
+ *  from. */
+export function buildOpenVaultUri(vault: string): string {
+  return buildUri('open', { vault });
+}
+
 /** Hand a URI to the OS handler. Safe to call outside a click handler. */
 export function launchUri(uri: string): void {
   const a = document.createElement('a');

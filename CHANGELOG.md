@@ -2,6 +2,13 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.18.0] — Iframe widget, inline Weather forecast, Obsidian vault note picker
+
+- **New Iframe widget**: displays a webpage inside a widget, with an edit-mode overlay so it stays draggable (an iframe is its own browsing context and would otherwise swallow every pointer event). URL field accepts a bare host (`example.com` → `https://example.com`) via a new shared `normalizeUrl()` helper, also now used by Quicklinks instead of its own local regex copy. Many sites block being embedded this way (`X-Frame-Options`/CSP) with no client-side workaround — documented in the widget's own settings hint
+- **Weather**: new inline multi-day forecast (3–7 days, toggle + slider in settings) using Open-Meteo's free `daily` forecast endpoint — no new API/key needed. Independent of the existing "open forecast on click" external link
+- **Obsidian Pinned Note**: the raw text path field is now a proper vault note picker (`VaultNotePicker`, shared for reuse by other Obsidian widgets later) — typing searches the whole vault by filename, an empty/focused field browses folder-by-folder (breadcrumbs, 📁/📄 rows) starting from the current note's own folder. Backed by the same cached vault index ObsidianRandom's shuffle already builds. Includes an "Open vault" deep-link button and a rebuild-index button for after vault changes
+- Every Obsidian widget's "Obsidian Connection" settings block is now collapsed by default behind the same "Open/Close Settings" toggle used for Display Settings elsewhere, instead of always being expanded inline
+
 ## [1.17.0] — Global Font Scale
 
 - New single "Font Scale" slider (Settings, 50–200%, default 100%) replaces the 9 separate per-widget font/text-size sliders that used to live in Weather, Greeting, Notes, the 4 Obsidian widgets, Quicklinks, and BookmarkFolder — each now scales its own fixed base size off one shared `--sg-font-scale` CSS variable (`WidgetContainer.tsx`) instead of storing an independent value. Clock and Greeting stay fixed at their own size, matching their existing locked-style treatment (transparency/shadow/glass/gradient are already immune to global/local overrides for these two)

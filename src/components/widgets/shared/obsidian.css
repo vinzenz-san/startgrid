@@ -30,6 +30,8 @@
   color: var(--text-muted);
 }
 
+.sg-obs-hint--error { color: #f87171; }
+
 .sg-obs-hint code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.9em;
@@ -75,3 +77,116 @@
 }
 
 .sg-obs-result--ok { color: #22c55e; }
+
+/* ── VaultNotePicker ──────────────────────────────────────────────────── */
+/* Fixed height (not max-height) — this box holds a scrollable row list OR a
+   single "empty"/"no matches" hint, and it must stay the same size either
+   way so switching between them (typing, clicking into a folder) doesn't
+   reflow the whole Settings panel around it. */
+.sg-vault-picker-results {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  height: 160px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  overflow-y: auto;
+  margin-top: 4px;
+  /* Reserves the scrollbar's width whether or not content actually
+     overflows — without this, a native (non-overlay) scrollbar toggling
+     in/out as row count crosses the fixed height narrows the row content
+     and visibly shifts the whole Settings panel by a few pixels. */
+  scrollbar-gutter: stable;
+}
+.sg-vault-picker-results .sg-obs-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  margin: 0;
+}
+
+.sg-vault-picker-result {
+  text-align: left;
+  padding: 4px 8px;
+  border-radius: 5px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.sg-vault-picker-result:hover { background: rgba(128, 128, 128, 0.12); }
+
+.sg-vault-picker-breadcrumb {
+  display: flex;
+  align-items: center;
+  /* nowrap + horizontal scroll, not wrap — a deep folder path (many crumbs)
+     must never grow past one line's height, or the Settings panel below it
+     shifts down every time you navigate one level deeper. Matches
+     BookmarkFolder's own breadcrumb, which has the same constraint. */
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  gap: 0;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.sg-vault-picker-breadcrumb::-webkit-scrollbar { display: none; }
+
+.sg-vault-picker-crumb {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 1px 3px;
+  border-radius: 3px;
+  background: none;
+  border: none;
+  transition: background 0.1s, color 0.1s;
+}
+.sg-vault-picker-crumb:disabled {
+  cursor: default;
+  color: var(--text);
+  font-weight: 600;
+}
+.sg-vault-picker-crumb:hover { background: rgba(128, 128, 128, 0.15); color: var(--text); }
+.sg-vault-picker-crumb:last-child { color: var(--text); font-weight: 600; }
+
+.sg-vault-picker-crumb-sep {
+  font-size: 10px;
+  opacity: 0.4;
+  padding: 0 1px;
+}
+
+.sg-vault-picker-row {
+  text-align: left;
+  padding: 4px 8px;
+  border-radius: 5px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.sg-vault-picker-row:hover { background: rgba(128, 128, 128, 0.12); }
+.sg-vault-picker-row--folder { font-weight: 500; }
+
+.sg-vault-picker-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}

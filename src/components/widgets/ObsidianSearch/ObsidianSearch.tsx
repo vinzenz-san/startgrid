@@ -9,6 +9,7 @@ import { simpleSearch, openInObsidian, ObsidianError, type SearchHit, type Obsid
 import { isExtensionEnv, isScreenshotMode } from '../../../lib/permissions';
 import { vaultPathToTitle } from '../../../lib/obsidianPath';
 import ObsidianConnect from '../shared/ObsidianConnect';
+import { DetailedSettings } from '../../Layout/DetailedSettings';
 import ObsidianStatus from '../shared/ObsidianStatus';
 import '../shared/obsidian.css';
 import './ObsidianSearch.css';
@@ -54,8 +55,9 @@ export function ObsidianSearchSettings({ data, onUpdateData }: SettingsProps) {
         onChange={v => onUpdateData({ contextLength: v })}
         valueFormatter={v => String(v)}
       />
-      <div className="sg-cal-settings-divider"/>
-      <ObsidianConnect />
+      <DetailedSettings title={t('widget.obsidian.sectionTitle')}>
+        <ObsidianConnect />
+      </DetailedSettings>
     </div>
   );
 }
