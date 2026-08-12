@@ -696,6 +696,9 @@ export const en = {
   'tour.step6.body':       'Replay this anytime from Settings → "Show tutorial again", just above Import/Export.',
   'tour.skipNotice.title': 'No worries',
   'tour.skipNotice.body':  'You can restart this tutorial anytime from Settings → "Show tutorial again", just above Import/Export.',
+  'tour.presetPicker.title': 'Start from a layout',
+  'tour.presetPicker.body':  'Pick a starting layout, or skip and build your own from scratch.',
+  'tour.presetPicker.skip':  'Skip, I\'ll build my own',
 } as const;
 
 export type TranslationKey = keyof typeof en;

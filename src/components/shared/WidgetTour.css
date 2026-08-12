@@ -60,9 +60,27 @@
   justify-content: space-between;
 }
 
+/* min-height: 0 lets this flex item shrink below its content size — without
+   it, a step whose body text is too long to fit the dialog's fixed 220px
+   height would overflow the dialog box itself instead of scrolling inside
+   it (flex items default to min-height: auto, i.e. never smaller than their
+   content, on the main axis). */
+.sg-tour-content { min-height: 0; overflow: hidden; }
+
 .sg-tour-progress { font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.03em; }
 .sg-tour-title    { font-size: 14px; font-weight: 600; color: var(--text); }
-.sg-tour-body     { font-size: 12px; line-height: 1.55; color: var(--text-muted); margin: 0; }
+/* max-height + overflow-y: auto is a safety net, not the common case — at
+   today's copy lengths this never scrolls (verified across EN/DE). Keeps
+   a future longer translation/step from breaking the dialog's fixed size
+   instead of silently spilling text past its border. */
+.sg-tour-body {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  margin: 0;
+  max-height: 110px;
+  overflow-y: auto;
+}
 
 .sg-tour-dots { display: flex; gap: 5px; margin: 6px 0 2px; }
 .sg-tour-dot  { width: 6px; height: 6px; border-radius: 50%; background: var(--border); }

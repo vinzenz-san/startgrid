@@ -698,4 +698,7 @@ export const de: Record<TranslationKey, string> = {
   'tour.step6.body':       'Jederzeit wiederholbar unter Einstellungen → "Tutorial erneut anzeigen", direkt über Import/Export.',
   'tour.skipNotice.title': 'Kein Problem',
   'tour.skipNotice.body':  'Du kannst dieses Tutorial jederzeit unter Einstellungen → "Tutorial erneut anzeigen" neu starten, direkt über Import/Export.',
+  'tour.presetPicker.title': 'Mit einem Layout starten',
+  'tour.presetPicker.body':  'Wähle ein Start-Layout, oder überspringe diesen Schritt und baue dein eigenes.',
+  'tour.presetPicker.skip':  'Überspringen, ich baue mein eigenes',
 };

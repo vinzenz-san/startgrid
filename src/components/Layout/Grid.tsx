@@ -9,6 +9,7 @@ import ThemeToggle from '../shared/ThemeToggle';
 import GearIcon from '../shared/icons/GearIcon';
 import SettingsPanel from './SettingsPanel';
 import WidgetTour from '../shared/WidgetTour';
+import LayoutPresetPicker from '../shared/LayoutPresetPicker';
 import CommandPalette from '../shared/CommandPalette';
 import DevPanel, { type DevPanelPos } from '../DevPanel/DevPanel';
 import InspectorHistoryPanel from '../DevPanel/InspectorHistoryPanel';
@@ -31,6 +32,7 @@ export default function Grid() {
   const [settingsPanelOpen, setSettingsPanelOpen] = useState(false);
   const [devPanelPos,       setDevPanelPos]       = useState<DevPanelPos | null>(null);
   const [tourOpen,          setTourOpen]          = useState(false);
+  const [presetPickerOpen,  setPresetPickerOpen]  = useState(false);
 
   // Auto-trigger the widget onboarding tour once widgets have loaded (never
   // flashes open on a dashboard that's still mid-restore). Gating differs by
@@ -150,6 +152,12 @@ export default function Grid() {
         open={tourOpen}
         onClose={closeTour}
         onOpenSettings={() => setSettingsPanelOpen(true)}
+        onComplete={() => setPresetPickerOpen(true)}
+      />
+
+      <LayoutPresetPicker
+        open={presetPickerOpen}
+        onClose={() => setPresetPickerOpen(false)}
       />
 
       <CommandPalette />

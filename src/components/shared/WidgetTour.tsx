@@ -13,6 +13,10 @@ interface Props {
    *  in a context), so the tour needs it threaded in to actually perform the
    *  "click Next to open it" step rather than just describing it. */
   onOpenSettings: () => void;
+  /** Fired only when the last step's "Got it" is clicked — i.e. a real
+   *  completion, not "Skip tour". Grid.tsx uses this to follow up with the
+   *  layout preset picker. */
+  onComplete?: () => void;
 }
 
 interface Step {
@@ -76,7 +80,7 @@ function useHighlightRect(selector: string | undefined) {
   return rect;
 }
 
-export default function WidgetTour({ open, onClose, onOpenSettings }: Props) {
+export default function WidgetTour({ open, onClose, onOpenSettings, onComplete }: Props) {
   const { t, updateSettings } = useSettings();
   const { isEditMode, toggleEditMode } = useEditMode();
   const [step, setStep] = useState(0);
@@ -143,7 +147,7 @@ export default function WidgetTour({ open, onClose, onOpenSettings }: Props) {
         />
       )}
       <div className="sg-tour-dialog">
-        <div>
+        <div className="sg-tour-content">
           <div className="sg-tour-progress">{t('tour.stepCounter', { current: step + 1, total: STEPS.length })}</div>
           <div className="sg-tour-title">{t(titleKey)}</div>
           <p className="sg-tour-body">{t(bodyKey)}</p>
@@ -159,7 +163,7 @@ export default function WidgetTour({ open, onClose, onOpenSettings }: Props) {
             {step > 0 && (
               <button className="sg-tour-btn sg-tour-btn--back" onClick={() => setStep(step - 1)}>{t('tour.back')}</button>
             )}
-            <button className="sg-tour-btn sg-tour-btn--next" onClick={() => isLast ? (markSeen(), onClose()) : advance(step + 1)}>
+            <button className="sg-tour-btn sg-tour-btn--next" onClick={() => isLast ? (markSeen(), onClose(), onComplete?.()) : advance(step + 1)}>
               {isLast ? t('tour.done') : t('tour.next')}
             </button>
           </div>

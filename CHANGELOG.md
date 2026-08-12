@@ -2,6 +2,11 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.16.5] — Post-tour layout picker scaffolding, tour overflow safety net
+
+- New `LayoutPresetPicker` component: a card-grid version of the existing text-only layout preset dropdown, shown once right after the onboarding tour's final "Got it" (not on Skip). Applies the chosen preset immediately, no confirm step. `GridPreset` gained an optional `previewImage` field — falls back to a placeholder tile when unset, so this ships inert until thumbnail images are added per preset
+- `WidgetTour`'s fixed-size dialog box could overflow if a future step's body text ran long enough (verified current EN/DE copy all fits) — the text area now has a max-height + scroll as a safety net instead of silently spilling past the dialog's border
+
 ## [1.16.4] — Edit-mode drag-vs-click fixes, RSS entity decoding, calendar sizing
 
 - Fixed edit-mode widget context menu/settings sliders triggering a grid drag instead of the control itself: `react-grid-layout`'s `dragConfig.cancel` selector was never configured, so any pointerdown inside a widget was drag-eligible unless individually `stopPropagation()`'d. A shared `.sg-no-drag` class now marks the gear button and remove button as drag-exempt (the edit-mode info bar itself stays draggable, so dragging by the header still works)

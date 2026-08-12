@@ -34,6 +34,9 @@ export interface GridPreset {
    *  type's own registry defaultSize (WIDGET_REGISTRY) for this preset only,
    *  without touching the shared default other presets/Add Widget still use. */
   sizeOverrides?: Partial<Record<WidgetType, { w: number; h: number }>>;
+  /** Thumbnail shown in the layout-picker card grid (LayoutPresetPicker).
+   *  Falls back to a text-only card when absent. */
+  previewImage?: string;
 }
 
 // Onboarding-style "starting point" presets (Focus / Grid / Goals) — built
