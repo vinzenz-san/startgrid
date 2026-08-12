@@ -500,6 +500,15 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
             >
               ☕ {t('settings.support')}
             </a>
+
+            <a
+              className="sg-support-link"
+              href="https://github.com/vinzenz-san/startgrid/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              🐙 {t('settings.reportIssue')}
+            </a>
           </PanelSection>
 
           {/* ══ 6. DEVELOPER OPTIONS (hidden until unlocked — see handleTitleTap) ══ */}

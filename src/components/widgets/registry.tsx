@@ -137,7 +137,7 @@ const _registry = {
   calendar: {
     label:         'Google Calendar',
     icon:          '📅',
-    defaultSize:   { w: 2, h: 3 },
+    defaultSize:   { w: 5, h: 5 },
     defaultData:   { maxDays: 3, showAllDay: true } satisfies CalendarData,
     // Google OAuth verification of the calendar.readonly scope succeeded
     // (2026-07-28) — no longer gated behind Developer Options.
@@ -149,7 +149,7 @@ const _registry = {
   outlookCalendar: {
     label:         'Outlook Calendar',
     icon:          '📆',
-    defaultSize:   { w: 2, h: 3 },
+    defaultSize:   { w: 5, h: 5 },
     defaultData:   { maxDays: 3, showAllDay: true } satisfies OutlookCalendarData,
     titleBehavior: 'auto',
     renderComponent: (data, onUpdateData) => <OutlookCalendar data={data} onUpdateData={onUpdateData} />,

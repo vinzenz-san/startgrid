@@ -21,9 +21,24 @@ export interface ParsedFeed {
   items: FeedItem[];
 }
 
+// Some feeds HTML-escape their text content on top of the XML escaping —
+// sometimes more than once (e.g. "&amp;amp;#8217;" in the source, which the
+// XML parser only unwraps one level of, leaving "&#8217;" or even
+// "&amp;#8217;" literally in textContent). Keep decoding via an HTML parse
+// until a pass changes nothing, capped so a pathological feed can't loop forever.
+function decodeEntities(str: string): string {
+  let prev = str;
+  for (let i = 0; i < 5; i++) {
+    const next = new DOMParser().parseFromString(prev, 'text/html').documentElement.textContent ?? prev;
+    if (next === prev) break;
+    prev = next;
+  }
+  return prev;
+}
+
 function text(el: Element | null | undefined): string | undefined {
   const t = el?.textContent?.trim();
-  return t ? t : undefined;
+  return t ? decodeEntities(t) : undefined;
 }
 
 // Both RSS <pubDate> (RFC 822) and Atom <published>/<updated> (RFC 3339) parse

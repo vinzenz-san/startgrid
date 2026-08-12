@@ -9,6 +9,7 @@ import { geocodeCity, type GeocodeResult } from '../../../lib/openMeteoApi';
 import { getForecastUrl, type ForecastProvider } from '../../../lib/forecastLinks';
 import { getWeatherCodeInfo } from '../../../lib/weatherCodes';
 import { resolveDisplayStyle } from '../../../lib/displayStyle';
+import { useClickDragGuard } from '../../../lib/clickDragGuard';
 import './Weather.css';
 
 // Weather's old fixed sizes (icon 42 / temp 28 / condition 13 / feelslike+location
@@ -187,6 +188,7 @@ interface Props {
 
 export default function Weather({ data }: Props) {
   const { t } = useSettings();
+  const { onPointerDown, guardClick } = useClickDragGuard();
   const units           = data.units ?? 'metric';
   const showFeelsLike    = data.showFeelsLike ?? true;
   const showLocationName = data.showLocationName ?? true;
@@ -249,7 +251,8 @@ export default function Weather({ data }: Props) {
     <div
       className={`sg-weather sg-weather--align-${alignment}${data.allowOverflow ? ' sg-weather--overflow' : ''}${openForecast ? ' sg-weather--clickable' : ''}`}
       style={wrapper}
-      onClick={openForecast}
+      onPointerDown={onPointerDown}
+      onClick={e => { if (openForecast) guardClick(e, openForecast); }}
     >
       <div className="sg-weather-icon" style={{ fontSize: iconSize }}>{info.icon}</div>
       <div className="sg-weather-main">

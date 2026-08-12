@@ -142,7 +142,7 @@ export default function RGLGrid({ contentRows, disableGridGlow }: Props) {
             layout={layout}
             width={innerWidth}
             gridConfig={{ cols: columns, rowHeight: cellHeight, margin: [gap, gap], containerPadding: [0, 0] }}
-            dragConfig={{ enabled: isEditMode }}
+            dragConfig={{ enabled: isEditMode, cancel: '.sg-no-drag' }}
             resizeConfig={{ enabled: isEditMode, handles: ['se'] }}
             compactor={fullPageGrid ? fullPageDragCompactor : dragCompactor}
             autoSize={false}

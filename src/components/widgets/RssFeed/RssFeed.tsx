@@ -4,6 +4,7 @@ import { SettingsRow, SettingsSlider, SettingsSwitch, Dropdown, ActionButton } f
 import { useSettings } from '../../../contexts/SettingsContext';
 import { useRssFeed } from '../../../hooks/useRssFeed';
 import { isExtensionEnv } from '../../../lib/permissions';
+import { useClickDragGuard } from '../../../lib/clickDragGuard';
 import type { TranslationKey } from '../../../i18n';
 import './RssFeed.css';
 
@@ -106,6 +107,7 @@ export default function RssFeed({ data, onUpdateData }: Props) {
   const { t } = useSettings();
   const maxItems = data.maxItems ?? 8;
   const showDescription = data.showDescription ?? false;
+  const { onPointerDown, guardClick } = useClickDragGuard();
 
   const { status, items, feedTitle, error, isStale, refetch } = useRssFeed({
     feedUrl: data.feedUrl,
@@ -153,7 +155,11 @@ export default function RssFeed({ data, onUpdateData }: Props) {
       )}
       {items.slice(0, maxItems).map((item, i) => (
         <li key={item.link || `${item.title}-${i}`} className="sg-rss-item">
-          <button className="sg-rss-item-link" onClick={() => item.link && openUrl(item.link)}>
+          <button
+            className="sg-rss-item-link"
+            onPointerDown={onPointerDown}
+            onClick={e => guardClick(e, () => item.link && openUrl(item.link))}
+          >
             <span className="sg-rss-item-title">{item.title}</span>
             {showDescription && item.description && (
               <span className="sg-rss-item-desc">{item.description}</span>

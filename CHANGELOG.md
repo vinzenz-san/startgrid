@@ -2,6 +2,14 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.16.4] — Edit-mode drag-vs-click fixes, RSS entity decoding, calendar sizing
+
+- Fixed edit-mode widget context menu/settings sliders triggering a grid drag instead of the control itself: `react-grid-layout`'s `dragConfig.cancel` selector was never configured, so any pointerdown inside a widget was drag-eligible unless individually `stopPropagation()`'d. A shared `.sg-no-drag` class now marks the gear button and remove button as drag-exempt (the edit-mode info bar itself stays draggable, so dragging by the header still works)
+- Fixed Weather and RSS Feed items registering a drag-release (mouseup after dragging the widget) as a click, which opened the forecast/article link unintentionally. New shared `useClickDragGuard` hook (`lib/clickDragGuard.ts`) compares pointerdown vs. click coordinates and ignores the click if the pointer moved more than 5px, used by both widgets instead of a plain `onClick`
+- Fixed RSS Feed items showing raw HTML entities (e.g. `&#8217;`) instead of the decoded character — some feeds HTML-escape their content on top of XML escaping, sometimes more than once; `rssApi.ts` now decodes iteratively until stable instead of trusting the XML parser's single decode pass ([#6](https://github.com/vinzenz-san/startgrid/issues/6))
+- Google Calendar and Outlook Calendar default size increased from 2×3 to 5×5 — too small to be useful at the old default
+- Settings page now has a "Report an Issue" link (GitHub issues) alongside the existing support link
+
 ## [1.16.3] — Grid preset rebuild, unified widget spacing, factory-reset fix
 
 - **"Grid" layout preset rebuilt** as a 3-column layout: Clock/Greeting/Bookmark Search full-width, then RSS Feed (pre-filled with a feed URL), Quicklinks (list layout, one pre-filled link with a white badge), and Weather (Berlin, pre-resolved coordinates) stacked above Notes. New `layout` field on `GridPreset` supports fully explicit multi-column positioning, for layouts too irregular for the existing single-column stacking mode

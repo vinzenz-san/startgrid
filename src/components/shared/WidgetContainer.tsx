@@ -186,7 +186,7 @@ export default function WidgetContainer({ widget }: Props) {
   const floatingPanel = settingsOpen && createPortal(
     <div
       ref={refs.setFloating}
-      className="sg-widget-float-panel sg-scroll-thin"
+      className="sg-widget-float-panel sg-scroll-thin sg-no-drag"
       style={floatingStyles}
       onPointerDown={e => e.stopPropagation()}
     >
@@ -371,7 +371,7 @@ export default function WidgetContainer({ widget }: Props) {
       >
         {hasSettings && (
           <button
-            className={`sg-widget-gear${settingsOpen ? ' active' : ''}`}
+            className={`sg-widget-gear sg-no-drag${settingsOpen ? ' active' : ''}`}
             draggable={false}
             onPointerDown={e => e.stopPropagation()}
             onDragStart={e => e.stopPropagation()}
@@ -381,13 +381,13 @@ export default function WidgetContainer({ widget }: Props) {
         )}
 
         {isEditMode && (
-          <div className="sg-widget-controls" draggable={false} onDragStart={e => e.stopPropagation()}>
+          <div className="sg-widget-controls" draggable={false}>
             <div className="sg-widget-controls-info">
               <span className="sg-widget-name">{t(WIDGET_TYPE_LABEL_KEYS[widget.type])}</span>
               <span className="sg-widget-size">{widget.w}×{widget.h}</span>
             </div>
             <div className="sg-widget-actions">
-              <button className="sg-widget-action danger"
+              <button className="sg-widget-action danger sg-no-drag"
                 onPointerDown={e => e.stopPropagation()}
                 onClick={e => { e.stopPropagation(); setRemoveConfirmOpen(true); }}
                 title="Remove widget">✕</button>

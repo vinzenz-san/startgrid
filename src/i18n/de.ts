@@ -33,6 +33,7 @@ export const de: Record<TranslationKey, string> = {
   'settings.resetAppearance':      'Erscheinungsbild zurücksetzen',
   'settings.factoryReset':         'Werkseinstellungen',
   'settings.support':              'StartGrid unterstützen',
+  'settings.reportIssue':          'Problem melden',
   'settings.factoryReset.title':   'Werkseinstellungen',
   'settings.factoryReset.body':    'Bist du sicher? Alle Einstellungen werden dauerhaft gelöscht und die Seite wird neu geladen.',
   'settings.factoryReset.confirm': 'Alles löschen',

@@ -31,6 +31,7 @@ export const en = {
   'settings.resetAppearance':      'Reset Appearance',
   'settings.factoryReset':         'Factory Reset',
   'settings.support':              'Support StartGrid',
+  'settings.reportIssue':          'Report an Issue',
   'settings.factoryReset.title':   'Factory Reset',
   'settings.factoryReset.body':    'Are you sure? All configuration will be permanently deleted and the page will reload.',
   'settings.factoryReset.confirm': 'Delete Everything',
