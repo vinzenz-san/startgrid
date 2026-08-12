@@ -13,6 +13,10 @@ export interface GridPreset {
    *  latter packs a narrow second widget beside the first instead of below
    *  it. Used for Focus's clock-above-search-bar layout. */
   stacked?: boolean;
+  /** Per-preset widget size overrides — takes precedence over that widget
+   *  type's own registry defaultSize (WIDGET_REGISTRY) for this preset only,
+   *  without touching the shared default other presets/Add Widget still use. */
+  sizeOverrides?: Partial<Record<WidgetType, { w: number; h: number }>>;
 }
 
 // Onboarding-style "starting point" presets (Focus / Grid / Goals) — built
@@ -21,23 +25,21 @@ export interface GridPreset {
 // even with zero bookmarks), and "Goals" is built around the To-Do widget
 // since there's no dedicated daily-goal/quote widget here.
 export const GRID_PRESETS: GridPreset[] = [
-  { id: 'focus', labelKey: 'widgets.presets.focus', descriptionKey: 'widgets.presets.focusDescription', types: ['clock', 'bookmarkSearch'], stacked: true },
+  { id: 'focus', labelKey: 'widgets.presets.focus', descriptionKey: 'widgets.presets.focusDescription', types: ['clock', 'bookmarkSearch'], stacked: true, sizeOverrides: { clock: { w: 15, h: 2 }, bookmarkSearch: { w: 11, h: 1 } } },
   { id: 'grid', labelKey: 'widgets.presets.grid', descriptionKey: 'widgets.presets.gridDescription', types: ['clock', 'greeting', 'weather', 'calendar', 'quicklinks', 'bookmarks', 'notes', 'todoList', 'rssFeed'] },
-  { id: 'goals', labelKey: 'widgets.presets.goals', descriptionKey: 'widgets.presets.goalsDescription', types: ['clock', 'greeting', 'todoList'] },
+  {
+    id: 'goals', labelKey: 'widgets.presets.goals', descriptionKey: 'widgets.presets.goalsDescription',
+    types: ['clock', 'greeting', 'bookmarkSearch', 'invisible-spacer', 'todoList'],
+    stacked: true,
+    sizeOverrides: {
+      clock: { w: 15, h: 2 },
+      greeting: { w: 15, h: 1 },
+      bookmarkSearch: { w: 15, h: 1 },
+      'invisible-spacer': { w: 15, h: 1 },
+      todoList: { w: 5, h: 3 },
+    },
+  },
 ];
-
-// Per-preset Clock style override — applied only to the Clock widget these
-// presets create, on top of Clock's own registry defaults (WIDGET_REGISTRY),
-// never mutating those defaults themselves. Values mirror WidgetContainer's
-// local-style slider semantics: bgOpacity is inverted (1 - transparency%/100),
-// bgShadow/bgGlass/bgGradientIntensity are plain 0-100 percentages.
-const PRESET_CLOCK_STYLE: Partial<Widget> = {
-  localOverrideEnabled: true,
-  bgOpacity: 0,            // Transparency 100%
-  bgShadow: 0,             // Shadow Intensity 0%
-  bgGlass: 0,              // Glass effect 0%
-  bgGradientIntensity: 0,  // Gradient Intensity 0%
-};
 
 /**
  * Builds a complete, non-overlapping Widget[] for a preset — replaces
@@ -52,9 +54,9 @@ export function applyPreset(presetId: string, columns: number): Widget[] {
   const placed: Widget[] = [];
   let nextStackedRow = 1;
   preset.types.forEach((type, i) => {
-    const styleOverride = type === 'clock' ? PRESET_CLOCK_STYLE : {};
     if (preset.stacked) {
-      const { defaultSize, defaultData } = WIDGET_REGISTRY[type];
+      const { defaultData, defaultStyle } = WIDGET_REGISTRY[type];
+      const defaultSize = preset.sizeOverrides?.[type] ?? WIDGET_REGISTRY[type].defaultSize;
       const row = nextStackedRow;
       nextStackedRow += defaultSize.h;
       // Each stacked widget centers itself independently on the column axis
@@ -65,15 +67,16 @@ export function applyPreset(presetId: string, columns: number): Widget[] {
       placed.push({
         id: `w-preset-${Date.now()}-${i}`, type, col, row,
         w: defaultSize.w, h: defaultSize.h, data: defaultData,
-        ...styleOverride,
+        ...defaultStyle,
       } as Widget);
       return;
     }
     // Built up sequentially against `placed` so each new widget avoids every
     // one placed before it, same as buildNewWidget's normal "add one widget"
-    // use — just called in a loop here instead of once per user click.
+    // use — just called in a loop here instead of once per user click
+    // (buildNewWidget already merges the widget type's defaultStyle in).
     const widget = buildNewWidget(placed, columns, type);
-    placed.push({ ...widget, id: `w-preset-${Date.now()}-${i}`, ...styleOverride } as Widget);
+    placed.push({ ...widget, id: `w-preset-${Date.now()}-${i}` } as Widget);
   });
   return placed;
 }

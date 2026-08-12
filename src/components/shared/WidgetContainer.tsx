@@ -350,6 +350,7 @@ export default function WidgetContainer({ widget }: Props) {
           settingsOpen && !disableWidgetGlow ? 'sg-widget--glow' : '',
           (widget.data as { allowOverflow?: boolean }).allowOverflow ? 'sg-widget--overflow' : '',
           widget.type === 'invisible-spacer' && !isEditMode ? 'sg-widget--spacer' : '',
+          localOpacityPct === 0 ? 'sg-widget--transparent' : '',
         ].filter(Boolean).join(' ')}
         data-theme={overrideEnabled ? widget.localColorScheme : undefined}
         onContextMenu={handleContextMenu}

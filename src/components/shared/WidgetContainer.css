@@ -50,6 +50,20 @@
   box-shadow: none !important;
 }
 
+/* Always-on, non-configurable text-shadow for fully transparent widgets
+   (Transparency 100% / bgOpacity 0) — with no panel box visible behind it,
+   text otherwise has no guaranteed contrast against whatever's under it
+   (background image, another widget, etc.). A soft wide blur handles general
+   contrast, a small sharp offset shadow adds edge definition on top of it.
+   text-shadow inherits by default, so setting it here covers every piece of
+   text inside the widget without each one needing its own rule. Unlike
+   Shadow Intensity (bgShadow, a box-shadow on the widget's own box) this has
+   no user-facing control — it's tied purely to full transparency, not a
+   separate setting. */
+.sg-widget--transparent {
+  text-shadow: 0 0 1.5em rgba(59, 42, 42, 0.3), 2px 2px 2px rgba(15, 15, 15, 0.4);
+}
+
 /* An earlier attempt set z-index: -1 directly on .sg-widget--overflow to
    sink it behind neighbors. That combined with this element's own
    position: relative to force it into forming a brand new stacking

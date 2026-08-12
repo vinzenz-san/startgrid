@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { WidgetDataMap, WidgetType, ClockData, QuicklinksData, BookmarksData, BookmarkSearchData, CalendarData, OutlookCalendarData, OutlookMailData, NotesData, ObsidianCaptureData, ObsidianDailyData, ObsidianNoteData, ObsidianSearchData, ObsidianRandomData, GreetingData, WeatherData, RssFeedData, TodoData, CurrencyTickerData, RainRadarData, PlaceholderData, SpacerData } from '../../types/widget';
+import type { WidgetDataMap, WidgetType, WidgetBase, ClockData, QuicklinksData, BookmarksData, BookmarkSearchData, CalendarData, OutlookCalendarData, OutlookMailData, NotesData, ObsidianCaptureData, ObsidianDailyData, ObsidianNoteData, ObsidianSearchData, ObsidianRandomData, GreetingData, WeatherData, RssFeedData, TodoData, CurrencyTickerData, RainRadarData, PlaceholderData, SpacerData } from '../../types/widget';
 import type { TranslationKey } from '../../i18n';
 import Clock, { ClockSettings } from './Clock/Clock';
 import Quicklinks, { QuicklinksSettings } from './Quicklinks/Quicklinks';
@@ -31,6 +31,12 @@ interface TypedEntry<T> {
   icon:        string;
   defaultSize: { w: number; h: number };
   defaultData: T;
+  /** Local-style override (transparency/shadow/glass/gradient/etc.) applied
+   *  to every newly created instance of this widget type — via the Add
+   *  Widget menu, Ctrl+K palette, or a layout preset (buildNewWidget in
+   *  gridUtils.ts and applyPreset in gridPresets.ts both merge this in).
+   *  Existing widgets already on a grid are unaffected by changing this. */
+  defaultStyle?: Partial<WidgetBase>;
   devOnly?:    boolean;
   titleBehavior:        'optional' | 'auto' | 'none';
   defaultTitle?:        string;
@@ -47,6 +53,7 @@ export interface WidgetEntry {
   icon:        string;
   defaultSize: { w: number; h: number };
   defaultData: unknown;
+  defaultStyle?: Partial<WidgetBase>;
   devOnly?:    boolean;
   titleBehavior:        'optional' | 'auto' | 'none';
   defaultTitle?:        string;
@@ -68,6 +75,16 @@ const _registry = {
       fontSettings: { fontWeight: 500 },
       displaySettings: { scale: 1.5, fontSize: 60 },
     } satisfies ClockData,
+    // Transparency 100% / Shadow 0% / Glass 0% / Gradient Intensity 0% — was
+    // previously only applied by the layout presets (gridPresets.ts); now the
+    // default for every new Clock however it's added.
+    defaultStyle: {
+      localOverrideEnabled: true,
+      bgOpacity: 0,
+      bgShadow: 0,
+      bgGlass: 0,
+      bgGradientIntensity: 0,
+    },
     titleBehavior: 'none',
     renderComponent: (data, onUpdateData) => <Clock data={data} onUpdateData={onUpdateData} />,
     renderSettings:  (data, onUpdateData) => <ClockSettings data={data} onUpdateData={onUpdateData} />,

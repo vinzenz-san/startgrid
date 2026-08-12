@@ -2,6 +2,13 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.16.1] — Preset sizing refinements, per-widget default style, shared transparent-text-shadow
+
+- Focus preset: Clock 15×2, Bookmark Search 11×1 centered (col 3, matching a 15/11 split); Goals preset rebuilt as a proper vertical stack (was using free-slot auto-placement) — Clock 15×2, Greeting 15×1, Bookmark Search 15×1, an Invisible Spacer, then To-Do sized 5×3 and centered
+- New `defaultStyle` field on widget registry entries — a local-style override (transparency/shadow/glass/gradient) applied to every newly created instance of that widget type, whether added via the Add Widget menu, Ctrl+K, or a layout preset, not just preset-created ones. Clock now carries its 100%/0%/0%/0% style this way; the old preset-only duplicate of this override was removed now that the registry is the single source of truth
+- Fixed the To-Do widget's "Add a task…" field looking cramped compared to Bookmark Search's input — added matching top/side padding scoped to just this field, not the shared input style used everywhere else
+- **New: shared, always-on text-shadow for fully transparent widgets.** Any widget at 100% Transparency (whether via the global setting or a per-widget local override) now automatically gets a soft blur + sharp offset text-shadow on all its text, for readability against whatever's showing through — no new setting, not configurable, purely tied to full transparency (mirrors Shadow Intensity's box-shadow, but on the text itself rather than the widget's box)
+
 ## [1.16.0] — Configurable grid settings, layout presets overhaul, edit history/undo
 
 - New Grid settings: **Grid Columns** and **Grid Spacing** (defaults 15 cols / 15px, both apply live, no separate Apply step), **Full Page Grid** (stretches columns edge-to-edge, drag switches to no-push placement so widgets don't get shoved around, includes a live "fits X columns at Y px" hint), and **Vertically Center Grid** (default on — centers sparse layouts in the viewport instead of anchoring to the top)

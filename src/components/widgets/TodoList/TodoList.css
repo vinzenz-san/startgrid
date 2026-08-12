@@ -10,6 +10,15 @@
   flex-shrink: 0;
 }
 
+/* Scoped override, not a change to .sg-form-input itself (shared across every
+   settings-panel input) — gives this specific field the same open, padded
+   feel as BookmarkSearch's search row (.sg-bks-search-row: padding 5px 8px)
+   instead of the shared class's fixed-height/no-vertical-padding sizing. */
+.sg-todo-add .sg-form-input {
+  height: auto;
+  padding: 5px 8px;
+}
+
 .sg-todo-list {
   display: flex;
   flex-direction: column;

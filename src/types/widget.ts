@@ -298,7 +298,7 @@ export interface WidgetDataMap {
 
 export type WidgetType = keyof WidgetDataMap;
 
-interface WidgetBase {
+export interface WidgetBase {
   id: string;
   col: number;
   row: number;
