@@ -8,7 +8,7 @@ import { useWeather } from '../../../hooks/useWeather';
 import { geocodeCity, type GeocodeResult } from '../../../lib/openMeteoApi';
 import { getForecastUrl, type ForecastProvider } from '../../../lib/forecastLinks';
 import { getWeatherCodeInfo } from '../../../lib/weatherCodes';
-import { resolveDisplayStyle } from '../../../lib/displayStyle';
+import { resolveDisplayStyle, scaledFontSize } from '../../../lib/displayStyle';
 import { useClickDragGuard } from '../../../lib/clickDragGuard';
 import './Weather.css';
 
@@ -171,7 +171,6 @@ export function WeatherSettings({ data, onUpdateData }: SettingsProps) {
       <DetailedSettings title={t('widget.displaySettings.title')}>
         <DisplaySettingsPanel
           value={data.displaySettings}
-          defaultFontSize={DEFAULT_TEMP_SIZE}
           onChange={patch => onUpdateData({ displaySettings: { ...data.displaySettings, ...patch } })}
         />
       </DetailedSettings>
@@ -235,10 +234,11 @@ export default function Weather({ data }: Props) {
   const temp = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(weather.temperature);
   const feelsLike = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(weather.feelsLike);
 
-  const { wrapper, fontSize: tempSize } = resolveDisplayStyle(data.displaySettings, DEFAULT_TEMP_SIZE);
-  const iconSize      = tempSize * ICON_SIZE_RATIO;
-  const conditionSize = tempSize * CONDITION_SIZE_RATIO;
-  const secondarySize = tempSize * SECONDARY_SIZE_RATIO;
+  const { wrapper } = resolveDisplayStyle(data.displaySettings, DEFAULT_TEMP_SIZE);
+  const tempSize      = scaledFontSize(DEFAULT_TEMP_SIZE);
+  const iconSize      = scaledFontSize(DEFAULT_TEMP_SIZE * ICON_SIZE_RATIO);
+  const conditionSize = scaledFontSize(DEFAULT_TEMP_SIZE * CONDITION_SIZE_RATIO);
+  const secondarySize = scaledFontSize(DEFAULT_TEMP_SIZE * SECONDARY_SIZE_RATIO);
 
   const forecastUrl = data.openForecastOnClick
     ? getForecastUrl(data.forecastProvider ?? 'google', data)

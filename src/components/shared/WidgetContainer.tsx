@@ -23,7 +23,7 @@ export default function WidgetContainer({ widget }: Props) {
   const { isEditMode } = useEditMode();
   const { removeWidget, updateWidget } = useWidgets();
   const { pushHistory } = useEditHistory();
-  const { globalColor, globalColorScheme, globalOpacity, globalDim, globalGradientIntensity, globalPresetId, widgetShadowOpacity, globalGlassIntensity } = useTheme();
+  const { globalColor, globalColorScheme, globalOpacity, globalDim, globalGradientIntensity, globalPresetId, widgetShadowOpacity, globalGlassIntensity, globalFontScale } = useTheme();
   const { colorScheme, enableCustomContextMenu, disableWidgetGlow, t } = useSettings();
   const elRef = useRef<HTMLDivElement>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -367,7 +367,12 @@ export default function WidgetContainer({ widget }: Props) {
         ].filter(Boolean).join(' ')}
         data-theme={overrideEnabled ? widget.localColorScheme : undefined}
         onContextMenu={handleContextMenu}
-        style={localOverrideStyle}
+        style={{
+          // Clock/Greeting (isLockedStyle) stay fixed at their own size —
+          // never scaled, matching their other locked style properties.
+          '--sg-font-scale': String(isLockedStyle ? 1 : globalFontScale / 100),
+          ...localOverrideStyle,
+        } as React.CSSProperties}
       >
         {hasSettings && (
           <button

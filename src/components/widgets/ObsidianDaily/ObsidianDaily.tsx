@@ -5,6 +5,7 @@ import { useObsidian } from '../../../hooks/useObsidian';
 import { SettingsRow, SettingsSwitch, SettingsSlider } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { isScreenshotMode } from '../../../lib/permissions';
+import { scaledFontSize } from '../../../lib/displayStyle';
 import { DEFAULT_DAILY_TEMPLATE, resolvePathTemplate, vaultPathToTitle } from '../../../lib/obsidianPath';
 import { sliceSection, type MdBlock } from '../../../lib/obsidianMarkdown';
 import MarkdownView from '../shared/MarkdownView';
@@ -15,6 +16,8 @@ import { IconObsidian, IconRefresh, IconOpenExternal, IconEdit, SkeletonRow } fr
 import { openInObsidian } from '../../../lib/obsidianApi';
 import '../shared/obsidian.css';
 import './ObsidianDaily.css';
+
+const DEFAULT_FONT_SIZE = 13;
 
 // ── Filtering ─────────────────────────────────────────────────────────────────
 
@@ -83,16 +86,6 @@ export function ObsidianDailySettings({ data, onUpdateData }: SettingsProps) {
         value={data.maxLines ?? 0}
         onChange={v => onUpdateData({ maxLines: v || undefined })}
         valueFormatter={v => (v ? String(v) : t('widget.obsidianDaily.noLimit'))}
-      />
-
-      <SettingsSlider
-        label={t('widget.obsidianDaily.fontSize')}
-        value={data.fontSize ?? 13}
-        min={9}
-        max={20}
-        step={1}
-        valueFormatter={v => `${v}px`}
-        onChange={v => onUpdateData({ fontSize: v })}
       />
 
       <div className="sg-cal-settings-divider"/>
@@ -176,7 +169,7 @@ export default function ObsidianDaily({ data }: Props) {
         </div>
       </div>
 
-      <div className="sg-cal-body sg-obsd sg-scroll-thin" style={{ fontSize: data.fontSize ?? 13 }}>
+      <div className="sg-cal-body sg-obsd sg-scroll-thin" style={{ fontSize: scaledFontSize(DEFAULT_FONT_SIZE) }}>
         {isMock && !isScreenshotMode() && <div className="sg-cal-preview-badge">{t('widget.obsidian.previewBadge')}</div>}
         {isStale && !isLoading && <div className="sg-cal-stale-banner">{t('widget.obsidianDaily.stale')}</div>}
 
@@ -185,7 +178,7 @@ export default function ObsidianDaily({ data }: Props) {
             value={draft}
             onChange={setDraft}
             saving={writing}
-            fontSize={data.fontSize ?? 13}
+            fontSize={scaledFontSize(DEFAULT_FONT_SIZE)}
             onCancel={() => setEditing(false)}
             onSave={() => void (async () => {
               await saveEdit(source, draft);

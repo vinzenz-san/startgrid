@@ -74,7 +74,7 @@
 }
 
 .sg-todo-stale-banner {
-  font-size: 11px;
+  font-size: calc(11px * var(--sg-font-scale, 1));
   color: var(--text-muted);
   background: color-mix(in srgb, var(--text) 6%, transparent);
   border-radius: 6px;
@@ -91,7 +91,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: calc(11px * var(--sg-font-scale, 1));
   line-height: 1;
   color: var(--text);
   cursor: pointer;
@@ -106,7 +106,7 @@
 .sg-todo-text {
   flex: 1;
   min-width: 0;
-  font-size: 13px;
+  font-size: calc(13px * var(--sg-font-scale, 1));
   color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -129,7 +129,7 @@
 
 .sg-todo-empty {
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: calc(13px * var(--sg-font-scale, 1));
   text-align: center;
   padding: 12px;
 }

@@ -10,18 +10,25 @@ const DATE_SIZE_RATIO = 0.36;
 export interface ResolvedDisplayStyle {
   /** transform: scale + rotate — apply to the widget's outer wrapper. */
   wrapper:  CSSProperties;
-  /** The resolved primary font size (px) — the widget's main/only text. */
-  fontSize: number;
-  /** Secondary-text font size (px), derived from `fontSize` via DATE_SIZE_RATIO.
-   *  Named for its original use (Clock's date line) — any widget with a
-   *  secondary text element can reuse it the same way. */
-  dateFontSize: number;
+  /** The resolved primary font size — a CSS calc() expression multiplying
+   *  the widget's own fixed default by the global Font Scale setting
+   *  (--sg-font-scale, set per-widget in WidgetContainer.tsx). */
+  fontSize: string;
+  /** Secondary-text font size, derived from `fontSize` via DATE_SIZE_RATIO,
+   *  same global-scale calc() shape. Named for its original use (Clock's
+   *  date line) — any widget with a secondary text element can reuse it. */
+  dateFontSize: string;
 }
 
-/** @param defaultFontSize the widget's own "no override" font size (e.g. Clock's old "M" = 42px, Greeting's old "M" = 22px) — resolveDisplayStyle has no opinion of its own, since that default is a per-widget design choice.
+/** Any widget with several text elements that should scale together off one
+ *  base size (e.g. Weather's icon/temp/condition/secondary ratios) can reuse
+ *  this directly instead of going through resolveDisplayStyle's own single
+ *  fontSize/dateFontSize pair. */
+export const scaledFontSize = (px: number) => `calc(${px}px * var(--sg-font-scale, 1))`;
+
+/** @param defaultFontSize the widget's own fixed base font size (e.g. Greeting's 28px, Weather's temp size) — resolveDisplayStyle has no opinion of its own, since that default is a per-widget design choice.
  *  @param defaultPadding matches the widget's own CSS padding (currently 12px for every widget using this panel) — kept as a param rather than hardcoded so a future widget with a different base padding isn't forced to 12. */
 export function resolveDisplayStyle(ds: DisplaySettings | undefined, defaultFontSize = 42, defaultPadding = 12): ResolvedDisplayStyle {
-  const fontSize = ds?.fontSize ?? defaultFontSize;
   const scale    = ds?.scale    ?? 1;
   const rotation = ds?.rotation ?? 0;
   const padding  = ds?.padding  ?? defaultPadding;
@@ -35,7 +42,7 @@ export function resolveDisplayStyle(ds: DisplaySettings | undefined, defaultFont
 
   return {
     wrapper,
-    fontSize,
-    dateFontSize: Math.round(fontSize * DATE_SIZE_RATIO),
+    fontSize: scaledFontSize(defaultFontSize),
+    dateFontSize: scaledFontSize(Math.round(defaultFontSize * DATE_SIZE_RATIO)),
   };
 }

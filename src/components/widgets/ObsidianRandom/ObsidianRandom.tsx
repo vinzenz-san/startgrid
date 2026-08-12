@@ -5,6 +5,7 @@ import { useObsidian } from '../../../hooks/useObsidian';
 import { SettingsRow, Dropdown, SettingsSwitch, SettingsSlider, ActionButton } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { isScreenshotMode } from '../../../lib/permissions';
+import { scaledFontSize } from '../../../lib/displayStyle';
 import { vaultPathToTitle } from '../../../lib/obsidianPath';
 import { openInObsidian } from '../../../lib/obsidianApi';
 import { clearVaultIndex } from '../../../lib/obsidianIndex';
@@ -18,6 +19,8 @@ import './ObsidianRandom.css';
 function parseExcludes(raw: string): string[] {
   return raw.split(',').map(s => s.trim()).filter(Boolean);
 }
+
+const DEFAULT_FONT_SIZE = 13;
 
 // ── Settings ──────────────────────────────────────────────────────────────────
 
@@ -68,16 +71,6 @@ export function ObsidianRandomSettings({ data, onUpdateData }: SettingsProps) {
         value={data.excerptLines ?? 4}
         onChange={v => onUpdateData({ excerptLines: v })}
         valueFormatter={v => String(v)}
-      />
-
-      <SettingsSlider
-        label={t('widget.obsidianRandom.fontSize')}
-        value={data.fontSize ?? 13}
-        min={9}
-        max={20}
-        step={1}
-        valueFormatter={v => `${v}px`}
-        onChange={v => onUpdateData({ fontSize: v })}
       />
 
       <ActionButton variant="ghost" onClick={() => void clearVaultIndex()}>
@@ -150,7 +143,7 @@ export default function ObsidianRandom({ data }: Props) {
         </div>
       </div>
 
-      <div className="sg-cal-body sg-obsr sg-scroll-thin" style={{ fontSize: data.fontSize ?? 13 }}>
+      <div className="sg-cal-body sg-obsr sg-scroll-thin" style={{ fontSize: scaledFontSize(DEFAULT_FONT_SIZE) }}>
         {isMock && !isScreenshotMode() && <div className="sg-cal-preview-badge">{t('widget.obsidian.previewBadge')}</div>}
 
         {notConfigured ? (

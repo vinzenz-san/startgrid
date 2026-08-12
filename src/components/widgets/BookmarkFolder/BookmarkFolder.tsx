@@ -5,8 +5,11 @@ import { useBookmarkFolder } from './useBookmarkFolder';
 import type { BmNode } from './bookmarks.mock';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { isScreenshotMode } from '../../../lib/permissions';
+import { scaledFontSize } from '../../../lib/displayStyle';
 import type { TranslationKey } from '../../../i18n';
 import './BookmarkFolder.css';
+
+const DEFAULT_TEXT_SIZE = 13;
 
 type TFn = (key: TranslationKey, vars?: Record<string, string | number>) => string;
 
@@ -179,15 +182,6 @@ export function BookmarkFolderSettings({ data, onUpdateData }: SettingsProps) {
       <SettingsRow label={t('widget.quicklinks.showTitles')}>
         <SettingsSwitch checked={data.showTitles ?? true} onChange={v => onUpdateData({ showTitles: v })} />
       </SettingsRow>
-      <SettingsSlider
-        label={t('widget.quicklinks.textSize')}
-        value={data.textSize ?? 13}
-        min={9}
-        max={20}
-        step={1}
-        valueFormatter={v => `${v}px`}
-        onChange={v => onUpdateData({ textSize: v })}
-      />
       <SettingsRow label={t('widget.quicklinks.layout')}>
         <Dropdown
           options={[
@@ -346,7 +340,7 @@ interface ItemRowProps {
   node:           BmNode;
   iconSize:       number;
   showTitle:      boolean;
-  textSize:       number;
+  textSize:       string;
   onFolderClick:  (node: BmNode) => void;
   override?:      BookmarkIconOverride;
   /** Tile width only applies in grid layout — list rows stretch full width. */
@@ -497,7 +491,7 @@ export default function BookmarkFolder({ data, onUpdateData }: Props) {
   const displayItems = applySorting(items, data?.sortingMode ?? 'original');
   const iconSize      = data.iconSize ?? 30;
   const showTitles    = data.showTitles ?? true;
-  const textSize      = data.textSize ?? 13;
+  const textSize      = scaledFontSize(DEFAULT_TEXT_SIZE);
   const alignment     = data.alignment ?? 'left';
   // Icon overrides only ever apply to the root folder's own direct children —
   // navigating into a subfolder shows those items with no overrides at all.

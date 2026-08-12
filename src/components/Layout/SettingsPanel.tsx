@@ -44,9 +44,9 @@ interface Props {
 
 export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) {
   const {
-    globalColor, globalColorScheme, globalOpacity, globalDim, globalGradientIntensity, widgetShadowOpacity, globalGlassIntensity, globalPresetId,
+    globalColor, globalColorScheme, globalOpacity, globalDim, globalGradientIntensity, widgetShadowOpacity, globalGlassIntensity, globalPresetId, globalFontScale,
     setGlobalColor, setGlobalOpacity, setGlobalDim, setGlobalGradientIntensity,
-    setWidgetShadowOpacity, setGlobalGlassIntensity, setGlobalPresetId,
+    setWidgetShadowOpacity, setGlobalGlassIntensity, setGlobalPresetId, setGlobalFontScale,
   } = useTheme();
   const {
     colorScheme, accentColor, language, developerOptionsEnabled,
@@ -181,6 +181,7 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
     setWidgetShadowOpacity(THEME_DEFAULTS.widgetShadowOpacity);
     setGlobalGlassIntensity(THEME_DEFAULTS.globalGlassIntensity);
     setGlobalPresetId(THEME_DEFAULTS.globalPresetId);
+    setGlobalFontScale(THEME_DEFAULTS.globalFontScale);
     updateSettings({ colorScheme: SETTINGS_DEFAULTS.colorScheme, accentColor: SETTINGS_DEFAULTS.accentColor, enableCustomContextMenu: SETTINGS_DEFAULTS.enableCustomContextMenu });
   }
 
@@ -299,26 +300,36 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
                 label={t('widgets.transparency')}
                 value={transparencyPct}
                 onChange={v => setGlobalOpacity((100 - v) / 100)}
+                defaultValue={100 - Math.round(THEME_DEFAULTS.globalOpacity * 100)}
+                resetTitle={t('widget.resetToDefault')}
               />
               <SettingsSlider
                 label={t('widgets.shadowIntensity')}
                 value={widgetShadowOpacity}
                 onChange={setWidgetShadowOpacity}
+                defaultValue={THEME_DEFAULTS.widgetShadowOpacity}
+                resetTitle={t('widget.resetToDefault')}
               />
               <SettingsSlider
                 label={t('widgets.glassIntensity')}
                 value={globalGlassIntensity}
                 onChange={setGlobalGlassIntensity}
+                defaultValue={THEME_DEFAULTS.globalGlassIntensity}
+                resetTitle={t('widget.resetToDefault')}
               />
               <SettingsSlider
                 label={t('widgets.gradientIntensity')}
                 value={globalGradientIntensity}
                 onChange={setGlobalGradientIntensity}
+                defaultValue={THEME_DEFAULTS.globalGradientIntensity}
+                resetTitle={t('widget.resetToDefault')}
               />
               <SettingsSlider
                 label={t('widgets.dimming')}
                 value={Math.round(globalDim)}
                 onChange={v => setGlobalDim(v)}
+                defaultValue={THEME_DEFAULTS.globalDim}
+                resetTitle={t('widget.resetToDefault')}
               />
             </DetailedSettings>
 
@@ -440,6 +451,17 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
                 onChange={v => updateSettings({ disableBackgroundBlur: v })}
               />
             </SettingsRow>
+            <SettingsSlider
+              label={t('widgets.fontScale')}
+              value={globalFontScale}
+              min={50}
+              max={200}
+              step={5}
+              onChange={setGlobalFontScale}
+              defaultValue={THEME_DEFAULTS.globalFontScale}
+              resetTitle={t('widget.resetToDefault')}
+            />
+            <p className="sg-form-hint">{t('widgets.fontScaleHint')}</p>
             <SettingsRow label={t('settings.editHistoryPanelEnabled')}>
               <SettingsSwitch
                 checked={editHistoryPanelEnabled}

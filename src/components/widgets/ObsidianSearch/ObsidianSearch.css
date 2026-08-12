@@ -33,7 +33,7 @@
   background: transparent;
   border: none;
   outline: none;
-  font-size: 12px;
+  font-size: calc(12px * var(--sg-font-scale, 1));
   color: var(--text);
   min-width: 0;
 }
@@ -104,7 +104,7 @@
 }
 
 .sg-obss-item-title {
-  font-size: 12px;
+  font-size: calc(12px * var(--sg-font-scale, 1));
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -112,7 +112,7 @@
 }
 
 .sg-obss-item-path {
-  font-size: 10px;
+  font-size: calc(10px * var(--sg-font-scale, 1));
   color: var(--text-muted);
   opacity: 0.6;
   white-space: nowrap;
@@ -124,7 +124,7 @@
    it so one verbose note can't push the rest of the results off-screen. */
 .sg-obss-item-context {
   margin-top: 2px;
-  font-size: 10.5px;
+  font-size: calc(10.5px * var(--sg-font-scale, 1));
   line-height: 1.4;
   color: var(--text-muted);
   display: -webkit-box;
@@ -145,4 +145,4 @@
 }
 
 .sg-obss-empty-icon { font-size: 20px; opacity: 0.35; }
-.sg-obss-empty-text { font-size: 12px; opacity: 0.4; text-align: center; }
+.sg-obss-empty-text { font-size: calc(12px * var(--sg-font-scale, 1)); opacity: 0.4; text-align: center; }

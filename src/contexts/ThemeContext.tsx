@@ -17,6 +17,10 @@ interface ThemeConfig {
   /** @deprecated kept for backwards-compat with stored data */
   globalGradient?:         boolean;
   globalPresetId?:         string;
+  /** 50-200; percentage multiplier applied to every widget's text via the
+   *  --sg-font-scale CSS variable (WidgetContainer.tsx) — except Clock and
+   *  Greeting, which stay fixed at their own size (see isLockedStyle). */
+  globalFontScale:         number;
 }
 
 export const DEFAULTS: ThemeConfig = {
@@ -28,6 +32,7 @@ export const DEFAULTS: ThemeConfig = {
   widgetShadowOpacity:     75,
   globalGlassIntensity:    0,
   globalPresetId:          'midnight',
+  globalFontScale:         100,
 };
 
 interface ThemeCtx extends ThemeConfig {
@@ -38,6 +43,7 @@ interface ThemeCtx extends ThemeConfig {
   setWidgetShadowOpacity:     (opacity: number) => void;
   setGlobalGlassIntensity:    (intensity: number) => void;
   setGlobalPresetId:          (id: string | undefined) => void;
+  setGlobalFontScale:         (scale: number) => void;
 }
 
 const Ctx = createContext<ThemeCtx | null>(null);
@@ -59,6 +65,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     widgetShadowOpacity:     t.widgetShadowOpacity     ?? DEFAULTS.widgetShadowOpacity,
     globalGlassIntensity:    t.globalGlassIntensity    ?? DEFAULTS.globalGlassIntensity,
     globalPresetId:          t.globalPresetId,
+    globalFontScale:         t.globalFontScale         ?? DEFAULTS.globalFontScale,
   };
 
   useEffect(() => {
@@ -104,9 +111,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const setWidgetShadowOpacity     = (widgetShadowOpacity: number)     => setTheme(t => ({ ...t, widgetShadowOpacity }));
   const setGlobalGlassIntensity    = (globalGlassIntensity: number)    => setTheme(t => ({ ...t, globalGlassIntensity }));
   const setGlobalPresetId          = (globalPresetId: string | undefined) => setTheme(t => ({ ...t, globalPresetId }));
+  const setGlobalFontScale         = (globalFontScale: number)         => setTheme(t => ({ ...t, globalFontScale }));
 
   return (
-    <Ctx.Provider value={{ ...safeTheme, setGlobalColor, setGlobalOpacity, setGlobalDim, setGlobalGradientIntensity, setWidgetShadowOpacity, setGlobalGlassIntensity, setGlobalPresetId }}>
+    <Ctx.Provider value={{ ...safeTheme, setGlobalColor, setGlobalOpacity, setGlobalDim, setGlobalGradientIntensity, setWidgetShadowOpacity, setGlobalGlassIntensity, setGlobalPresetId, setGlobalFontScale }}>
       {children}
     </Ctx.Provider>
   );

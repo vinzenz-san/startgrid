@@ -4,8 +4,11 @@ import { useFloating, flip, shift, offset, autoUpdate } from '@floating-ui/react
 import type { QuickLink, QuicklinksData } from '../../../types/widget';
 import { SettingsRow, SettingsSlider, SettingsSwitch, Dropdown } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
+import { scaledFontSize } from '../../../lib/displayStyle';
 import type { TranslationKey } from '../../../i18n';
 import './Quicklinks.css';
+
+const DEFAULT_TEXT_SIZE = 13;
 
 type TFn = (key: TranslationKey, vars?: Record<string, string | number>) => string;
 
@@ -76,7 +79,7 @@ interface LinkItemProps {
   iconSize: number;
   showTitle: boolean;
   showWhiteBadge: boolean;
-  textSize: number;
+  textSize: string;
   /** Tile width only applies in grid/row layout — list rows stretch full width. */
   applyTileWidth: boolean;
 }
@@ -191,7 +194,6 @@ export function QuicklinksSettings({ data, onUpdateData }: SettingsProps) {
   const iconSize   = data.iconSize   ?? 30;
   const showTitles = data.showTitles ?? true;
   const layout     = data.layout     ?? 'grid';
-  const textSize   = data.textSize   ?? 13;
   const alignment  = data.alignment  ?? 'left';
 
   const ALIGNMENT_OPTIONS = [
@@ -250,16 +252,6 @@ export function QuicklinksSettings({ data, onUpdateData }: SettingsProps) {
       <SettingsRow label={t('widget.quicklinks.showTitles')}>
         <SettingsSwitch checked={showTitles} onChange={v => onUpdateData({ showTitles: v })} />
       </SettingsRow>
-
-      <SettingsSlider
-        label={t('widget.quicklinks.textSize')}
-        value={textSize}
-        min={9}
-        max={20}
-        step={1}
-        valueFormatter={v => `${v}px`}
-        onChange={v => onUpdateData({ textSize: v })}
-      />
 
       <SettingsRow label={t('widget.quicklinks.alignment')}>
         <Dropdown
@@ -398,7 +390,7 @@ export default function Quicklinks({ data, onUpdateData }: Props) {
   const { links = [], layout = 'grid' } = data;
   const iconSize    = data.iconSize   ?? 30;
   const showTitles  = data.showTitles ?? true;
-  const textSize    = data.textSize   ?? 13;
+  const textSize    = scaledFontSize(DEFAULT_TEXT_SIZE);
   const alignment   = data.alignment  ?? 'left';
 
   const containerRef                    = useRef<HTMLDivElement>(null);

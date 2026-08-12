@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import type { NotesData } from '../../../types/widget';
-import { SettingsRow, Dropdown, SettingsSlider } from '../../shared/Form';
+import { SettingsRow, Dropdown } from '../../shared/Form';
 import { storageLocal } from '../../../lib/storageLocal';
 import { useSettings } from '../../../contexts/SettingsContext';
+import { scaledFontSize } from '../../../lib/displayStyle';
 import './Notes.css';
+
+const DEFAULT_FONT_SIZE = 13;
 
 const SYNC_CHAR_LIMIT = 4_000;
 
@@ -36,15 +39,6 @@ export function NotesSettings({ data, onUpdateData, widgetId }: SettingsProps) {
 
   return (
     <div className="sg-notes-settings" onClick={e => e.stopPropagation()}>
-      <SettingsSlider
-        label={t('widget.notes.fontSize')}
-        value={data.fontSize ?? 13}
-        min={9}
-        max={20}
-        step={1}
-        valueFormatter={v => `${v}px`}
-        onChange={v => onUpdateData({ fontSize: v })}
-      />
       <SettingsRow label={t('widget.notes.storage')}>
         <Dropdown
           options={[{ value: 'local', label: t('widget.notes.storageLocal') }, { value: 'synced', label: t('widget.notes.storageCloud') }]}
@@ -115,7 +109,7 @@ export default function Notes({ data, onUpdateData, widgetId }: Props) {
     <div className="sg-notes-wrap">
       <textarea
         className="sg-notes sg-scroll-thin"
-        style={{ fontSize: data.fontSize ?? 13 }}
+        style={{ fontSize: scaledFontSize(DEFAULT_FONT_SIZE) }}
         value={content}
         placeholder={t('widget.notes.placeholder')}
         spellCheck={false}

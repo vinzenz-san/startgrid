@@ -8,7 +8,7 @@ interface Props {
   onSave: () => void;
   onCancel: () => void;
   saving: boolean;
-  fontSize: number;
+  fontSize: number | string;
 }
 
 /** Raw-markdown editor shared by ObsidianDaily and ObsidianNote — edits and

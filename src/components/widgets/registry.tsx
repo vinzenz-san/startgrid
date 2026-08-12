@@ -170,7 +170,7 @@ const _registry = {
     label:                 'Notes',
     icon:                  '📝',
     defaultSize:           { w: 2, h: 2 },
-    defaultData:           { content: '', fontSize: 13, storageMode: 'local' } satisfies NotesData,
+    defaultData:           { content: '', storageMode: 'local' } satisfies NotesData,
     titleBehavior:         'optional',
     defaultTitle:          'Notes',
     defaultShowCustomTitle: false,

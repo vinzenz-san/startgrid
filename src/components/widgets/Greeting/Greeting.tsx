@@ -106,7 +106,6 @@ export function GreetingSettings({ data, onUpdateData }: SettingsProps) {
       <DetailedSettings title={t('widget.displaySettings.title')}>
         <DisplaySettingsPanel
           value={data.displaySettings}
-          defaultFontSize={DEFAULT_FONT_SIZE}
           showPadding={false}
           onChange={patch => onUpdateData({ displaySettings: { ...data.displaySettings, ...patch } })}
         />

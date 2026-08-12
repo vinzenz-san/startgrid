@@ -6,9 +6,6 @@ import './FontSettingsPanel.css'; // reuses the generic .sg-fs-panel column layo
 interface Props {
   value:    DisplaySettings | undefined;
   onChange: (patch: Partial<DisplaySettings>) => void;
-  /** The widget's own "no override" font size (e.g. Clock 42, Greeting 22) —
-   *  shown as the slider's resting value until the user actually moves it. */
-  defaultFontSize?: number;
   /** The widget's own CSS padding (currently 12px everywhere this panel is used). */
   defaultPadding?: number;
   /** Hide the Padding slider entirely — for widgets whose outer inset is
@@ -18,13 +15,15 @@ interface Props {
 }
 
 /**
- * Generic "Display Settings" block — Font Size / Scale /
- * Rotation, plus a StartGrid-specific Padding control (lets a widget's own
- * text sit closer to its box edge than the fixed 12px default). Reusable
- * the same way as FontSettingsPanel: any widget adds
- * `displaySettings?: DisplaySettings` to its own data type.
+ * Generic "Display Settings" block — Scale / Rotation, plus a
+ * StartGrid-specific Padding control (lets a widget's own text sit closer
+ * to its box edge than the fixed 12px default). Font size is no longer
+ * per-widget here — every widget scales via the global Font Scale setting
+ * (--sg-font-scale, WidgetContainer.tsx) instead. Reusable the same way as
+ * FontSettingsPanel: any widget adds `displaySettings?: DisplaySettings` to
+ * its own data type.
  */
-export default function DisplaySettingsPanel({ value, onChange, defaultFontSize = 42, defaultPadding = 12, showPadding = true }: Props) {
+export default function DisplaySettingsPanel({ value, onChange, defaultPadding = 12, showPadding = true }: Props) {
   const { t } = useSettings();
   const ds = value ?? {};
 
@@ -32,18 +31,6 @@ export default function DisplaySettingsPanel({ value, onChange, defaultFontSize 
 
   return (
     <div className="sg-fs-panel" onClick={e => e.stopPropagation()}>
-      <SettingsSlider
-        label={t('widget.displaySettings.fontSize')}
-        value={ds.fontSize ?? defaultFontSize}
-        min={2}
-        max={100}
-        step={2}
-        valueFormatter={v => `${v}px`}
-        onChange={v => onChange({ fontSize: v })}
-        defaultValue={defaultFontSize}
-        resetTitle={resetTitle}
-      />
-
       <SettingsSlider
         label={t('widget.displaySettings.scale')}
         value={ds.scale ?? 1}

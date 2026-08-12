@@ -44,7 +44,7 @@
 .sg-omail-unread-dot--hidden { visibility: hidden; }
 
 .sg-omail-from {
-  font-size: 12px;
+  font-size: calc(12px * var(--sg-font-scale, 1));
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -59,14 +59,14 @@
 }
 
 .sg-omail-time {
-  font-size: 10px;
+  font-size: calc(10px * var(--sg-font-scale, 1));
   opacity: 0.45;
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
 }
 
 .sg-omail-subject {
-  font-size: 11.5px;
+  font-size: calc(11.5px * var(--sg-font-scale, 1));
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -78,7 +78,7 @@
 }
 
 .sg-omail-preview {
-  font-size: 10.5px;
+  font-size: calc(10.5px * var(--sg-font-scale, 1));
   opacity: 0.45;
   white-space: nowrap;
   overflow: hidden;

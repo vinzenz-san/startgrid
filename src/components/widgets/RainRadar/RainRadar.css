@@ -35,7 +35,7 @@ html[data-scheme="dark"] .sg-rainradar-map { background: #17191d; }
 /* Required attribution (OSM/CARTO tile license) — kept, just shrunk to fit
    the widget's small footprint instead of Leaflet's default full-size bar. */
 .sg-rainradar-map .leaflet-control-attribution {
-  font-size: 8px;
+  font-size: calc(8px * var(--sg-font-scale, 1));
   padding: 0 4px;
   background: rgba(0, 0, 0, 0.4);
   color: #ddd;
@@ -52,12 +52,12 @@ html[data-scheme="dark"] .sg-rainradar-map { background: #17191d; }
 }
 
 .sg-rainradar-empty-text {
-  font-size: 13px;
+  font-size: calc(13px * var(--sg-font-scale, 1));
   color: var(--text-muted);
 }
 
 .sg-rainradar-empty-hint {
-  font-size: 11px;
+  font-size: calc(11px * var(--sg-font-scale, 1));
   color: var(--text-muted);
   opacity: 0.75;
 }
@@ -72,7 +72,7 @@ html[data-scheme="dark"] .sg-rainradar-map { background: #17191d; }
   gap: 8px;
   background: rgba(0, 0, 0, 0.35);
   color: #fff;
-  font-size: 13px;
+  font-size: calc(13px * var(--sg-font-scale, 1));
 }
 
 .sg-rainradar-settings {

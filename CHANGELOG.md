@@ -2,6 +2,13 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.17.0] — Global Font Scale
+
+- New single "Font Scale" slider (Settings, 50–200%, default 100%) replaces the 9 separate per-widget font/text-size sliders that used to live in Weather, Greeting, Notes, the 4 Obsidian widgets, Quicklinks, and BookmarkFolder — each now scales its own fixed base size off one shared `--sg-font-scale` CSS variable (`WidgetContainer.tsx`) instead of storing an independent value. Clock and Greeting stay fixed at their own size, matching their existing locked-style treatment (transparency/shadow/glass/gradient are already immune to global/local overrides for these two)
+- The 7 widgets that never had a font-size control (Bookmark Search, Outlook Mail, Obsidian Search, RSS Feed, To-Do, Currency Ticker, Rain Radar) now scale with the same slider too — icon-only glyphs (search icons, clear/back buttons, chevrons, empty-state icons) are deliberately excluded, matching how Quicklinks/BookmarkFolder's own icon-size sliders were already kept separate from text size
+- Existing per-widget custom sizes are not migrated — a clean reset to each widget's registry default, scaled by the new global slider at 100%
+- Settings → Widgets → Appearance: Transparency/Shadow/Glass/Gradient/Dimming sliders all gained a reset-to-default button, matching Font Scale's
+
 ## [1.16.7] — Layout picker simplification, RSS preview fallback, preset path fix
 
 - Fixed layout preset thumbnails not loading in the web preview (`docs/preview`) — `previewImage` paths used a leading slash, which resolves against the page's origin root; that happened to work in the installed extension by coincidence but breaks under GitHub Pages' subpath hosting. Paths are now relative, matching how every other build asset reference already works

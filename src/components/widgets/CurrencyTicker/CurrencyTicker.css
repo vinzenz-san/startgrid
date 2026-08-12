@@ -16,7 +16,7 @@
   gap: 8px;
 }
 
-.sg-fx-empty-text { font-size: 13px; color: var(--text-muted); }
+.sg-fx-empty-text { font-size: calc(13px * var(--sg-font-scale, 1)); color: var(--text-muted); }
 
 .sg-fx-list {
   display: flex;
@@ -32,20 +32,20 @@
 }
 
 .sg-fx-code {
-  font-size: 12px;
+  font-size: calc(12px * var(--sg-font-scale, 1));
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 
 .sg-fx-rate {
-  font-size: 14px;
+  font-size: calc(14px * var(--sg-font-scale, 1));
   font-weight: 500;
   color: var(--text);
   font-variant-numeric: tabular-nums;
 }
 
 .sg-fx-stale-banner {
-  font-size: 11px;
+  font-size: calc(11px * var(--sg-font-scale, 1));
   color: var(--text-muted);
   background: color-mix(in srgb, var(--text) 6%, transparent);
   border-radius: 6px;
@@ -53,7 +53,7 @@
 }
 
 .sg-fx-target-label {
-  font-size: 12px;
+  font-size: calc(12px * var(--sg-font-scale, 1));
   color: var(--text-muted);
   margin-top: 4px;
 }
@@ -70,7 +70,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: calc(12px * var(--sg-font-scale, 1));
   color: var(--text);
   cursor: pointer;
   padding: 2px 0;

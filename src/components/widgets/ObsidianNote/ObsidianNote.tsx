@@ -5,6 +5,7 @@ import { useObsidian } from '../../../hooks/useObsidian';
 import { SettingsRow, SettingsSlider } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { isScreenshotMode } from '../../../lib/permissions';
+import { scaledFontSize } from '../../../lib/displayStyle';
 import { normalizeVaultPath, vaultPathToTitle } from '../../../lib/obsidianPath';
 import { sliceSection } from '../../../lib/obsidianMarkdown';
 import { openInObsidian } from '../../../lib/obsidianApi';
@@ -15,6 +16,8 @@ import ObsidianStatus from '../shared/ObsidianStatus';
 import { IconObsidian, IconRefresh, IconOpenExternal, IconEdit, SkeletonRow } from '../shared/ObsidianIcons';
 import '../shared/obsidian.css';
 import './ObsidianNote.css';
+
+const DEFAULT_FONT_SIZE = 13;
 
 // ── Settings ──────────────────────────────────────────────────────────────────
 
@@ -66,16 +69,6 @@ export function ObsidianNoteSettings({ data, onUpdateData }: SettingsProps) {
         value={data.refreshMinutes ?? 0}
         onChange={v => onUpdateData({ refreshMinutes: v || undefined })}
         valueFormatter={v => (v ? `${v} min` : t('widget.obsidianNote.refreshOnLoad'))}
-      />
-
-      <SettingsSlider
-        label={t('widget.obsidianNote.fontSize')}
-        value={data.fontSize ?? 13}
-        min={9}
-        max={20}
-        step={1}
-        valueFormatter={v => `${v}px`}
-        onChange={v => onUpdateData({ fontSize: v })}
       />
 
       <div className="sg-cal-settings-divider"/>
@@ -164,7 +157,7 @@ export default function ObsidianNote({ data }: Props) {
         </div>
       </div>
 
-      <div className="sg-cal-body sg-obsn sg-scroll-thin" style={{ fontSize: data.fontSize ?? 13 }}>
+      <div className="sg-cal-body sg-obsn sg-scroll-thin" style={{ fontSize: scaledFontSize(DEFAULT_FONT_SIZE) }}>
         {isMock && !isScreenshotMode() && <div className="sg-cal-preview-badge">{t('widget.obsidian.previewBadge')}</div>}
         {isStale && !isLoading && <div className="sg-cal-stale-banner">{t('widget.obsidianNote.stale')}</div>}
 
@@ -173,7 +166,7 @@ export default function ObsidianNote({ data }: Props) {
             value={draft}
             onChange={setDraft}
             saving={writing}
-            fontSize={data.fontSize ?? 13}
+            fontSize={scaledFontSize(DEFAULT_FONT_SIZE)}
             onCancel={() => setEditing(false)}
             onSave={() => void (async () => {
               await saveEdit(source, draft);

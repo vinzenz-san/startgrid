@@ -15,13 +15,14 @@ export interface FontSettings {
   textOutlineSize?:    number;  // advanced only
 }
 
-/** Shared "Display Settings" — Font Size / Scale / Rotation
- *  (Position and Custom CSS Class are deliberately not part of this app's
- *  version). Reusable the same way as FontSettings: any widget data type
- *  adds `displaySettings?: DisplaySettings`. Resolved via
+/** Shared "Display Settings" — Scale / Rotation (Position and Custom CSS
+ *  Class are deliberately not part of this app's version). Font size is not
+ *  part of this anymore — every widget scales via the global Font Scale
+ *  setting instead (--sg-font-scale, WidgetContainer.tsx). Reusable the same
+ *  way as FontSettings: any widget data type adds
+ *  `displaySettings?: DisplaySettings`. Resolved via
  *  lib/displayStyle.ts's resolveDisplayStyle(). */
 export interface DisplaySettings {
-  fontSize?: number; // px, default 42 — the widget's primary text size
   scale?:    number; // default 1
   rotation?: number; // degrees, default 0
   padding?:  number; // px, default 12 — overrides the widget's own CSS padding
@@ -59,7 +60,6 @@ export interface QuicklinksData {
   layout: 'grid' | 'list';
   iconSize?: number; // px, 18-48, default 30
   showTitles?: boolean;
-  textSize?: number; // px, 9-20, default 13
   alignment?: WidgetAlignment; // default 'left'
 }
 
@@ -76,7 +76,6 @@ export interface BookmarksData {
   folderTitle?:  string;
   iconSize?:     number;  // px, 18-48, default 30
   showTitles?:   boolean; // default true
-  textSize?:     number;  // px, 9-20, default 13
   layout?:       'list' | 'grid';               // default 'list'
   alignment?:    WidgetAlignment;                // default 'left'
   sortingMode?:  BookmarkSortMode;
@@ -115,7 +114,6 @@ export interface OutlookMailData {
 
 export interface NotesData {
   content:      string;
-  fontSize?:    number; // px, 9-20, default 13
   storageMode?: 'local' | 'synced';
 }
 
@@ -136,7 +134,6 @@ export interface ObsidianCaptureData {
   /** Time format for prependTimestamp, in the token subset of lib/obsidianPath. */
   timestampFormat?: string;
   clearAfterSend?:  boolean;
-  fontSize?:        number; // px, 9-20, default 13
 }
 
 /** Daily Note — reads today's note over the REST transport. The path comes
@@ -151,7 +148,6 @@ export interface ObsidianDailyData {
   /** Show already-ticked tasks. Default true. */
   showChecked?:    boolean;
   maxLines?:       number;
-  fontSize?:       number; // px, 9-20, default 13
 }
 
 /** Pinned Note — one note rendered read-only. Editing deliberately stays in
@@ -162,7 +158,6 @@ export interface ObsidianNoteData {
   maxLines?:       number;
   /** Auto-refresh interval in minutes; 0/undefined = only on load. */
   refreshMinutes?: number;
-  fontSize?:       number; // px, 9-20, default 13
 }
 
 export interface ObsidianSearchData {
@@ -178,7 +173,6 @@ export interface ObsidianRandomData {
   excerptLines?:   number;
   /** 'load' picks a fresh note on every new tab; 'manual' only on the button. */
   refreshOn?:      'load' | 'manual';
-  fontSize?:       number; // px, 9-20, default 13
 }
 
 export interface PlaceholderData {

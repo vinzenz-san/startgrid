@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ObsidianCaptureData } from '../../../types/widget';
-import { SettingsRow, Dropdown, SettingsSlider, SettingsSwitch } from '../../shared/Form';
+import { SettingsRow, Dropdown, SettingsSwitch } from '../../shared/Form';
 import { storageLocal } from '../../../lib/storageLocal';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { useObsidian } from '../../../hooks/useObsidian';
+import { scaledFontSize } from '../../../lib/displayStyle';
 import { appendToFile } from '../../../lib/obsidianApi';
 import { buildAppendUri, launchUri } from '../../../lib/obsidianUri';
 import {
@@ -18,6 +19,7 @@ import './ObsidianCapture.css';
 
 const DEFAULT_TIMESTAMP_FORMAT = 'HH:mm';
 const SENT_FLASH_MS = 1600;
+const DEFAULT_FONT_SIZE = 13;
 
 // ── Composition ───────────────────────────────────────────────────────────────
 
@@ -140,16 +142,6 @@ export function ObsidianCaptureSettings({ data, onUpdateData }: SettingsProps) {
           onChange={v => onUpdateData({ clearAfterSend: v })}
         />
       </SettingsRow>
-
-      <SettingsSlider
-        label={t('widget.obsidianCapture.fontSize')}
-        value={data.fontSize ?? 13}
-        min={9}
-        max={20}
-        step={1}
-        valueFormatter={v => `${v}px`}
-        onChange={v => onUpdateData({ fontSize: v })}
-      />
 
       <div className="sg-cal-settings-divider"/>
       <p className="sg-obs-hint">{t('widget.obsidianCapture.restNote')}</p>
@@ -311,7 +303,7 @@ export default function ObsidianCapture({ data, widgetId }: Props) {
     <div className="sg-obsc">
       <textarea
         className="sg-obsc-input sg-scroll-thin"
-        style={{ fontSize: data.fontSize ?? 13 }}
+        style={{ fontSize: scaledFontSize(DEFAULT_FONT_SIZE) }}
         value={text}
         placeholder={t('widget.obsidianCapture.placeholder')}
         spellCheck={false}
