@@ -2,6 +2,10 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.16.6] — Layout preset thumbnails
+
+- Focus/Grid/Goals now have real thumbnail images in the post-tour layout picker (480×300 WebP, ~10KB combined) instead of placeholder tiles
+
 ## [1.16.5] — Post-tour layout picker scaffolding, tour overflow safety net
 
 - New `LayoutPresetPicker` component: a card-grid version of the existing text-only layout preset dropdown, shown once right after the onboarding tour's final "Got it" (not on Skip). Applies the chosen preset immediately, no confirm step. `GridPreset` gained an optional `previewImage` field — falls back to a placeholder tile when unset, so this ships inert until thumbnail images are added per preset

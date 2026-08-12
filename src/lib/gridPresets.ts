@@ -45,9 +45,9 @@ export interface GridPreset {
 // even with zero bookmarks), and "Goals" is built around the To-Do widget
 // since there's no dedicated daily-goal/quote widget here.
 export const GRID_PRESETS: GridPreset[] = [
-  { id: 'focus', labelKey: 'widgets.presets.focus', descriptionKey: 'widgets.presets.focusDescription', types: ['clock', 'bookmarkSearch'], stacked: true, sizeOverrides: { clock: { w: 15, h: 2 }, bookmarkSearch: { w: 11, h: 1 } } },
+  { id: 'focus', labelKey: 'widgets.presets.focus', descriptionKey: 'widgets.presets.focusDescription', types: ['clock', 'bookmarkSearch'], stacked: true, sizeOverrides: { clock: { w: 15, h: 2 }, bookmarkSearch: { w: 11, h: 1 } }, previewImage: '/presets/focus.webp' },
   {
-    id: 'grid', labelKey: 'widgets.presets.grid', descriptionKey: 'widgets.presets.gridDescription',
+    id: 'grid', labelKey: 'widgets.presets.grid', descriptionKey: 'widgets.presets.gridDescription', previewImage: '/presets/grid.webp',
     layout: [
       { type: 'clock', col: 1, row: 1, w: 15, h: 2 },
       { type: 'greeting', col: 1, row: 3, w: 15, h: 1 },
@@ -66,7 +66,7 @@ export const GRID_PRESETS: GridPreset[] = [
     ],
   },
   {
-    id: 'goals', labelKey: 'widgets.presets.goals', descriptionKey: 'widgets.presets.goalsDescription',
+    id: 'goals', labelKey: 'widgets.presets.goals', descriptionKey: 'widgets.presets.goalsDescription', previewImage: '/presets/goals.webp',
     types: ['clock', 'greeting', 'bookmarkSearch', 'invisible-spacer', 'todoList'],
     stacked: true,
     sizeOverrides: {
