@@ -55,7 +55,7 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
   } = useSettings();
   const panelRef = useRef<HTMLDivElement>(null);
   const { config, setConfig } = useBackground();
-  const { isEditMode, toggleEditMode } = useEditMode();
+  const { isEditMode } = useEditMode();
   const { widgets, updateWidget, replaceAllWidgets } = useWidgets();
   const { gridConfig } = useGridConfig();
   const { applyGridConfig } = useApplyGridConfig();
@@ -322,17 +322,7 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
               />
             </DetailedSettings>
 
-            <DetailedSettings title={t('widgets.layoutSectionTitle')}>
-              {/* Lock / Unlock */}
-              <SettingsRow label={isEditMode ? t('widgets.layoutUnlocked') : t('widgets.layoutLocked')}>
-                <ActionButton variant="ghost" active={isEditMode} fullWidth={false} onClick={toggleEditMode}>
-                  {isEditMode ? t('widgets.lock') : t('widgets.unlock')}
-                </ActionButton>
-              </SettingsRow>
-
-              {/* Layout presets */}
-              <LayoutPresets />
-            </DetailedSettings>
+            <LayoutPresets />
           </PanelSection>
           </div>
 

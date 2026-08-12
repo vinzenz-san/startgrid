@@ -109,7 +109,7 @@ export default function RssFeed({ data, onUpdateData }: Props) {
   const showDescription = data.showDescription ?? false;
   const { onPointerDown, guardClick } = useClickDragGuard();
 
-  const { status, items, feedTitle, error, isStale, refetch } = useRssFeed({
+  const { status, items, feedTitle, error, isStale, isDemo, refetch } = useRssFeed({
     feedUrl: data.feedUrl,
     refreshIntervalMin: data.refreshIntervalMin,
   });
@@ -151,6 +151,11 @@ export default function RssFeed({ data, onUpdateData }: Props) {
       {isStale && (
         <li className="sg-rss-stale-banner">
           {t('widget.rssFeed.stale')}
+        </li>
+      )}
+      {isDemo && (
+        <li className="sg-rss-stale-banner">
+          {t('widget.rssFeed.demo')}
         </li>
       )}
       {items.slice(0, maxItems).map((item, i) => (

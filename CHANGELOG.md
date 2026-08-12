@@ -2,6 +2,12 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.16.7] — Layout picker simplification, RSS preview fallback, preset path fix
+
+- Fixed layout preset thumbnails not loading in the web preview (`docs/preview`) — `previewImage` paths used a leading slash, which resolves against the page's origin root; that happened to work in the installed extension by coincidence but breaks under GitHub Pages' subpath hosting. Paths are now relative, matching how every other build asset reference already works
+- Settings → Widgets: removed the Layout Lock/Unlock row (locking is still available via the pencil idle-icon / Ctrl+E) and the text-only "Layout preset" dropdown + Apply button, replaced with a single "Pick a layout" button that opens the same card-grid picker shown at the end of the onboarding tour — no longer buried behind a collapsible sub-section
+- RSS Feed: the web preview (`docs/preview` and local dev server) can't guarantee every visitor's browser reaches the proxy Worker, so a first-ever load with nothing cached yet now falls back to clearly-labelled sample content instead of a bare error — never triggers inside the actual installed extension, which still shows the real error state
+
 ## [1.16.6] — Layout preset thumbnails
 
 - Focus/Grid/Goals now have real thumbnail images in the post-tour layout picker (480×300 WebP, ~10KB combined) instead of placeholder tiles
