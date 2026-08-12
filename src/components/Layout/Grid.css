@@ -129,6 +129,30 @@ html.sg-glow-all-widgets .sg-widget {
 }
 [data-scheme="light"] .sg-idle-icon:hover { color: var(--accent); }
 
+/* Edit-mode scrim — a full-viewport semi-transparent dark wash, sitting
+   above the real background (Background.css, z-index -1/-2) but below the
+   grid/widgets (.sg-grid-wrapper, z-index 0, painted later in DOM order so
+   it wins the tie at the same z-index). Boosts contrast for the grid
+   overlay (dot-grid + glow lines below, both accent-colored) against
+   whatever hue the background happens to be, without outlining each line
+   individually or being confined to just the grid's own box — covers the
+   whole screen so the effect reads as one consistent dimming rather than a
+   rectangle cut out around the grid. Edit-mode only, same reasoning as the
+   overlay itself: hovering a settings row (the other time the glow lines
+   can show) shouldn't dim the entire screen just for a preview. */
+.sg-edit-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.sg-root--edit .sg-edit-scrim {
+  opacity: 1;
+}
+
 /* ── Grid ────────────────────────────────────────── */
 .sg-grid-wrapper {
   flex: 1;
@@ -149,9 +173,17 @@ html.sg-glow-all-widgets .sg-widget {
    within the wrapper when its content is shorter than the viewport, instead
    of sitting flush at the top (the wrapper's default align-items: stretch
    has no visible effect here since .sg-grid always sets an explicit height,
-   so without this it just renders at the cross-axis start = top). Renewed
-   Tab centers sparse layouts (e.g. its Focus preset) the same way. */
-.sg-grid-wrapper--center-vertical { align-items: center; }
+   so without this it just renders at the cross-axis start = top).
+   `safe center` (not plain `center`) matters once content grows taller than
+   the viewport (e.g. adding enough widgets in edit mode, where contentRows
+   also briefly grows by +5 rows of headroom) — plain center overflows
+   equally on both sides of the centered box, and a flex/grid container can't
+   scroll to reach the part that overflows past the start edge, silently
+   cutting off whatever's at the top with no way to scroll up to it. `safe`
+   falls back to start-alignment specifically when centering would make
+   content inaccessible like that, so nothing gets stranded above the
+   viewport. */
+.sg-grid-wrapper--center-vertical { align-items: safe center; }
 
 /* Plain width:100% measuring host for RGLGrid.tsx's useContainerWidth — kept
    separate from .sg-grid itself so Full Page Grid mode has a stable,
@@ -222,13 +254,6 @@ html.sg-glow-all-widgets .sg-widget {
   transition: transform 200ms ease, width 200ms ease, height 200ms ease;
 }
 
-/* Edit-mode: dot-grid background */
-.sg-root--edit .sg-grid {
-  background-image: radial-gradient(circle, rgba(99,102,241,0.2) 1px, transparent 1px);
-  background-size: calc((100% - var(--gap)) / var(--grid-cols)) calc(var(--cell-h) + var(--gap));
-  background-position: calc(var(--gap) + (100% - var(--gap)) / (var(--grid-cols) * 2)) calc(var(--gap) + var(--cell-h) / 2);
-}
-
 /* ── Grid glow overlay ─────────────────────────────
    Glowing lines along cell boundaries, built from two repeating linear
    gradients (one per axis) sized to the live cell-width/height + gap, so it
@@ -267,6 +292,15 @@ html.sg-glow-all-widgets .sg-widget {
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
+}
+
+/* Edit-mode dot-grid background — back on .sg-grid itself (contrast for this
+   and the glow lines below now comes from .sg-edit-scrim, a full-viewport
+   dark wash — see its own comment further down). */
+.sg-root--edit .sg-grid {
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--accent) 20%, transparent) 1px, transparent 1px);
+  background-size: calc((100% - var(--gap)) / var(--grid-cols)) calc(var(--cell-h) + var(--gap));
+  background-position: calc(var(--gap) + (100% - var(--gap)) / (var(--grid-cols) * 2)) calc(var(--gap) + var(--cell-h) / 2);
 }
 
 .sg-grid-glow-overlay {

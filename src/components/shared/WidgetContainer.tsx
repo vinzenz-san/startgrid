@@ -121,15 +121,23 @@ export default function WidgetContainer({ widget }: Props) {
     updateWidget(widget.id, { data: merged } as Partial<Widget>);
   };
 
-  const overrideEnabled      = widget.localOverrideEnabled ?? false;
-  const localOpacityPct      = Math.round((widget.bgOpacity ?? globalOpacity) * 100);
+  // Locked-style widget types (Clock, Greeting — see TypedEntry.lockedStyle)
+  // always render defaultStyle's values, ignoring the widget's own stored
+  // style fields and the global theme entirely; the Local Style appearance
+  // section below is hidden for them so there's no control implying it's
+  // actually adjustable.
+  const isLockedStyle = entry.lockedStyle ?? false;
+  const locked = isLockedStyle ? entry.defaultStyle : undefined;
+
+  const overrideEnabled      = isLockedStyle || (widget.localOverrideEnabled ?? false);
+  const localOpacityPct      = Math.round((locked?.bgOpacity ?? widget.bgOpacity ?? globalOpacity) * 100);
   const localTransparencyPct = 100 - localOpacityPct;
-  const localDimPct          = Math.round(widget.bgDim ?? globalDim);
-  const localShadowPct       = Math.round(widget.bgShadow ?? widgetShadowOpacity);
-  const localGlassPct        = Math.round(widget.bgGlass ?? globalGlassIntensity);
+  const localDimPct          = Math.round(locked?.bgDim ?? widget.bgDim ?? globalDim);
+  const localShadowPct       = Math.round(locked?.bgShadow ?? widget.bgShadow ?? widgetShadowOpacity);
+  const localGlassPct        = Math.round(locked?.bgGlass ?? widget.bgGlass ?? globalGlassIntensity);
 
   // Effective intensity: per-widget value if set, else backwards-compat from old boolean, else global
-  const localIntensity = widget.bgGradientIntensity
+  const localIntensity = locked?.bgGradientIntensity ?? widget.bgGradientIntensity
     ?? (widget.localGradientOverride === false ? 0 : globalGradientIntensity);
 
   // 'auto' (unset) follows the live global colorScheme; an explicit choice always wins.
@@ -161,13 +169,13 @@ export default function WidgetContainer({ widget }: Props) {
     ? (() => {
         const t = localIntensity / 100;
         const colorEnd = mixHex(effectiveColor, darkenHex(effectiveColor), t);
-        const shadowPct = widget.bgShadow ?? widgetShadowOpacity;
+        const shadowPct = locked?.bgShadow ?? widget.bgShadow ?? widgetShadowOpacity;
         return {
-          '--widget-bg-opacity':     String(widget.bgOpacity ?? globalOpacity),
-          '--widget-dim':            String(widget.bgDim ?? globalDim),
+          '--widget-bg-opacity':     String(locked?.bgOpacity ?? widget.bgOpacity ?? globalOpacity),
+          '--widget-dim':            String(locked?.bgDim ?? widget.bgDim ?? globalDim),
           '--widget-shadow-opacity': String(shadowPct),
           '--widget-shadow-factor':  String((shadowPct / 100) ** 2),
-          '--widget-glass':          String((widget.bgGlass ?? globalGlassIntensity) / 100),
+          '--widget-glass':          String((locked?.bgGlass ?? widget.bgGlass ?? globalGlassIntensity) / 100),
           '--widget-bg-preset-css':  `linear-gradient(135deg, ${effectiveColor} 0%, ${colorEnd} 100%)`,
         } as React.CSSProperties;
       })()
@@ -218,7 +226,10 @@ export default function WidgetContainer({ widget }: Props) {
         {entry.renderSettings?.(widget.data, handleUpdateData, widget.id)}
       </div>
 
-      {/* Appearance section — shared across all widgets */}
+      {/* Appearance section — shared across all widgets except locked-style
+          ones (Clock, Greeting), which have nothing here to show */}
+      {!isLockedStyle && (
+      <>
       <div className="sg-widget-float-divider" />
       <div className="sg-widget-appearance">
         <div className="sg-widget-appearance-row">
@@ -335,6 +346,8 @@ export default function WidgetContainer({ widget }: Props) {
           </>
         )}
       </div>
+      </>
+      )}
     </div>,
     document.body
   );

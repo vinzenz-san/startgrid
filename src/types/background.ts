@@ -72,8 +72,8 @@ export interface ColorGradientConfig extends BackgroundShared {
   value: string;             // unused; kept for storage shape uniformity with other modes
   gradientType?: 'linear' | 'radial'; // default 'linear'
   angle?: number;             // 0-360, default 135 — linear only
-  from?: string;               // hex, default '#ffffff'
-  to?: string;                 // hex, default '#000000'
+  from?: string;               // hex, default '#3498db'
+  to?: string;                 // hex, default '#9b59b6'
 }
 
 export interface OnlineImageConfig extends BackgroundShared {
@@ -102,14 +102,17 @@ export type BackgroundMode = BackgroundConfig['mode'];
 
 // ─── Defaults ──────────────────────────────────────────────────────────────
 // First-run and post-factory-reset default (BackgroundContext falls back to
-// this when storage is empty), and what "Reset Appearance" restores.
+// this when storage is empty), and what "Reset Appearance" restores. The
+// grid's edit-mode dot-grid/glow overlay (Grid.css) carries its own
+// dark+light outline now, so this can be a real color pair instead of
+// white/black picked purely to dodge that overlay's contrast.
 export const DEFAULT_BG: ColorGradientConfig = {
   mode: 'colourGradient',
   value: '',
   gradientType: 'linear',
   angle: 135,
-  from: '#ffffff',
-  to: '#000000',
+  from: '#3498db',
+  to: '#9b59b6',
 };
 
 // ─── Editor grouping ───────────────────────────────────────────────────────

@@ -37,6 +37,16 @@ interface TypedEntry<T> {
    *  gridUtils.ts and applyPreset in gridPresets.ts both merge this in).
    *  Existing widgets already on a grid are unaffected by changing this. */
   defaultStyle?: Partial<WidgetBase>;
+  /** When true, this widget type's local style is permanently fixed to
+   *  defaultStyle: WidgetContainer.tsx ignores the widget's own stored
+   *  bgOpacity/bgShadow/bgGlass/bgGradientIntensity/localOverrideEnabled and
+   *  the global theme settings, always rendering defaultStyle's values
+   *  instead, and hides the "Local Style" appearance section entirely so
+   *  there's no control that would suggest it's actually changeable. Also
+   *  makes it immune to "Reset all widget styles" — that only clears
+   *  localOverrideEnabled/localColorScheme, which locked rendering never
+   *  reads in the first place. */
+  lockedStyle?: boolean;
   devOnly?:    boolean;
   titleBehavior:        'optional' | 'auto' | 'none';
   defaultTitle?:        string;
@@ -54,6 +64,7 @@ export interface WidgetEntry {
   defaultSize: { w: number; h: number };
   defaultData: unknown;
   defaultStyle?: Partial<WidgetBase>;
+  lockedStyle?: boolean;
   devOnly?:    boolean;
   titleBehavior:        'optional' | 'auto' | 'none';
   defaultTitle?:        string;
@@ -72,12 +83,9 @@ const _registry = {
     defaultSize:   { w: 4, h: 2 },
     defaultData:   {
       format: '24h', showSeconds: false, showDate: false, allowOverflow: true,
-      fontSettings: { fontWeight: 500 },
-      displaySettings: { scale: 1.5, fontSize: 60 },
     } satisfies ClockData,
-    // Transparency 100% / Shadow 0% / Glass 0% / Gradient Intensity 0% — was
-    // previously only applied by the layout presets (gridPresets.ts); now the
-    // default for every new Clock however it's added.
+    // Transparency 100% / Shadow 0% / Glass 0% / Gradient Intensity 0%,
+    // permanently — see TypedEntry.lockedStyle.
     defaultStyle: {
       localOverrideEnabled: true,
       bgOpacity: 0,
@@ -85,6 +93,7 @@ const _registry = {
       bgGlass: 0,
       bgGradientIntensity: 0,
     },
+    lockedStyle: true,
     titleBehavior: 'none',
     renderComponent: (data, onUpdateData) => <Clock data={data} onUpdateData={onUpdateData} />,
     renderSettings:  (data, onUpdateData) => <ClockSettings data={data} onUpdateData={onUpdateData} />,
@@ -230,7 +239,17 @@ const _registry = {
     label:         'Greeting',
     icon:          '👋',
     defaultSize:   { w: 2, h: 1 },
-    defaultData:   { alignment: 'left' } satisfies GreetingData,
+    defaultData:   { alignment: 'center' } satisfies GreetingData,
+    // Transparency 100% / Shadow 0% / Glass 0% / Gradient Intensity 0%,
+    // permanently — see TypedEntry.lockedStyle.
+    defaultStyle: {
+      localOverrideEnabled: true,
+      bgOpacity: 0,
+      bgShadow: 0,
+      bgGlass: 0,
+      bgGradientIntensity: 0,
+    },
+    lockedStyle: true,
     titleBehavior: 'none',
     renderComponent: (data, onUpdateData) => <Greeting data={data} onUpdateData={onUpdateData} />,
     renderSettings:  (data, onUpdateData) => <GreetingSettings data={data} onUpdateData={onUpdateData} />,

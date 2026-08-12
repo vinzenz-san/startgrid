@@ -2,6 +2,15 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.16.2] — Locked-style Clock/Greeting, auto-fit Clock text, grid-overlay contrast fix
+
+- Clock and Greeting now have their local style (Transparency/Shadow/Glass/Gradient Intensity) permanently fixed to 100%/0%/0%/0% — no longer user-editable, immune to global theme settings, and immune to "Reset all widget styles" (new `lockedStyle` registry flag, `WidgetContainer.tsx` ignores stored/global values entirely for these types and hides the Local Style section)
+- Clock's Font Settings and Display Settings panels removed entirely. Time text now auto-scales to fill its box via a new `FitText` component (measures its own size + the time string's aspect ratio on every resize, no manual font-size setting to drift out of sync); date text uses a fixed size. Both bumped up from the first pass — time bolder (font-weight 600) and less conservative about box-filling, date resized to match
+- Greeting: default alignment changed to centered (was left), default font size bumped (22px → 28px)
+- Fixed the grid's edit-mode dot-grid/glow-line overlay losing contrast against background colors near the accent color's own hue (e.g. blue/purple) — a full-viewport semi-transparent dark scrim now sits behind the grid/widgets during edit mode, instead of relying purely on the accent-colored glow for contrast
+- Reverted the default "Color Gradient" background from white/black back to blue/purple (`#3498db` → `#9b59b6`) now that the overlay contrast issue above is fixed at the source
+- Fixed widgets becoming inaccessible above the viewport (only reappearing after leaving edit mode) once a grid's content grew taller than the window with Vertically Center Grid on — `align-items: center` on the grid wrapper cut off content that overflowed past the start edge with no way to scroll to it; changed to `align-items: safe center`, which falls back to top-anchored specifically when centering would strand content like that
+
 ## [1.16.1] — Preset sizing refinements, per-widget default style, shared transparent-text-shadow
 
 - Focus preset: Clock 15×2, Bookmark Search 11×1 centered (col 3, matching a 15/11 split); Goals preset rebuilt as a proper vertical stack (was using free-slot auto-placement) — Clock 15×2, Greeting 15×1, Bookmark Search 15×1, an Invisible Spacer, then To-Do sized 5×3 and centered

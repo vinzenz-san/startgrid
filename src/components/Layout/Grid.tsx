@@ -154,6 +154,8 @@ export default function Grid() {
 
       <CommandPalette />
 
+      <div className="sg-edit-scrim" />
+
       <main
         className={`sg-grid-wrapper${settingsPinned ? ' sg-grid-wrapper--pinned-right' : ''}${gridConfig.verticalCenter ? ' sg-grid-wrapper--center-vertical' : ''}`}
         onClick={() => { if (!settingsPinned) setSettingsPanelOpen(false); }}

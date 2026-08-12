@@ -37,8 +37,6 @@ export interface ClockData {
    *  vertical placement (the widget's flex-direction is column, so these
    *  map to align-items vs justify-content respectively). Default 'center'. */
   alignment?: WidgetAlignment;
-  fontSettings?: FontSettings;
-  displaySettings?: DisplaySettings;
   /** Let the rendered text spill past the widget's own box instead of being
    *  clipped — useful for a large clock font. Default false. */
   allowOverflow?: boolean;
