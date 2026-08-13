@@ -39,11 +39,12 @@ interface SettingsProps {
 }
 
 const REFRESH_OPTIONS = [15, 30, 60, 120] as const;
+const DEFAULT_MAX_ITEMS = 8;
 
 export function RssFeedSettings({ data, onUpdateData }: SettingsProps) {
   const { t } = useSettings();
   const [urlDraft, setUrlDraft] = useState(data.feedUrl ?? '');
-  const maxItems = data.maxItems ?? 8;
+  const maxItems = data.maxItems ?? DEFAULT_MAX_ITEMS;
   const showDescription = data.showDescription ?? false;
   const refreshIntervalMin = data.refreshIntervalMin ?? 30;
 
@@ -66,17 +67,16 @@ export function RssFeedSettings({ data, onUpdateData }: SettingsProps) {
         />
       </SettingsRow>
 
-      <SettingsRow label={t('widget.rssFeed.maxItems')}>
-        <SettingsSlider
-          label=""
-          value={maxItems}
-          onChange={v => onUpdateData({ maxItems: v })}
-          min={3}
-          max={20}
-          step={1}
-          valueFormatter={v => String(v)}
-        />
-      </SettingsRow>
+      <SettingsSlider
+        label={t('widget.rssFeed.maxItems')}
+        value={maxItems}
+        onChange={v => onUpdateData({ maxItems: v })}
+        min={3}
+        max={20}
+        step={1}
+        valueFormatter={v => String(v)}
+        defaultValue={DEFAULT_MAX_ITEMS}
+      />
 
       <SettingsRow label={t('widget.rssFeed.showDescription')}>
         <SettingsSwitch checked={showDescription} onChange={v => onUpdateData({ showDescription: v })} />
@@ -105,7 +105,7 @@ interface Props {
 
 export default function RssFeed({ data, onUpdateData }: Props) {
   const { t } = useSettings();
-  const maxItems = data.maxItems ?? 8;
+  const maxItems = data.maxItems ?? DEFAULT_MAX_ITEMS;
   const showDescription = data.showDescription ?? false;
   const { onPointerDown, guardClick } = useClickDragGuard();
 

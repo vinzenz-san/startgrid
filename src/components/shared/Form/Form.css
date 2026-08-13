@@ -19,12 +19,14 @@
   flex-shrink: 0;
 }
 
-/* Pins expanding row controls (dropdown, segmented control) to a shared
-   width so their right edges align across a settings panel instead of each
-   one sizing to its own content. Fixed-size controls (switch, swatch button,
-   icon button, ...) are left alone — stretching those would distort them. */
+/* Pins expanding row controls (dropdown, segmented control, slider) to a
+   shared width so their right edges align across a settings panel instead of
+   each one sizing to its own content. Fixed-size controls (switch, swatch
+   button, icon button, ...) are left alone — stretching those would distort
+   them. */
 .sg-form-row > .sg-dropdown,
-.sg-form-row > .sg-form-seg {
+.sg-form-row > .sg-form-seg,
+.sg-form-row > .sg-slider-wrap {
   width: 50%;
   flex-shrink: 0;
 }
@@ -117,49 +119,78 @@
 }
 
 /* ── SettingsSlider ──────────────────────────────────────────────────────── */
-.sg-settings-slider {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 2px 0;
+/* Full self-contained row: label (flexible) / [reset?][value] 52px / track
+   104px, via CSS grid — this one component owns the whole row (not nested
+   inside SettingsRow) so every slider in the app renders identically
+   regardless of call site: change the grid-template-columns below and every
+   slider moves together.
+   Only the label column is flexible (1fr) — it stretches to fill whatever
+   width its container has, so the row's right edge always reaches the same
+   edge every other row/button in that panel reaches (the Settings sidebar's
+   cards and a widget panel's flatter padding give the row different total
+   widths, but that's fine: it's only text). The value+reset and track
+   columns are fixed px, so *those* — the part a user visually reads as "the
+   slider" — render at the identical absolute size everywhere. */
+.sg-slider-row {
+  display: grid;
+  grid-template-columns: 1fr 52px 104px;
+  align-items: center;
+  column-gap: 8px;
+  width: 100%;
+  padding: 4px 0;
+  box-sizing: border-box;
 }
 
-.sg-settings-slider-header {
+.sg-slider-row-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sg-slider-row-value-group {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 4px;
+  min-width: 0;
 }
 
-.sg-settings-slider-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
+/* Bare/compact variant — no label column, for chromeless contexts (e.g.
+   RainRadar's toolbar frame scrubber) that have no room for one. */
+.sg-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--sg-control-h);
+  box-sizing: border-box;
 }
 
-.sg-settings-slider-val {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  min-width: 32px;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-.sg-settings-slider-reset {
+.sg-slider-reset {
   width: var(--sg-control-h);
   height: var(--sg-control-h);
   font-size: 0.8rem;
   flex-shrink: 0;
 }
 
-.sg-settings-slider-reset--default {
+.sg-slider-reset--default {
   opacity: 0.35;
 }
 
-.sg-settings-slider input[type="range"] {
+.sg-slider-val {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  min-width: 32px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.sg-slider {
+  flex: 1;
   width: 100%;
-  height: 20px;       /* tall enough for thumb in all browsers; track is styled via pseudo-elements */
+  min-width: 0;
+  height: 100%;       /* fills --sg-control-h; thumb is centered via track/thumb math below */
   cursor: pointer;
   overflow: visible;
   -webkit-appearance: none;
@@ -169,7 +200,7 @@
   box-sizing: border-box;
 }
 
-.sg-settings-slider input[type="range"]::-webkit-slider-runnable-track {
+.sg-slider::-webkit-slider-runnable-track {
   height: 4px;
   /* WebKit has no ::-moz-range-progress equivalent, so paint the accent fill
      ourselves: solid accent up to the thumb position, base track after it. */
@@ -181,7 +212,7 @@
   border-radius: 2px;
 }
 
-.sg-settings-slider input[type="range"]::-webkit-slider-thumb {
+.sg-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 12px;
@@ -194,19 +225,19 @@
   transition: background-color 0.1s;
 }
 
-.sg-settings-slider input[type="range"]::-moz-range-track {
+.sg-slider::-moz-range-track {
   height: 4px;
   background: rgba(128, 128, 128, 0.40);
   border-radius: 2px;
 }
 
-.sg-settings-slider input[type="range"]::-moz-range-progress {
+.sg-slider::-moz-range-progress {
   height: 4px;
   background: var(--accent);
   border-radius: 2px;
 }
 
-.sg-settings-slider input[type="range"]::-moz-range-thumb {
+.sg-slider::-moz-range-thumb {
   width: 12px;
   height: 12px;
   border-radius: 50%;

@@ -15,6 +15,8 @@ import '../shared/obsidian.css';
 import './ObsidianSearch.css';
 
 const DEBOUNCE_MS = 250;
+const DEFAULT_MAX_RESULTS = 8;
+const DEFAULT_CONTEXT_LENGTH = 100;
 
 // ── Mock ──────────────────────────────────────────────────────────────────────
 
@@ -44,16 +46,18 @@ export function ObsidianSearchSettings({ data, onUpdateData }: SettingsProps) {
       <SettingsSlider
         label={t('widget.obsidianSearch.maxResults')}
         min={3} max={25} step={1}
-        value={data.maxResults ?? 8}
+        value={data.maxResults ?? DEFAULT_MAX_RESULTS}
         onChange={v => onUpdateData({ maxResults: v })}
         valueFormatter={v => String(v)}
+        defaultValue={DEFAULT_MAX_RESULTS}
       />
       <SettingsSlider
         label={t('widget.obsidianSearch.contextLength')}
         min={40} max={240} step={20}
-        value={data.contextLength ?? 100}
+        value={data.contextLength ?? DEFAULT_CONTEXT_LENGTH}
         onChange={v => onUpdateData({ contextLength: v })}
         valueFormatter={v => String(v)}
+        defaultValue={DEFAULT_CONTEXT_LENGTH}
       />
       <DetailedSettings title={t('widget.obsidian.sectionTitle')}>
         <ObsidianConnect />
@@ -86,8 +90,8 @@ export default function ObsidianSearch({ data }: Props) {
   const { t } = useSettings();
   const { isReady, checking } = useObsidian();
 
-  const maxResults    = data.maxResults ?? 8;
-  const contextLength = data.contextLength ?? 100;
+  const maxResults    = data.maxResults ?? DEFAULT_MAX_RESULTS;
+  const contextLength = data.contextLength ?? DEFAULT_CONTEXT_LENGTH;
 
   const [query,     setQuery]     = useState('');
   const [hits,      setHits]      = useState<SearchHit[]>([]);

@@ -214,59 +214,6 @@
   opacity: 0.5;
 }
 
-/* Slider */
-
-.sg-cal-slider-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  /* Shares --sg-control-h with SegmentedControl/Dropdown/SettingsSwitch —
-     without this, the browser's default <input type="range"> box metrics
-     make this row a different height than its siblings, throwing off
-     row-to-row spacing even though every row shares the same SettingsRow
-     padding. */
-  height: var(--sg-control-h);
-}
-
-.sg-cal-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 90px;
-  height: 4px;
-  margin: 0;
-  border-radius: 2px;
-  background: rgba(128, 128, 128, 0.25);
-  outline: none;
-  cursor: pointer;
-}
-
-.sg-cal-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  transition: background 0.1s;
-}
-
-.sg-cal-slider::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--accent);
-  border: none;
-  cursor: pointer;
-}
-
-.sg-cal-slider-val {
-  font-size: 0.75rem;
-  font-weight: 600;
-  min-width: 14px;
-  text-align: right;
-  opacity: 0.75;
-}
 
 /* Divider */
 

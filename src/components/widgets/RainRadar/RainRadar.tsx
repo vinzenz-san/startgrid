@@ -119,27 +119,23 @@ export function RainRadarSettings({ data, onUpdateData }: SettingsProps) {
         <div className="sg-weather-current-location">{data.locationName}</div>
       )}
 
-      <SettingsRow label={t('widget.rainRadar.zoom')}>
-        <SettingsSlider
-          label=""
-          value={zoom}
-          onChange={v => onUpdateData({ zoom: v })}
-          min={MAP_ZOOM_MIN}
-          max={MAP_ZOOM_MAX}
-          step={1}
-          valueFormatter={v => String(v)}
-          defaultValue={DEFAULT_ZOOM}
-        />
-      </SettingsRow>
+      <SettingsSlider
+        label={t('widget.rainRadar.zoom')}
+        value={zoom}
+        onChange={v => onUpdateData({ zoom: v })}
+        min={MAP_ZOOM_MIN}
+        max={MAP_ZOOM_MAX}
+        step={1}
+        valueFormatter={v => String(v)}
+        defaultValue={DEFAULT_ZOOM}
+      />
 
-      <SettingsRow label={t('widget.rainRadar.opacity')}>
-        <SettingsSlider
-          label=""
-          value={opacity}
-          onChange={v => onUpdateData({ opacity: v })}
-          defaultValue={DEFAULT_OPACITY}
-        />
-      </SettingsRow>
+      <SettingsSlider
+        label={t('widget.rainRadar.opacity')}
+        value={opacity}
+        onChange={v => onUpdateData({ opacity: v })}
+        defaultValue={DEFAULT_OPACITY}
+      />
 
       <SettingsRow label={t('widget.rainRadar.mapStyle')}>
         <Dropdown
@@ -424,7 +420,7 @@ export default function RainRadar({ data }: Props) {
           />
           <div className="sg-rainradar-scrubber">
             <SettingsSlider
-              label=""
+              ariaLabel={t('widget.rainRadar.frameScrubber')}
               value={frameIndex}
               onChange={i => { setIsPlaying(false); setFrameIndex(i); }}
               min={0}

@@ -87,6 +87,7 @@ export function ObsidianDailySettings({ data, onUpdateData }: SettingsProps) {
         value={data.maxLines ?? 0}
         onChange={v => onUpdateData({ maxLines: v || undefined })}
         valueFormatter={v => (v ? String(v) : t('widget.obsidianDaily.noLimit'))}
+        defaultValue={0}
       />
 
       <DetailedSettings title={t('widget.obsidian.sectionTitle')}>

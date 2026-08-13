@@ -3,11 +3,13 @@ import type { OutlookMailData } from '../../../types/widget';
 import type { MailMessage } from './outlookMail.types';
 import { useOutlookMail } from './useOutlookMail';
 import { useMsAuth } from '../../../hooks/useMsAuth';
-import { SettingsRow, SettingsSwitch } from '../../shared/Form';
+import { SettingsRow, SettingsSwitch, SettingsSlider } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { isScreenshotMode } from '../../../lib/permissions';
 import { LOCALES } from '../../../i18n';
 import './OutlookMail.css';
+
+const DEFAULT_MAX_RESULTS = 8;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -105,21 +107,20 @@ interface SettingsProps {
 
 export function OutlookMailSettings({ data, onUpdateData }: SettingsProps) {
   const { t } = useSettings();
-  const maxResults     = data.maxResults ?? 8;
+  const maxResults     = data.maxResults ?? DEFAULT_MAX_RESULTS;
   const showUnreadOnly = data.showUnreadOnly ?? false;
   const { isConnected, isConnecting, email, error, connect, disconnect } = useMsAuth();
 
   return (
     <div className="sg-cal-settings" onClick={e => e.stopPropagation()}>
-      <SettingsRow label={t('widget.outlookMail.maxResults')}>
-        <div className="sg-cal-slider-wrap">
-          {/* eslint-disable-next-line no-restricted-syntax -- pre-existing, not yet migrated to SettingsSlider (shared with Calendar/OutlookCalendar) */}
-          <input type="range" min={1} max={25} value={maxResults}
-            onChange={e => onUpdateData({ maxResults: Number(e.target.value) })}
-            className="sg-cal-slider"/>
-          <span className="sg-cal-slider-val">{maxResults}</span>
-        </div>
-      </SettingsRow>
+      <SettingsSlider
+        label={t('widget.outlookMail.maxResults')}
+        min={1} max={25} step={1}
+        value={maxResults}
+        onChange={v => onUpdateData({ maxResults: v })}
+        valueFormatter={v => String(v)}
+        defaultValue={DEFAULT_MAX_RESULTS}
+      />
 
       <SettingsRow label={t('widget.outlookMail.unreadOnly')}>
         <SettingsSwitch checked={showUnreadOnly} onChange={v => onUpdateData({ showUnreadOnly: v })} />
@@ -162,7 +163,7 @@ export default function OutlookMail({ data }: Props) {
   const locale = LOCALES[language];
   const { status, messages, isStale, refresh, isMock } = useOutlookMail();
   const { isConnected, connect, isConnecting } = useMsAuth();
-  const maxResults     = data.maxResults ?? 8;
+  const maxResults     = data.maxResults ?? DEFAULT_MAX_RESULTS;
   const showUnreadOnly = data.showUnreadOnly ?? false;
 
   useEffect(() => { refresh(maxResults, showUnreadOnly); }, []); // eslint-disable-line react-hooks/exhaustive-deps

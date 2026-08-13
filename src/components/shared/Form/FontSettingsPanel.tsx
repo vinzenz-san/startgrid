@@ -150,7 +150,6 @@ export default function FontSettingsPanel({ value, onChange }: Props) {
               valueFormatter={v => `${v}px`}
               onChange={v => onChange({ textOutlineSize: v })}
               defaultValue={1}
-              resetTitle={t('widget.resetToDefault')}
             />
           )}
         </>

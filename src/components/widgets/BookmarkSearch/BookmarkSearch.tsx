@@ -13,6 +13,8 @@ import './BookmarkSearch.css';
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
+const DEFAULT_MAX_RESULTS = 10;
+
 function hostnameOf(url: string): string {
   try { return new URL(url).hostname; } catch { return ''; }
 }
@@ -82,9 +84,10 @@ export function BookmarkSearchSettings({ data, onUpdateData }: SettingsProps) {
       <SettingsSlider
         label={t('widget.bookmarkSearch.maxResults')}
         min={5} max={30} step={1}
-        value={data.maxResults ?? 10}
+        value={data.maxResults ?? DEFAULT_MAX_RESULTS}
         onChange={v => onUpdateData({ maxResults: v })}
         valueFormatter={v => String(v)}
+        defaultValue={DEFAULT_MAX_RESULTS}
       />
       <SettingsRow label={t('widget.bookmarkSearch.focusShortcut')}>
         <span className="sg-bks-shortcut-badge">Ctrl + Shift + F</span>
@@ -111,7 +114,7 @@ interface Props {
 export default function BookmarkSearch({ data }: Props) {
   const { t } = useSettings();
   const bookmarks  = useBookmarkFolder();
-  const maxResults = data.maxResults ?? 10;
+  const maxResults = data.maxResults ?? DEFAULT_MAX_RESULTS;
 
   const [query,            setQuery]            = useState('');
   const [searchResults,    setSearchResults]    = useState<BmNode[]>([]);

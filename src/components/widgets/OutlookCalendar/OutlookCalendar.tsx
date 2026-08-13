@@ -5,7 +5,7 @@ import type { CalendarEvent } from '../shared/calendarEvent.types';
 import { OUTLOOK_CATEGORY_COLORS, DEFAULT_EVENT_COLOR } from './outlookCalendar.types';
 import { useOutlookCalendar, useOutlookCalendarList } from './useOutlookCalendar';
 import { useMsAuth } from '../../../hooks/useMsAuth';
-import { SettingsRow, Dropdown, SettingsSwitch } from '../../shared/Form';
+import { SettingsRow, Dropdown, SettingsSwitch, SettingsSlider } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { isScreenshotMode } from '../../../lib/permissions';
 import { LOCALES } from '../../../i18n';
@@ -14,6 +14,8 @@ import {
   DayGroupView, MonthlyCalendar, groupEventsByDay, formatHeaderDate,
 } from '../shared/CalendarCore';
 import './OutlookCalendar.css';
+
+const DEFAULT_DAYS_AHEAD = 3;
 
 function eventColor(event: CalendarEvent): string {
   if (event.colorId) return OUTLOOK_CATEGORY_COLORS[event.colorId] ?? DEFAULT_EVENT_COLOR;
@@ -43,7 +45,7 @@ interface SettingsProps {
 
 export function OutlookCalendarSettings({ data, onUpdateData }: SettingsProps) {
   const { t } = useSettings();
-  const maxDays    = data.maxDays    ?? 3;
+  const maxDays    = data.maxDays    ?? DEFAULT_DAYS_AHEAD;
   const showAllDay = data.showAllDay ?? true;
   const viewMode   = data.viewMode   ?? 'agenda';
   const firstDayOfWeek = data.firstDayOfWeek ?? 1;
@@ -81,15 +83,14 @@ export function OutlookCalendarSettings({ data, onUpdateData }: SettingsProps) {
       )}
 
       {viewMode === 'agenda' && (
-        <SettingsRow label={t('widget.outlookCalendar.daysAhead')}>
-          <div className="sg-cal-slider-wrap">
-            {/* eslint-disable-next-line no-restricted-syntax -- pre-existing, not yet migrated to SettingsSlider (shared with Calendar/OutlookMail) */}
-            <input type="range" min={1} max={28} value={maxDays}
-              onChange={e => onUpdateData({ maxDays: Number(e.target.value) })}
-              className="sg-cal-slider"/>
-            <span className="sg-cal-slider-val">{maxDays}</span>
-          </div>
-        </SettingsRow>
+        <SettingsSlider
+          label={t('widget.outlookCalendar.daysAhead')}
+          min={1} max={28} step={1}
+          value={maxDays}
+          onChange={v => onUpdateData({ maxDays: v })}
+          valueFormatter={v => String(v)}
+          defaultValue={DEFAULT_DAYS_AHEAD}
+        />
       )}
 
       <SettingsRow label={t('widget.outlookCalendar.allDayEvents')}>
@@ -160,7 +161,7 @@ export default function OutlookCalendar({ data }: Props) {
   const locale = LOCALES[language];
   const { status, events, isStale, refresh, isMock } = useOutlookCalendar();
   const { isConnected, connect, isConnecting } = useMsAuth();
-  const maxDays    = data.maxDays    ?? 3;
+  const maxDays    = data.maxDays    ?? DEFAULT_DAYS_AHEAD;
   const showAllDay = data.showAllDay ?? true;
   const viewMode   = data.viewMode   ?? 'agenda';
   const firstDayOfWeek = data.firstDayOfWeek ?? 1;

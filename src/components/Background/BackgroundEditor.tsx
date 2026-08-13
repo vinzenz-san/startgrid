@@ -14,8 +14,6 @@ import './BackgroundEditor.css';
 
 const SIZE_LIMIT_MB = 5;
 
-const noLabel = () => '';
-
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
 }
@@ -294,20 +292,21 @@ export default function BackgroundEditor() {
                   min={0}
                   max={100}
                   step={1}
-                  valueFormatter={noLabel}
+                  valueFormatter={v => `${v}px`}
+                  defaultValue={0}
                 />
 
-                <div className="bg-luminosity-slider-wrap">
-                  <SettingsSlider
-                    label={t('background.luminosity')}
-                    value={customCfg.luminosity ?? 100}
-                    onChange={v => setConfig({ ...customCfg, luminosity: v })}
-                    min={0}
-                    max={200}
-                    step={5}
-                    valueFormatter={noLabel}
-                  />
-                </div>
+                <SettingsSlider
+                  label={t('background.luminosity')}
+                  className="bg-luminosity-slider-wrap"
+                  value={customCfg.luminosity ?? 100}
+                  onChange={v => setConfig({ ...customCfg, luminosity: v })}
+                  min={0}
+                  max={200}
+                  step={5}
+                  valueFormatter={v => `${v}%`}
+                  defaultValue={100}
+                />
 
                 <SettingsRow label={t('background.scaleToFit')}>
                   <SettingsSwitch
@@ -413,20 +412,21 @@ export default function BackgroundEditor() {
               min={0}
               max={100}
               step={1}
-              valueFormatter={noLabel}
+              valueFormatter={v => `${v}px`}
+              defaultValue={0}
             />
 
-            <div className="bg-luminosity-slider-wrap">
-              <SettingsSlider
-                label={t('background.luminosity')}
-                value={bingCfg.luminosity ?? 100}
-                onChange={v => setConfig({ ...bingCfg, luminosity: v })}
-                min={0}
-                max={200}
-                step={5}
-                valueFormatter={noLabel}
-              />
-            </div>
+            <SettingsSlider
+              label={t('background.luminosity')}
+              className="bg-luminosity-slider-wrap"
+              value={bingCfg.luminosity ?? 100}
+              onChange={v => setConfig({ ...bingCfg, luminosity: v })}
+              min={0}
+              max={200}
+              step={5}
+              valueFormatter={v => `${v}%`}
+              defaultValue={100}
+            />
 
             <SettingsRow label={t('background.scaleToFit')}>
               <SettingsSwitch
@@ -530,20 +530,21 @@ export default function BackgroundEditor() {
               min={0}
               max={100}
               step={1}
-              valueFormatter={noLabel}
+              valueFormatter={v => `${v}px`}
+              defaultValue={0}
             />
 
-            <div className="bg-luminosity-slider-wrap">
-              <SettingsSlider
-                label={t('background.luminosity')}
-                value={astro.luminosity ?? 100}
-                onChange={v => setConfig({ ...astro, luminosity: v })}
-                min={0}
-                max={200}
-                step={5}
-                valueFormatter={noLabel}
-              />
-            </div>
+            <SettingsSlider
+              label={t('background.luminosity')}
+              className="bg-luminosity-slider-wrap"
+              value={astro.luminosity ?? 100}
+              onChange={v => setConfig({ ...astro, luminosity: v })}
+              min={0}
+              max={200}
+              step={5}
+              valueFormatter={v => `${v}%`}
+              defaultValue={100}
+            />
 
             <SettingsRow label={t('background.scaleToFit')}>
               <SettingsSwitch
@@ -633,6 +634,7 @@ export default function BackgroundEditor() {
               max={360}
               step={1}
               valueFormatter={v => `${v}°`}
+              defaultValue={135}
             />
           )}
 
@@ -701,20 +703,21 @@ export default function BackgroundEditor() {
                   min={0}
                   max={100}
                   step={1}
-                  valueFormatter={noLabel}
+                  valueFormatter={v => `${v}px`}
+                  defaultValue={0}
                 />
 
-                <div className="bg-luminosity-slider-wrap">
-                  <SettingsSlider
-                    label={t('background.luminosity')}
-                    value={onlineCfg.luminosity ?? 100}
-                    onChange={v => setConfig({ ...onlineCfg, luminosity: v })}
-                    min={0}
-                    max={200}
-                    step={5}
-                    valueFormatter={noLabel}
-                  />
-                </div>
+                <SettingsSlider
+                  label={t('background.luminosity')}
+                  className="bg-luminosity-slider-wrap"
+                  value={onlineCfg.luminosity ?? 100}
+                  onChange={v => setConfig({ ...onlineCfg, luminosity: v })}
+                  min={0}
+                  max={200}
+                  step={5}
+                  valueFormatter={v => `${v}%`}
+                  defaultValue={100}
+                />
 
                 <SettingsRow label={t('background.scaleToFit')}>
                   <SettingsSwitch
@@ -817,20 +820,21 @@ export default function BackgroundEditor() {
               min={0}
               max={100}
               step={1}
-              valueFormatter={noLabel}
+              valueFormatter={v => `${v}px`}
+              defaultValue={0}
             />
 
-            <div className="bg-luminosity-slider-wrap">
-              <SettingsSlider
-                label={t('background.luminosity')}
-                value={wikiCfg.luminosity ?? 100}
-                onChange={v => setConfig({ ...wikiCfg, luminosity: v })}
-                min={0}
-                max={200}
-                step={5}
-                valueFormatter={noLabel}
-              />
-            </div>
+            <SettingsSlider
+              label={t('background.luminosity')}
+              className="bg-luminosity-slider-wrap"
+              value={wikiCfg.luminosity ?? 100}
+              onChange={v => setConfig({ ...wikiCfg, luminosity: v })}
+              min={0}
+              max={200}
+              step={5}
+              valueFormatter={v => `${v}%`}
+              defaultValue={100}
+            />
 
             <SettingsRow label={t('background.scaleToFit')}>
               <SettingsSwitch

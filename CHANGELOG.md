@@ -2,6 +2,14 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.19.1] — Unified slider component
+
+- Every slider in the app — widget settings, Background editor (Blur/Luminosity/Angle across all providers), and the global Settings sidebar (Transparency/Shadow/Glass/Gradient/Dimming, Grid Columns/Cell Size/Gap, Font Scale) — now renders through one shared `SettingsSlider` component instead of two divergent shapes (a self-contained labeled block vs. three grandfathered raw `<input type="range">`s in Calendar/OutlookCalendar/OutlookMail, exempted from the widgets-only ESLint rule banning them). The 3 raw inputs are migrated to the shared component and their exemption removed
+- Sliders render as a single row (label / reset+value / track) rather than the label sitting above its own track — matches the label-left/control-right shape every other row control (Dropdown, SegmentedControl, Switch) already used. Value+reset column and track are fixed-width so a slider renders at the identical size regardless of which panel it's in (the Settings sidebar's card padding and a widget panel's flatter padding previously produced visibly different sizes for the same control); only the label stretches to fill the rest of the row, keeping the right edge aligned with every other row/button in the panel
+- Widget context menu panel widened 300px → 340px to match the Settings sidebar, for the same size-parity reason
+- Reset-to-default buttons added to every slider that was missing one (Grid Columns/Cell Size/Gap, all Background editor Blur/Luminosity/Angle sliders, and every remaining per-widget slider) — the 5 per-widget "Local Style" sliders reset to the *current global value* rather than a fixed number, since they're overrides, not independent settings; a new `widgets.resetSliderToGlobal` string separates their tooltip from the existing bulk "Reset to Global" button's own label
+- `resetTitle` defaults internally to the (correctly localized) "Reset to default" string instead of every call site passing the same translated literal; `defaultValue` numbers that duplicated an existing `?? X` fallback were pulled into a single named constant per file (matching the `DEFAULT_TEXT_SIZE`/`DEFAULT_FORECAST_DAYS` pattern already used elsewhere), so each default lives in exactly one place
+
 ## [1.19.0] — Excalidraw drawing embeds
 
 - Obsidian notes can now embed Excalidraw drawings: `![[drawing.excalidraw]]` inline in a note's Markdown, or an ObsidianNote widget pinned directly at a `.excalidraw.md` file, renders the drawing's auto-exported SVG instead of an inert wikilink or raw JSON. Relies on the Excalidraw plugin's "Auto-export SVG" setting rather than bundling any Excalidraw rendering code client-side — keeps this dependency-free and avoids the bundle-size/perf cost of parsing the scene JSON in-extension

@@ -301,35 +301,30 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
                 value={transparencyPct}
                 onChange={v => setGlobalOpacity((100 - v) / 100)}
                 defaultValue={100 - Math.round(THEME_DEFAULTS.globalOpacity * 100)}
-                resetTitle={t('widget.resetToDefault')}
               />
               <SettingsSlider
                 label={t('widgets.shadowIntensity')}
                 value={widgetShadowOpacity}
                 onChange={setWidgetShadowOpacity}
                 defaultValue={THEME_DEFAULTS.widgetShadowOpacity}
-                resetTitle={t('widget.resetToDefault')}
               />
               <SettingsSlider
                 label={t('widgets.glassIntensity')}
                 value={globalGlassIntensity}
                 onChange={setGlobalGlassIntensity}
                 defaultValue={THEME_DEFAULTS.globalGlassIntensity}
-                resetTitle={t('widget.resetToDefault')}
               />
               <SettingsSlider
                 label={t('widgets.gradientIntensity')}
                 value={globalGradientIntensity}
                 onChange={setGlobalGradientIntensity}
                 defaultValue={THEME_DEFAULTS.globalGradientIntensity}
-                resetTitle={t('widget.resetToDefault')}
               />
               <SettingsSlider
                 label={t('widgets.dimming')}
                 value={Math.round(globalDim)}
                 onChange={v => setGlobalDim(v)}
                 defaultValue={THEME_DEFAULTS.globalDim}
-                resetTitle={t('widget.resetToDefault')}
               />
             </DetailedSettings>
 
@@ -351,6 +346,7 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
               max={64}
               step={1}
               valueFormatter={v => String(v)}
+              defaultValue={DEFAULT_GRID_CONFIG.columns}
             />
             <p className="bg-sync-warning">{t('grid.columnsFitHint', { count: maxFitColumns, width: windowWidth })}</p>
             {/* Single square-cell control — writes the same value to both
@@ -367,6 +363,7 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
               max={200}
               step={5}
               valueFormatter={v => `${v}px`}
+              defaultValue={DEFAULT_GRID_CONFIG.cellWidth}
             />
             <SettingsSlider
               label={t('grid.gap')}
@@ -376,6 +373,7 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
               max={40}
               step={1}
               valueFormatter={v => `${v}px`}
+              defaultValue={DEFAULT_GRID_CONFIG.gap}
             />
             <SettingsRow label={t('grid.verticalCenter')}>
               <SettingsSwitch
@@ -459,7 +457,6 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
               step={5}
               onChange={setGlobalFontScale}
               defaultValue={THEME_DEFAULTS.globalFontScale}
-              resetTitle={t('widget.resetToDefault')}
             />
             <p className="sg-form-hint">{t('widgets.fontScaleHint')}</p>
             <SettingsRow label={t('settings.editHistoryPanelEnabled')}>

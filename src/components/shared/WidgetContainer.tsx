@@ -279,50 +279,50 @@ export default function WidgetContainer({ widget }: Props) {
               </button>
             </div>
 
-            <div className="sg-widget-appearance-section">
-              <SettingsSlider
-                label={t('widgets.transparency')}
-                value={localTransparencyPct}
-                onChange={v => updateWidget(widget.id, { bgOpacity: (100 - v) / 100 })}
-                onPointerDown={e => e.stopPropagation()}
-              />
-            </div>
+            <SettingsSlider
+              label={t('widgets.transparency')}
+              value={localTransparencyPct}
+              onChange={v => updateWidget(widget.id, { bgOpacity: (100 - v) / 100 })}
+              onPointerDown={e => e.stopPropagation()}
+              defaultValue={100 - Math.round(globalOpacity * 100)}
+              resetTitle={t('widgets.resetSliderToGlobal')}
+            />
 
-            <div className="sg-widget-appearance-section">
-              <SettingsSlider
-                label={t('widgets.shadowIntensity')}
-                value={localShadowPct}
-                onChange={v => updateWidget(widget.id, { bgShadow: v })}
-                onPointerDown={e => e.stopPropagation()}
-              />
-            </div>
+            <SettingsSlider
+              label={t('widgets.shadowIntensity')}
+              value={localShadowPct}
+              onChange={v => updateWidget(widget.id, { bgShadow: v })}
+              onPointerDown={e => e.stopPropagation()}
+              defaultValue={Math.round(widgetShadowOpacity)}
+              resetTitle={t('widgets.resetSliderToGlobal')}
+            />
 
-            <div className="sg-widget-appearance-section">
-              <SettingsSlider
-                label={t('widgets.glassIntensity')}
-                value={localGlassPct}
-                onChange={v => updateWidget(widget.id, { bgGlass: v })}
-                onPointerDown={e => e.stopPropagation()}
-              />
-            </div>
+            <SettingsSlider
+              label={t('widgets.glassIntensity')}
+              value={localGlassPct}
+              onChange={v => updateWidget(widget.id, { bgGlass: v })}
+              onPointerDown={e => e.stopPropagation()}
+              defaultValue={Math.round(globalGlassIntensity)}
+              resetTitle={t('widgets.resetSliderToGlobal')}
+            />
 
-            <div className="sg-widget-appearance-section">
-              <SettingsSlider
-                label={t('widgets.gradientIntensity')}
-                value={localIntensity}
-                onChange={v => updateWidget(widget.id, { bgGradientIntensity: v })}
-                onPointerDown={e => e.stopPropagation()}
-              />
-            </div>
+            <SettingsSlider
+              label={t('widgets.gradientIntensity')}
+              value={localIntensity}
+              onChange={v => updateWidget(widget.id, { bgGradientIntensity: v })}
+              onPointerDown={e => e.stopPropagation()}
+              defaultValue={globalGradientIntensity}
+              resetTitle={t('widgets.resetSliderToGlobal')}
+            />
 
-            <div className="sg-widget-appearance-section">
-              <SettingsSlider
-                label={t('widgets.dimming')}
-                value={localDimPct}
-                onChange={v => updateWidget(widget.id, { bgDim: v })}
-                onPointerDown={e => e.stopPropagation()}
-              />
-            </div>
+            <SettingsSlider
+              label={t('widgets.dimming')}
+              value={localDimPct}
+              onChange={v => updateWidget(widget.id, { bgDim: v })}
+              onPointerDown={e => e.stopPropagation()}
+              defaultValue={Math.round(globalDim)}
+              resetTitle={t('widgets.resetSliderToGlobal')}
+            />
 
             <div className="sg-widget-appearance-section">
               <button

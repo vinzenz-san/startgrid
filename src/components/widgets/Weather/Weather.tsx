@@ -186,6 +186,7 @@ export function WeatherSettings({ data, onUpdateData }: SettingsProps) {
           step={1}
           valueFormatter={v => String(v)}
           onChange={v => onUpdateData({ forecastDays: v })}
+          defaultValue={DEFAULT_FORECAST_DAYS}
         />
       )}
 

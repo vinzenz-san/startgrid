@@ -10,6 +10,7 @@ import type { TranslationKey } from '../../../i18n';
 import './Quicklinks.css';
 
 const DEFAULT_TEXT_SIZE = 13;
+const DEFAULT_ICON_SIZE = 30;
 
 type TFn = (key: TranslationKey, vars?: Record<string, string | number>) => string;
 
@@ -190,7 +191,7 @@ export function QuicklinksSettings({ data, onUpdateData }: SettingsProps) {
     return () => document.removeEventListener('pointerdown', handler, { capture: true });
   }, [linksPanelOpen, linksRefs.floating, linksRefs.reference]);
 
-  const iconSize   = data.iconSize   ?? 30;
+  const iconSize   = data.iconSize   ?? DEFAULT_ICON_SIZE;
   const showTitles = data.showTitles ?? true;
   const layout     = data.layout     ?? 'grid';
   const alignment  = data.alignment  ?? 'left';
@@ -245,6 +246,7 @@ export function QuicklinksSettings({ data, onUpdateData }: SettingsProps) {
         step={2}
         valueFormatter={v => `${v}px`}
         onChange={v => onUpdateData({ iconSize: v })}
+        defaultValue={DEFAULT_ICON_SIZE}
       />
 
       <SettingsRow label={t('widget.quicklinks.showTitles')}>
@@ -386,7 +388,7 @@ interface Props {
 export default function Quicklinks({ data, onUpdateData }: Props) {
   const { t } = useSettings();
   const { links = [], layout = 'grid' } = data;
-  const iconSize    = data.iconSize   ?? 30;
+  const iconSize    = data.iconSize   ?? DEFAULT_ICON_SIZE;
   const showTitles  = data.showTitles ?? true;
   const textSize    = scaledFontSize(DEFAULT_TEXT_SIZE);
   const alignment   = data.alignment  ?? 'left';

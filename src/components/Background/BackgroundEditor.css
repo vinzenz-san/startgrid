@@ -199,20 +199,23 @@
   box-sizing: border-box;
 }
 
-/* Luminosity slider — subtle tick at the 100 (middle) mark of its 0–200 range */
-.bg-luminosity-slider-wrap {
-  position: relative;
-}
+/* Luminosity slider — subtle tick at the 100 (middle) mark of its 0–200 range.
+   .bg-luminosity-slider-wrap is applied to SettingsSlider's own grid root
+   (.sg-slider-row, columns: label / value+reset / track); placing an
+   absolutely-positioned grid item on grid-column 3 makes that track column
+   its containing block, so it centers on the *track* regardless of the
+   other two columns' widths — no pixel math needed. */
 .bg-luminosity-slider-wrap::after {
   content: '';
   position: absolute;
+  grid-column: 3;
   left: 50%;
-  bottom: 15px;
+  top: 50%;
   width: 2px;
   height: 8px;
   background: var(--text-muted);
   opacity: 0.5;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   pointer-events: none;
   border-radius: 1px;
 }

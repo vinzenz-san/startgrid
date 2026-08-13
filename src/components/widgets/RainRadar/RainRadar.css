@@ -100,7 +100,7 @@ html[data-scheme="dark"] .sg-rainradar-map { background: #17191d; }
   min-width: 0;
 }
 
-.sg-rainradar-scrubber .sg-settings-slider-val {
+.sg-rainradar-scrubber .sg-slider-val {
   font-variant-numeric: tabular-nums;
   color: #fff;
 }

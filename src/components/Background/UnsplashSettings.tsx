@@ -9,8 +9,6 @@ import { DetailedSettings } from '../Layout/DetailedSettings';
 import CustomColorPicker from '../shared/CustomColorPicker';
 import './UnsplashSettings.css';
 
-const noLabel = () => '';
-
 export default function UnsplashSettings() {
   const { config, setConfig, unsplash } = useBackground();
   const { t } = useSettings();
@@ -164,20 +162,21 @@ export default function UnsplashSettings() {
           min={0}
           max={100}
           step={1}
-          valueFormatter={noLabel}
+          valueFormatter={v => `${v}px`}
+          defaultValue={0}
         />
 
-        <div className="bg-luminosity-slider-wrap">
-          <SettingsSlider
-            label={t('background.luminosity')}
-            value={uc.luminosity ?? 100}
-            onChange={v => update({ luminosity: v })}
-            min={0}
-            max={200}
-            step={5}
-            valueFormatter={noLabel}
-          />
-        </div>
+        <SettingsSlider
+          label={t('background.luminosity')}
+          className="bg-luminosity-slider-wrap"
+          value={uc.luminosity ?? 100}
+          onChange={v => update({ luminosity: v })}
+          min={0}
+          max={200}
+          step={5}
+          valueFormatter={v => `${v}%`}
+          defaultValue={100}
+        />
 
         <SettingsRow label={t('background.scaleToFit')}>
           <SettingsSwitch

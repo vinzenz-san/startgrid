@@ -59,6 +59,7 @@ export function ObsidianNoteSettings({ data, onUpdateData }: SettingsProps) {
         value={data.maxLines ?? 0}
         onChange={v => onUpdateData({ maxLines: v || undefined })}
         valueFormatter={v => (v ? String(v) : t('widget.obsidianNote.noLimit'))}
+        defaultValue={0}
       />
 
       <SettingsSlider
@@ -67,6 +68,7 @@ export function ObsidianNoteSettings({ data, onUpdateData }: SettingsProps) {
         value={data.refreshMinutes ?? 0}
         onChange={v => onUpdateData({ refreshMinutes: v || undefined })}
         valueFormatter={v => (v ? `${v} min` : t('widget.obsidianNote.refreshOnLoad'))}
+        defaultValue={0}
       />
 
       <DetailedSettings title={t('widget.obsidian.sectionTitle')}>

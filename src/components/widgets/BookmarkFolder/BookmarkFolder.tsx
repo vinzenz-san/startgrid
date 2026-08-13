@@ -10,6 +10,7 @@ import type { TranslationKey } from '../../../i18n';
 import './BookmarkFolder.css';
 
 const DEFAULT_TEXT_SIZE = 13;
+const DEFAULT_ICON_SIZE = 30;
 
 type TFn = (key: TranslationKey, vars?: Record<string, string | number>) => string;
 
@@ -172,12 +173,13 @@ export function BookmarkFolderSettings({ data, onUpdateData }: SettingsProps) {
     <div className="sg-bf-settings sg-scroll-thin" onClick={e => e.stopPropagation()}>
       <SettingsSlider
         label={t('widget.quicklinks.iconSize')}
-        value={data.iconSize ?? 30}
+        value={data.iconSize ?? DEFAULT_ICON_SIZE}
         min={18}
         max={48}
         step={2}
         valueFormatter={v => `${v}px`}
         onChange={v => onUpdateData({ iconSize: v })}
+        defaultValue={DEFAULT_ICON_SIZE}
       />
       <SettingsRow label={t('widget.quicklinks.showTitles')}>
         <SettingsSwitch checked={data.showTitles ?? true} onChange={v => onUpdateData({ showTitles: v })} />
@@ -489,7 +491,7 @@ export default function BookmarkFolder({ data, onUpdateData }: Props) {
 
   const breadcrumbs  = [{ id: rootFolderId, name: rootName }, ...navStack];
   const displayItems = applySorting(items, data?.sortingMode ?? 'original');
-  const iconSize      = data.iconSize ?? 30;
+  const iconSize      = data.iconSize ?? DEFAULT_ICON_SIZE;
   const showTitles    = data.showTitles ?? true;
   const textSize      = scaledFontSize(DEFAULT_TEXT_SIZE);
   const alignment     = data.alignment ?? 'left';

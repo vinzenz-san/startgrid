@@ -17,6 +17,8 @@ import { IconObsidian, IconShuffle, IconOpenExternal, SkeletonRow } from '../sha
 import '../shared/obsidian.css';
 import './ObsidianRandom.css';
 
+const DEFAULT_EXCERPT_LINES = 4;
+
 function parseExcludes(raw: string): string[] {
   return raw.split(',').map(s => s.trim()).filter(Boolean);
 }
@@ -69,9 +71,10 @@ export function ObsidianRandomSettings({ data, onUpdateData }: SettingsProps) {
       <SettingsSlider
         label={t('widget.obsidianRandom.excerptLines')}
         min={1} max={12} step={1}
-        value={data.excerptLines ?? 4}
+        value={data.excerptLines ?? DEFAULT_EXCERPT_LINES}
         onChange={v => onUpdateData({ excerptLines: v })}
         valueFormatter={v => String(v)}
+        defaultValue={DEFAULT_EXCERPT_LINES}
       />
 
       <ActionButton variant="ghost" onClick={() => void clearVaultIndex()}>
@@ -113,7 +116,7 @@ export default function ObsidianRandom({ data }: Props) {
   const isBusy        = status === 'indexing' || status === 'loading';
   const notConfigured = !isMock && !checking && !isReady;
 
-  const excerpt = data.showExcerpt ? firstLines(blocks, data.excerptLines ?? 4) : '';
+  const excerpt = data.showExcerpt ? firstLines(blocks, data.excerptLines ?? DEFAULT_EXCERPT_LINES) : '';
 
   return (
     <div className="sg-cal">
