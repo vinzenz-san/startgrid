@@ -391,7 +391,7 @@ export default function BackgroundEditor() {
 
           <SettingsRow label={t('background.showTitle')}>
             <SettingsSwitch
-              checked={bingCfg.showTitle ?? false}
+              checked={bingCfg.showTitle ?? true}
               onChange={v => setConfig({ ...bingCfg, showTitle: v })}
             />
           </SettingsRow>
@@ -508,7 +508,7 @@ export default function BackgroundEditor() {
 
           <SettingsRow label={t('background.showTitle')}>
             <SettingsSwitch
-              checked={astro.showApodTitle ?? false}
+              checked={astro.showApodTitle ?? true}
               onChange={v => setConfig({ ...astro, showApodTitle: v })}
             />
           </SettingsRow>
@@ -795,7 +795,7 @@ export default function BackgroundEditor() {
 
           <SettingsRow label={t('background.showTitle')}>
             <SettingsSwitch
-              checked={wikiCfg.showTitle ?? false}
+              checked={wikiCfg.showTitle ?? true}
               onChange={v => setConfig({ ...wikiCfg, showTitle: v })}
             />
           </SettingsRow>

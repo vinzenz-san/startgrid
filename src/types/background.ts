@@ -57,14 +57,14 @@ export interface UnsplashConfig extends BackgroundShared {
 export interface BingConfig extends BackgroundShared {
   mode: 'bing';
   value: string; // unused; kept for storage shape uniformity with other modes
-  showTitle?: boolean; // default false — overlay Bing's daily wallpaper title
+  showTitle?: boolean; // default true — overlay Bing's daily wallpaper title
 }
 
 // ─── Placeholder providers (not yet implemented) ───────────────────────────
 export interface AstronomyConfig extends BackgroundShared {
   mode: 'astronomy';
   value: string; // unused placeholder; kept for storage shape uniformity
-  showApodTitle?: boolean; // default false — overlay NASA's title for the day
+  showApodTitle?: boolean; // default true — overlay NASA's title for the day
 }
 
 export interface ColorGradientConfig extends BackgroundShared {
@@ -84,7 +84,7 @@ export interface OnlineImageConfig extends BackgroundShared {
 export interface WikimediaConfig extends BackgroundShared {
   mode: 'wikimedia';
   value: string; // unused placeholder; kept for storage shape uniformity
-  showTitle?: boolean; // default false — overlay Wikimedia's Picture of the Day title/artist
+  showTitle?: boolean; // default true — overlay Wikimedia's Picture of the Day title/artist
 }
 
 export type BackgroundConfig =

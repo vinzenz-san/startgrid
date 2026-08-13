@@ -164,17 +164,17 @@ export default function Background() {
 
   const showApodTitle =
     config.mode === 'astronomy' &&
-    (config.showApodTitle ?? false) &&
+    (config.showApodTitle ?? true) &&
     !!astronomy.title;
 
   const showBingTitle =
     config.mode === 'bing' &&
-    (config.showTitle ?? false) &&
+    (config.showTitle ?? true) &&
     !!bing.title;
 
   const showWikimediaTitle =
     config.mode === 'wikimedia' &&
-    (config.showTitle ?? false) &&
+    (config.showTitle ?? true) &&
     !!wikimedia.title;
 
   return (
