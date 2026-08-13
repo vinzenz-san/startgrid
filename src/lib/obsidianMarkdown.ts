@@ -22,12 +22,21 @@ export type InlineToken =
   | { type: 'code';     value: string }
   | { type: 'link';     label: string; href: string }
   | { type: 'wikilink'; label: string; target: string }
+  | { type: 'embed';    target: string }
   | { type: 'tag';      value: string };
 
+/** Only embed targets this renderer knows how to resolve — see
+ *  lib/obsidianExcalidraw.ts. Everything else (`![[image.png]]`,
+ *  `![[other note]]`) falls back to the existing inert `!` + wikilink
+ *  rendering, unchanged. */
+const EXCALIDRAW_EMBED_RE = /\.excalidraw(?:\.md)?$/i;
+
 // Ordered alternation: code first (backticks protect their contents), then
-// wikilinks before links so `[[a]]` can't be misread, then emphasis, then tags.
+// embeds before wikilinks (an embed is a superset pattern — `![[x]]` would
+// otherwise be read as literal `!` + wikilink `[[x]]`), then links, then
+// emphasis, then tags.
 const INLINE_RE =
-  /`([^`\n]+)`|\[\[([^\]\n]+)\]\]|\[([^\]\n]*)\]\(([^)\s]+)\)|\*\*([^*\n]+)\*\*|__([^_\n]+)__|\*([^*\n]+)\*|_([^_\n]+)_|(#[A-Za-z0-9_][A-Za-z0-9_/-]*)/g;
+  /`([^`\n]+)`|!\[\[([^\]\n]+)\]\]|\[\[([^\]\n]+)\]\]|\[([^\]\n]*)\]\(([^)\s]+)\)|\*\*([^*\n]+)\*\*|__([^_\n]+)__|\*([^*\n]+)\*|_([^_\n]+)_|(#[A-Za-z0-9_][A-Za-z0-9_/-]*)/g;
 
 /** Only schemes that are safe to hand to the browser as a navigation target.
  *  Anything else (notably `javascript:`) falls back to plain text. */
@@ -47,7 +56,7 @@ export function parseInline(source: string): InlineToken[] {
   let match: RegExpExecArray | null;
 
   while ((match = INLINE_RE.exec(source)) !== null) {
-    const [full, code, wiki, linkLabel, linkHref, boldStar, boldUnd, itaStar, itaUnd, tag] = match;
+    const [full, code, embed, wiki, linkLabel, linkHref, boldStar, boldUnd, itaStar, itaUnd, tag] = match;
 
     // A `#` only starts a tag at the beginning of a line or after whitespace —
     // otherwise `foo#bar` and URL fragments would both light up as tags.
@@ -62,6 +71,20 @@ export function parseInline(source: string): InlineToken[] {
 
     if (code !== undefined) {
       tokens.push({ type: 'code', value: code });
+    } else if (embed !== undefined) {
+      // `![[target|label]]` — an alias is valid syntax here too, but embeds
+      // render their own content, so any label is discarded.
+      const target = embed.split('|')[0].trim();
+      if (EXCALIDRAW_EMBED_RE.test(target)) {
+        tokens.push({ type: 'embed', target });
+      } else {
+        // Unsupported embed kind (image, other note, …) — same inert
+        // rendering as before this change existed: literal `!` then the
+        // wikilink span.
+        tokens.push({ type: 'text', value: '!' });
+        const [wikiTarget, wikiLabel] = embed.split('|');
+        tokens.push({ type: 'wikilink', target: wikiTarget.trim(), label: (wikiLabel ?? wikiTarget).trim() });
+      }
     } else if (wiki !== undefined) {
       // `[[target|label]]` — the alias after the pipe is what gets displayed.
       const [target, label] = wiki.split('|');
@@ -212,6 +235,7 @@ export function stripInline(source: string): string {
       switch (tok.type) {
         case 'link':
         case 'wikilink': return tok.label;
+        case 'embed':    return `[${tok.target}]`;
         case 'tag':      return tok.value;
         default:         return tok.value;
       }

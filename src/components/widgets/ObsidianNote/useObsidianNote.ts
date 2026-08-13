@@ -33,6 +33,8 @@ const MOCK_SOURCE = [
   '- Call the bike shop about the service slot',
   '- [ ] Renew the domain #admin',
   '',
+  '![[architecture.excalidraw]]',
+  '',
   '> A pinned note is a notice board you keep from inside Obsidian.',
 ].join('\n');
 

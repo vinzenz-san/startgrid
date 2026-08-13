@@ -150,6 +150,16 @@ export async function getFile(path: string): Promise<string> {
   return res.text();
 }
 
+/** Raw text of a non-Markdown vault asset (e.g. an auto-exported SVG sitting
+ *  next to a `.excalidraw.md` note). Same NOT_FOUND-on-missing behaviour as
+ *  `getFile` — callers use that to tell "not exported yet" apart from other
+ *  failures. */
+export async function getAsset(path: string, accept = 'image/svg+xml'): Promise<string> {
+  const conn = await ready();
+  const res = await request(conn, `/vault/${encodeVaultPath(path)}`, { accept });
+  return res.text();
+}
+
 /** Replace a note's entire contents, creating it if absent. */
 export async function putFile(path: string, content: string): Promise<void> {
   const conn = await ready();

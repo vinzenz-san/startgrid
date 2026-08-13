@@ -2,6 +2,13 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.19.0] — Excalidraw drawing embeds
+
+- Obsidian notes can now embed Excalidraw drawings: `![[drawing.excalidraw]]` inline in a note's Markdown, or an ObsidianNote widget pinned directly at a `.excalidraw.md` file, renders the drawing's auto-exported SVG instead of an inert wikilink or raw JSON. Relies on the Excalidraw plugin's "Auto-export SVG" setting rather than bundling any Excalidraw rendering code client-side — keeps this dependency-free and avoids the bundle-size/perf cost of parsing the scene JSON in-extension
+- New `lib/obsidianExcalidraw.ts`: resolves an embed target to its vault path via the existing vault index (no extra REST calls), fetches/caches the SVG (`obsidianApi.ts`'s new `getAsset()`, `Accept: image/svg+xml`), and always renders through `<img src="data:...">` — never inline SVG markup, since vault content is untrusted and an SVG can carry `<script>`/`onload` payloads
+- Handles the drawing not having an exported SVG yet (styled "Preview Unavailable" card with setup hint + "Open in Obsidian"), oversized exports (800KB cap, opens in Obsidian instead of caching/rendering), and Obsidian being unreachable (falls back to the last cached SVG, marked stale)
+- Fixed the exported SVG's path being derived wrong — the Excalidraw plugin keeps the `.excalidraw` segment (`drawing.excalidraw.md` → `drawing.excalidraw.svg`), not `drawing.svg` as first implemented; now tries both, in that order ([#10](https://github.com/vinzenz-san/startgrid/issues/10))
+
 ## [1.18.1] — Media-proxy warnings, local preview fix
 
 - Unsplash and Astronomy (NASA) background panels now show a note when the media-proxy Worker isn't configured for the current build, instead of silently failing (`src/lib/mediaProxy.ts` shared flag, used by `useUnsplash.ts` and `providers/astronomy.ts`)

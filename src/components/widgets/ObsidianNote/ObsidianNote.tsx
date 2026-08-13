@@ -10,7 +10,9 @@ import { scaledFontSize } from '../../../lib/displayStyle';
 import { normalizeVaultPath, vaultPathToTitle } from '../../../lib/obsidianPath';
 import { sliceSection } from '../../../lib/obsidianMarkdown';
 import { openInObsidian } from '../../../lib/obsidianApi';
+import { isExcalidrawNotePath } from '../../../lib/obsidianExcalidraw';
 import MarkdownView from '../shared/MarkdownView';
+import ExcalidrawEmbed from '../shared/ExcalidrawEmbed';
 import NoteEditor from '../shared/NoteEditor';
 import ObsidianConnect from '../shared/ObsidianConnect';
 import { DetailedSettings } from '../../Layout/DetailedSettings';
@@ -88,22 +90,31 @@ export default function ObsidianNote({ data }: Props) {
   const [draft, setDraft] = useState('');
 
   const path = normalizeVaultPath(data.path ?? '');
+  // The pinned path itself can be an Excalidraw note (picked directly via
+  // VaultNotePicker, not embedded inside some other note). Its body is
+  // compressed JSON, not prose — fetching/parsing it as Markdown would only
+  // request the raw `.excalidraw.md` (Accept: text/markdown) and render
+  // garbage. Render the drawing preview directly instead, same as an
+  // `![[...]]` embed would, and skip the note-fetch pipeline entirely.
+  const isDrawing = isExcalidrawNotePath(path);
 
   useEffect(() => {
+    if (isDrawing) return;
     if (checking) return;
     if (!isMock && !isReady) return;
     void refresh(path);
-  }, [checking, isReady, isMock, path, refresh]);
+  }, [checking, isReady, isMock, path, refresh, isDrawing]);
 
   // Optional polling — a pinned shopping list edited on a phone should catch up
   // without the user reaching for the refresh button.
   useEffect(() => {
+    if (isDrawing) return;
     const minutes = data.refreshMinutes ?? 0;
     if (!minutes || !path || editing) return;
     if (!isMock && !isReady) return;
     const id = setInterval(() => void refresh(path), minutes * 60_000);
     return () => clearInterval(id);
-  }, [data.refreshMinutes, path, isReady, isMock, refresh, editing]);
+  }, [data.refreshMinutes, path, isReady, isMock, refresh, editing, isDrawing]);
 
   const visible = useMemo(() => {
     let out = data.sectionHeading ? sliceSection(blocks, data.sectionHeading) : blocks;
@@ -122,7 +133,7 @@ export default function ObsidianNote({ data }: Props) {
           <span>{path ? vaultPathToTitle(path) : t('widget.obsidianNote.untitled')}</span>
         </div>
         <div className="sg-obsn-actions">
-          {isReady && status === 'success' && !editing && (
+          {!isDrawing && isReady && status === 'success' && !editing && (
             <button
               className="sg-cal-refresh"
               onClick={() => { setDraft(source); setEditing(true); }}
@@ -142,15 +153,17 @@ export default function ObsidianNote({ data }: Props) {
               <IconOpenExternal/>
             </button>
           )}
-          <button
-            className="sg-cal-refresh"
-            onClick={() => void refresh(path)}
-            disabled={isLoading || notConfigured || editing}
-            title={t('widget.obsidianNote.refresh')}
-            aria-label={t('widget.obsidianNote.refresh')}
-          >
-            <IconRefresh spinning={isLoading}/>
-          </button>
+          {!isDrawing && (
+            <button
+              className="sg-cal-refresh"
+              onClick={() => void refresh(path)}
+              disabled={isLoading || notConfigured || editing}
+              title={t('widget.obsidianNote.refresh')}
+              aria-label={t('widget.obsidianNote.refresh')}
+            >
+              <IconRefresh spinning={isLoading}/>
+            </button>
+          )}
         </div>
       </div>
 
@@ -174,6 +187,8 @@ export default function ObsidianNote({ data }: Props) {
           <ObsidianStatus code="NOT_CONFIGURED"/>
         ) : !path ? (
           <ObsidianStatus code="NOT_CONFIGURED"/>
+        ) : isDrawing ? (
+          <ExcalidrawEmbed target={path}/>
         ) : isLoading ? (
           <><SkeletonRow/><SkeletonRow/><SkeletonRow/></>
         ) : status === 'error' && errorCode ? (

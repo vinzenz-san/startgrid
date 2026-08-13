@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { parseInline, type InlineToken, type MdBlock } from '../../../lib/obsidianMarkdown';
+import ExcalidrawEmbed from './ExcalidrawEmbed';
 import './MarkdownView.css';
 
 /**
@@ -27,6 +28,8 @@ function renderInline(source: string, keyPrefix: string): ReactNode[] {
         // path needs Obsidian's own link resolution, which the REST API does
         // not expose. Showing it styled but inert beats guessing wrong.
         return <span key={key} className="sg-md-wikilink">{tok.label}</span>;
+      case 'embed':
+        return <ExcalidrawEmbed key={key} target={tok.target} />;
       default:
         return <span key={key}>{tok.value}</span>;
     }
