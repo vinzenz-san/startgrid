@@ -130,6 +130,8 @@ export const en = {
   'background.panel.online':    'Online Image',
   'background.panel.wikimedia': 'Wikimedia Image of the Day',
 
+  'background.astronomy.noProxyNote': "Running on NASA's public demo key in this preview build — may be rate-limited.",
+
   'background.section.customImage': 'Custom Image / GIF',
 
   'background.customColor':     'Custom Color',
@@ -182,6 +184,7 @@ export const en = {
   'background.unsplash.searchPlaceholder': 'e.g. dark forest, cyberpunk city…',
   'background.unsplash.collectionIdPlaceholder': 'Collection ID (e.g. 317099)',
   'background.unsplash.officialNote':      "A curated photo from Unsplash's official featured feed.",
+  'background.unsplash.noProxyNote':       'Unsplash images require the media proxy worker and are unavailable in this preview build.',
   'background.unsplash.showNewPhoto':      'Show a new photo',
   'background.unsplash.showAttribution':   'Show attribution',
   'background.unsplash.currentAttributionPrefix': 'Current:',

@@ -132,6 +132,8 @@ export const de: Record<TranslationKey, string> = {
   'background.panel.online':    'Online-Bild',
   'background.panel.wikimedia': 'Wikimedia-Bild des Tages',
 
+  'background.astronomy.noProxyNote': 'In dieser Vorschau läuft dies über NASAs öffentlichen Demo-Key – kann daher limitiert sein.',
+
   'background.section.customImage': 'Eigenes Bild / GIF',
 
   'background.customColor':     'Eigene Farbe',
@@ -184,6 +186,7 @@ export const de: Record<TranslationKey, string> = {
   'background.unsplash.searchPlaceholder': 'z. B. dunkler Wald, Cyberpunk-Stadt…',
   'background.unsplash.collectionIdPlaceholder': 'Sammlungs-ID (z. B. 317099)',
   'background.unsplash.officialNote':      'Ein kuratiertes Foto aus Unsplashs offiziellem Feed.',
+  'background.unsplash.noProxyNote':       'Unsplash-Bilder benötigen den Media-Proxy-Worker und sind in dieser Vorschau nicht verfügbar.',
   'background.unsplash.showNewPhoto':      'Neues Foto anzeigen',
   'background.unsplash.showAttribution':   'Bildnachweis anzeigen',
   'background.unsplash.currentAttributionPrefix': 'Aktuell:',

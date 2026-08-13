@@ -4,6 +4,7 @@ import { useSettings } from '../../contexts/SettingsContext';
 import { BackgroundMode, BackgroundPanel, BackgroundPosition, UnsplashConfig, OnlineImageConfig } from '../../types/background';
 import { COLOR_PRESETS } from '../../lib/presets';
 import { getAdaptiveColor } from '../../lib/colorUtils';
+import { MEDIA_PROXY_CONFIGURED } from '../../lib/mediaProxy';
 import { BACKGROUND_PROVIDERS } from './providers';
 import CustomColorPicker from '../shared/CustomColorPicker';
 import { SettingsSlider, SettingsRow, SettingsSwitch, Dropdown } from '../shared/Form';
@@ -479,6 +480,9 @@ export default function BackgroundEditor() {
       {activeTab === 'astronomy' && astro && (
         <section className="settings-section">
           <div className="settings-section-label">{t('background.panel.astronomy')}</div>
+          {!MEDIA_PROXY_CONFIGURED && (
+            <p className="bg-sync-warning">{t('background.astronomy.noProxyNote')}</p>
+          )}
           {astronomy.error && <p className="bg-bing-error">{astronomy.error}</p>}
 
           <SettingsRow label={t('background.date')}>

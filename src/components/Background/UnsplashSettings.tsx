@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { useBackground } from '../../contexts/BackgroundContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import { extractCollectionId } from '../../hooks/useUnsplash';
+import { MEDIA_PROXY_CONFIGURED } from '../../lib/mediaProxy';
 import { BackgroundPosition, UnsplashConfig } from '../../types/background';
 import { SettingsRow, SettingsSlider, SettingsSwitch, Dropdown } from '../shared/Form';
 import { DetailedSettings } from '../Layout/DetailedSettings';
@@ -77,6 +78,9 @@ export default function UnsplashSettings() {
 
       {/* Source tabs */}
       <section className="settings-section">
+        {!MEDIA_PROXY_CONFIGURED && (
+          <p className="bg-sync-warning">{t('background.unsplash.noProxyNote')}</p>
+        )}
         <div className="settings-section-label">{t('background.unsplash.source')}</div>
         <div className="sg-usp-tabs">
           {SOURCE_TABS.map(t => (

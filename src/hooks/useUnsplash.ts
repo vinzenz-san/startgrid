@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { storageLocal } from '../lib/storageLocal';
+import { MEDIA_PROXY_URL, MEDIA_PROXY_CONFIGURED } from '../lib/mediaProxy';
 import { BackgroundConfig, UnsplashConfig } from '../types/background';
 
 export interface UnsplashAttribution {
@@ -26,12 +27,10 @@ export function extractCollectionId(raw: string): string {
   return (match ? match[1] : trimmed).trim();
 }
 
-// Statically injected at build time via rspack.config.ts's DefinePlugin
-// (Rspack has no Vite-style import.meta.env of its own — APP_ prefix, not
-// VITE_). All Unsplash requests go through this Cloudflare Worker (shared
-// with astronomy.ts's NASA calls — see worker/api-proxy.ts), which attaches
-// the real Access Key server-side — the key never ships in the extension bundle.
-const PROXY_URL = (import.meta.env.APP_MEDIA_PROXY_URL || '').replace(/\/$/, '');
+// All Unsplash requests go through this Cloudflare Worker (shared with
+// astronomy.ts's NASA calls — see worker/api-proxy.ts), which attaches the
+// real Access Key server-side — the key never ships in the extension bundle.
+const PROXY_URL = MEDIA_PROXY_URL;
 const UNSPLASH_API_ORIGIN = 'https://api.unsplash.com';
 
 export function useUnsplash(
@@ -40,7 +39,7 @@ export function useUnsplash(
 ) {
   const isActive = config.mode === 'unsplash';
   const uc = isActive ? (config as UnsplashConfig) : undefined;
-  const proxyReady = !!PROXY_URL;
+  const proxyReady = MEDIA_PROXY_CONFIGURED;
 
   const [attribution, setAttribution] = useState<UnsplashAttribution | null>(null);
   const [isFetching, setIsFetching]   = useState(false);

@@ -2,6 +2,11 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.18.1] — Media-proxy warnings, local preview fix
+
+- Unsplash and Astronomy (NASA) background panels now show a note when the media-proxy Worker isn't configured for the current build, instead of silently failing (`src/lib/mediaProxy.ts` shared flag, used by `useUnsplash.ts` and `providers/astronomy.ts`)
+- Fixed Unsplash/NASA erroring with a generic "NetworkError" when testing `docs/preview` locally over `file://` — the Worker's CORS allowlist rejects the `null` origin `file://` sends. New `pnpm preview:docs` script serves `docs/preview` on `http://localhost:5173`, which the Worker already allowlists, instead of adding `file://`/`null` to the allowlist (would also open the proxy to sandboxed iframes/data: URIs)
+
 ## [1.18.0] — Iframe widget, inline Weather forecast, Obsidian vault note picker
 
 - **New Iframe widget**: displays a webpage inside a widget, with an edit-mode overlay so it stays draggable (an iframe is its own browsing context and would otherwise swallow every pointer event). URL field accepts a bare host (`example.com` → `https://example.com`) via a new shared `normalizeUrl()` helper, also now used by Quicklinks instead of its own local regex copy. Many sites block being embedded this way (`X-Frame-Options`/CSP) with no client-side workaround — documented in the widget's own settings hint

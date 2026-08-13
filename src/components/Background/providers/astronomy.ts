@@ -1,4 +1,5 @@
 import { AstronomyConfig, BackgroundProviderDef } from '../../../types/background';
+import { MEDIA_PROXY_URL } from '../../../lib/mediaProxy';
 
 // NASA APOD API. When APP_MEDIA_PROXY_URL is set (see .env.example), requests
 // go through the Cloudflare Worker in worker/api-proxy.ts, which attaches the
@@ -12,7 +13,6 @@ import { AstronomyConfig, BackgroundProviderDef } from '../../../types/backgroun
 // .replace() call, so the minifier can't fold it to a constant, can't prove
 // this branch dead, and would otherwise keep the key as a string literal in
 // every shipped bundle.
-const MEDIA_PROXY_URL = (import.meta.env.APP_MEDIA_PROXY_URL || '').replace(/\/$/, '');
 const NASA_API_KEY = import.meta.env.APP_NASA_API_KEY || '';
 
 let APOD_BASE: string;
