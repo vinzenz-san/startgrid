@@ -60,11 +60,12 @@
 
 .dev-crash-controls {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 6px;
-  align-items: center;
 }
 
-.dev-crash-controls > *:first-child { flex: 1; }
+.dev-crash-controls > *:first-child { align-self: stretch; }
 
 .dev-crash-btn {
   font-size: 10px;

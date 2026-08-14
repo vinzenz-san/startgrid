@@ -5,6 +5,7 @@ import { useEditMode } from '../../contexts/EditModeContext';
 import { useWidgets } from '../../contexts/WidgetContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useSettings } from '../../contexts/SettingsContext';
+import { useSettingsPanelVisible, SETTINGS_PANEL_WIDTH } from '../../contexts/SettingsPanelBoundsContext';
 import { useEditHistory } from '../../contexts/EditHistoryContext';
 import { darkenHex, mixHex, getAdaptiveColor } from '../../lib/colorUtils';
 import { COLOR_PRESETS } from '../../lib/presets';
@@ -25,6 +26,7 @@ export default function WidgetContainer({ widget }: Props) {
   const { pushHistory } = useEditHistory();
   const { globalColor, globalColorScheme, globalOpacity, globalDim, globalGradientIntensity, globalPresetId, widgetShadowOpacity, globalGlassIntensity, globalFontScale } = useTheme();
   const { colorScheme, enableCustomContextMenu, disableWidgetGlow, t } = useSettings();
+  const settingsPanelVisible = useSettingsPanelVisible();
   const elRef = useRef<HTMLDivElement>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [removeConfirmOpen, setRemoveConfirmOpen] = useState(false);
@@ -36,9 +38,16 @@ export default function WidgetContainer({ widget }: Props) {
   // that early return would otherwise skip these, violating Rules of Hooks
   // the moment a stale/removed widget type shows up in storage.
 
+  // The settings sidebar is a fixed sibling, not a scroll/clip ancestor, so
+  // floating-ui's default collision boundary (the viewport) never accounts
+  // for it. Shrinking the usable right edge by the panel's width whenever
+  // it's visible makes flip()/shift() steer this panel away from it instead
+  // of rendering half-hidden underneath.
+  const collisionPadding = settingsPanelVisible ? { right: SETTINGS_PANEL_WIDTH + 8 } : 8;
+
   const { refs, floatingStyles } = useFloating({
     placement: 'right-start',
-    middleware: [offset(8), flip(), shift({ padding: 8 })],
+    middleware: [offset(8), flip({ padding: collisionPadding }), shift({ padding: collisionPadding })],
     whileElementsMounted: autoUpdate,
   });
 

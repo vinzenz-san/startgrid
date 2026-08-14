@@ -14,6 +14,7 @@ import DevPanel, { type DevPanelPos } from '../DevPanel/DevPanel';
 import InspectorHistoryPanel from '../DevPanel/InspectorHistoryPanel';
 import EditHistoryPanel from '../shared/EditHistoryPanel';
 import { ElementInspectorProvider } from '../../contexts/ElementInspectorContext';
+import { SettingsPanelBoundsContext } from '../../contexts/SettingsPanelBoundsContext';
 import { isExtension } from '../../lib/storage';
 import { APP_VERSION } from '../../lib/appVersion';
 import './Grid.css';
@@ -89,6 +90,7 @@ export default function Grid() {
 
   return (
     <ElementInspectorProvider enabled={developerOptionsEnabled && elementInspectorEnabled}>
+    <SettingsPanelBoundsContext.Provider value={settingsPanelOpen || settingsPinned}>
     <div className={`sg-root${isEditMode ? ' sg-root--edit' : ''}`}>
 
       {/* ── Bottom control bar ──────────────────────────────────────────
@@ -185,6 +187,7 @@ export default function Grid() {
         <EditHistoryPanel devPanelPos={developerOptionsEnabled ? devPanelPos : null} />
       )}
     </div>
+    </SettingsPanelBoundsContext.Provider>
     </ElementInspectorProvider>
   );
 }

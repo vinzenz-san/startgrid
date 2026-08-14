@@ -271,7 +271,7 @@ function DevPanelInner({ position, onPositionChange }: Props) {
           onChange={v => updateSettings({ elementInspectorEnabled: v })}
         />
       </div>
-      <div className="dev-row">
+      <div className="dev-row dev-row--col">
         <span className="dev-label">{t('dev.weatherEffect.override')}</span>
         <Dropdown
           options={[

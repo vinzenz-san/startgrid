@@ -306,7 +306,10 @@ html[data-scheme="light"] .sg-widget:not([data-theme="dark"]) .sg-widget-control
   max-width: calc(100vw - 16px);
   max-height: calc(100vh - 40px);
   overflow-y: auto;
-  z-index: 9999;
+  /* Above .sg-settings-panel (10000) — flip()/shift() in WidgetContainer.tsx
+     already steer this panel away from the settings sidebar when it's open,
+     this is just the fallback if no room is left to flip/shift into. */
+  z-index: 10001;
 }
 
 /* Single shared horizontal inset AND row-to-row gap for every widget's
@@ -548,7 +551,11 @@ html[data-scheme="light"] .sg-widget:not([data-theme="dark"]) .sg-widget-control
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* `safe center`: centers when content fits, but falls back to start
+     alignment once it overflows — plain `center` can scroll-clip the
+     leading edge of an overflowing flex column in some browsers, which
+     hid the Reload/Remove buttons on small crashed widgets. */
+  justify-content: safe center;
   gap: 6px;
   padding: 16px;
   text-align: center;
@@ -557,6 +564,7 @@ html[data-scheme="light"] .sg-widget:not([data-theme="dark"]) .sg-widget-control
 /* Boundary fallback isn't inside .sg-widget--orphan, so it carries its own backdrop. */
 .sg-widget-body > .sg-widget-orphan-body {
   height: 100%;
+  overflow-y: auto;
   border-radius: inherit;
   background: linear-gradient(135deg, rgba(40, 20, 20, 0.85), rgba(30, 15, 15, 0.95));
 }

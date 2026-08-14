@@ -2,6 +2,14 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.19.5] — Widget menu collision fix, dev panel & edit-mode polish
+
+- Fixed a widget's floating settings/context-menu panel rendering partially behind the Settings sidebar when both were open — `flip()`/`shift()` collision middleware now accounts for the sidebar's reserved width via a new `SettingsPanelBoundsContext`, steering the panel away instead of only avoiding the raw viewport edge; panel z-index also bumped above the sidebar as a fallback for when there's no room to flip into
+- Dev Panel: "Trigger Crash" button moved below its widget dropdown instead of beside it, fixing it rendering outside the panel when a long widget name was selected; "Force Weather Effect" row restyled to match (label on its own line, selector below, left-aligned)
+- Fixed the crashed-widget fallback (Reload/Remove buttons) being clipped and unreachable on small widgets — the fallback now scrolls when its content is taller than the widget instead of centering with no way to scroll to the bottom
+- Grid settings section hover-preview now also dims the screen (reusing the same scrim as edit mode) to match the edit-mode grid preview's contrast
+- Removed the orange edge vignette shown during edit mode — no longer needed now that the full-screen scrim handles contrast
+
 ## [1.19.4] — Add Widget now opens the Ctrl+K palette
 
 - Replaced the "Add Widget" button's own dropdown menu with the same Ctrl+K command palette used elsewhere — the dropdown was a plain `position: absolute` list with no flip/shift/viewport-boundary handling, so it could run off-screen on narrow browser windows; the palette is a centered portal overlay and doesn't have this problem

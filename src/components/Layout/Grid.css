@@ -5,22 +5,6 @@
   height: 100%;
 }
 
-/* ── Edit-mode vignette ──────────────────────────── */
-.sg-root::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 5;
-  background: radial-gradient(ellipse at center, transparent 48%, rgba(255, 87, 34, 0.14) 100%);
-  opacity: 0;
-  transition: opacity 0.35s ease;
-}
-
-.sg-root--edit::after {
-  opacity: 1;
-}
-
 /* ── Background-section hover: blur every widget ──
    Toggled on document.documentElement by SettingsPanel while the cursor is over the
    Background section — same pattern as the Widgets-section glow below, shifting
@@ -137,9 +121,10 @@ html.sg-glow-all-widgets .sg-widget {
    whatever hue the background happens to be, without outlining each line
    individually or being confined to just the grid's own box — covers the
    whole screen so the effect reads as one consistent dimming rather than a
-   rectangle cut out around the grid. Edit-mode only, same reasoning as the
-   overlay itself: hovering a settings row (the other time the glow lines
-   can show) shouldn't dim the entire screen just for a preview. */
+   rectangle cut out around the grid. Also shown while hovering the Grid
+   settings section (html.sg-grid-glow-hover, toggled in SettingsPanel.tsx)
+   for the same reason it exists in edit mode — the glow lines need the
+   contrast boost there too, not just during an actual edit session. */
 .sg-edit-scrim {
   position: fixed;
   inset: 0;
@@ -149,7 +134,8 @@ html.sg-glow-all-widgets .sg-widget {
   transition: opacity 0.3s ease;
   pointer-events: none;
 }
-.sg-root--edit .sg-edit-scrim {
+.sg-root--edit .sg-edit-scrim,
+html.sg-grid-glow-hover .sg-edit-scrim {
   opacity: 1;
 }
 
