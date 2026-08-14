@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { SettingsRow, ActionButton } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { useObsidian } from '../../../hooks/useObsidian';
-import { getVaultIndex, searchIndex, listFolder } from '../../../lib/obsidianIndex';
+import { getVaultIndex, searchIndex, listFolder, addToVaultIndex, removeFromVaultIndex } from '../../../lib/obsidianIndex';
 import { buildOpenVaultUri, launchUri } from '../../../lib/obsidianUri';
+import { putFile, deleteFile } from '../../../lib/obsidianApi';
+import { IconNewNote, IconNewFolder, IconRefresh, IconOpenExternal, IconTrash } from './ObsidianIcons';
 import './obsidian.css';
 
 interface Props {
@@ -13,6 +15,10 @@ interface Props {
    *  ObsidianRandom's excludeFolders — most callers won't need this. */
   excludeFolders?: string[];
   label?: string;
+  /** Off by default at the call site — shows/hides the per-note delete button. */
+  deleteEnabled?: boolean;
+  /** On by default at the call site — adds an arm/cooldown wait before a delete confirm fires. */
+  deleteProtection?: boolean;
 }
 
 /**
@@ -38,7 +44,10 @@ interface Props {
  * instant the settings panel opens rather than needing a first click into
  * the field.
  */
-export default function VaultNotePicker({ value, onChange, excludeFolders, label }: Props) {
+export default function VaultNotePicker({
+  value, onChange, excludeFolders, label,
+  deleteEnabled = false, deleteProtection = true,
+}: Props) {
   const { t } = useSettings();
   const { connection } = useObsidian();
 
@@ -55,9 +64,32 @@ export default function VaultNotePicker({ value, onChange, excludeFolders, label
   // mode only engages once the user actually edits the text this session.
   const [typing, setTyping] = useState(false);
 
+  // "New note" mini-form — only meaningful in browse mode, since it creates
+  // into whatever folder is currently displayed.
+  const [creating, setCreating]     = useState(false);
+  const [newName, setNewName]       = useState('');
+  const [newBusy, setNewBusy]       = useState(false);
+  const [newError, setNewError]     = useState<string | null>(null);
+
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // "New folder" mini-form — mirrors the note one above.
+  const [creatingFolder, setCreatingFolder] = useState(false);
+  const [newFolderName, setNewFolderName]   = useState('');
+  const [newFolderNoteName, setNewFolderNoteName] = useState('');
+  const [folderBusy, setFolderBusy]         = useState(false);
+  const [folderError, setFolderError]       = useState<string | null>(null);
+
   // The stored value is the source of truth — keep the field in sync if it
   // changes from outside this component (e.g. a factory reset).
   useEffect(() => { setQuery(value); }, [value]);
+
+  // Close the new-note/new-folder forms whenever the browsed folder changes —
+  // their target folder would otherwise silently go stale under the user.
+  useEffect(() => {
+    setCreating(false); setNewName(''); setNewError(null);
+    setCreatingFolder(false); setNewFolderName(''); setNewFolderNoteName(''); setFolderError(null);
+  }, [folder]);
 
   // Load on mount, not just on first focus — every mount here is a fresh
   // settings-panel open (the floating panel unmounts this on close), so
@@ -98,6 +130,79 @@ export default function VaultNotePicker({ value, onChange, excludeFolders, label
     setQuery(path);
     setTyping(false);
     setFolder(dirOf(path));
+  }
+
+  async function createNote() {
+    const title = newName.trim().replace(/\.md$/i, '');
+    if (!title) return;
+    const path = folder ? `${folder}/${title}.md` : `${title}.md`;
+
+    const existing = allPaths ? listFolder(allPaths, folder) : null;
+    if (existing?.notes.some(n => n.path.toLowerCase() === path.toLowerCase())) {
+      setNewError(t('widget.vaultPicker.newNoteExists'));
+      return;
+    }
+
+    setNewBusy(true);
+    setNewError(null);
+    try {
+      await putFile(path, '');
+      setAllPaths(prev => (prev ? [...prev, path] : prev));
+      await addToVaultIndex(path);
+      setCreating(false);
+      setNewName('');
+      commit(path);
+    } catch {
+      setNewError(t('widget.vaultPicker.newNoteError'));
+    } finally {
+      setNewBusy(false);
+    }
+  }
+
+  async function createFolder() {
+    const name = newFolderName.trim().replace(/\/+$/, '');
+    if (!name) return;
+    const path = folder ? `${folder}/${name}` : name;
+
+    const existing = allPaths ? listFolder(allPaths, folder) : null;
+    if (existing?.folders.some(f => f.toLowerCase() === name.toLowerCase())) {
+      setFolderError(t('widget.vaultPicker.newFolderExists'));
+      return;
+    }
+
+    // Neither a rename nor a directory-creation endpoint exists on the Local
+    // REST API plugin, so the placeholder note's name is permanent unless
+    // it's picked correctly up front — hence asking for it here rather than
+    // defaulting to "Untitled".
+    const noteTitle = (newFolderNoteName.trim() || 'Untitled').replace(/\.md$/i, '');
+
+    setFolderBusy(true);
+    setFolderError(null);
+    try {
+      const placeholder = `${path}/${noteTitle}.md`;
+      await putFile(placeholder, '');
+      setAllPaths(prev => (prev ? [...prev, placeholder] : prev));
+      await addToVaultIndex(placeholder);
+      setFolder(path);
+    } catch {
+      setFolderError(t('widget.vaultPicker.newFolderError'));
+    } finally {
+      setFolderBusy(false);
+    }
+  }
+
+  async function deleteNote(path: string) {
+    setDeleteError(null);
+    try {
+      await deleteFile(path);
+      setAllPaths(prev => (prev ? prev.filter(p => p !== path) : prev));
+      await removeFromVaultIndex(path);
+      // The pinned note itself was just deleted — clear the pin rather than
+      // leaving the widget pointed at a note that no longer exists.
+      if (path === value) commit('');
+    } catch {
+      setDeleteError(t('widget.vaultPicker.deleteError'));
+    }
   }
 
   const searching = typing && query.trim().length > 0;
@@ -186,13 +291,26 @@ export default function VaultNotePicker({ value, onChange, excludeFolders, label
                 </button>
               ))}
               {listing.notes.map(note => (
-                <button
-                  key={note.path}
-                  className="sg-vault-picker-row"
-                  onMouseDown={e => { e.preventDefault(); commit(note.path); }}
-                >
-                  📄 {note.name}
-                </button>
+                <div key={note.path} className="sg-vault-picker-row-wrap">
+                  <button
+                    className="sg-vault-picker-row"
+                    onMouseDown={e => { e.preventDefault(); commit(note.path); }}
+                  >
+                    📄 {note.name}
+                  </button>
+                  {deleteEnabled && (
+                    <ActionButton
+                      variant="default"
+                      skipCooldown={!deleteProtection}
+                      fullWidth={false}
+                      className="sg-vault-picker-row-delete"
+                      onClick={() => void deleteNote(note.path)}
+                      title={t('widget.vaultPicker.delete')}
+                    >
+                      <IconTrash/>
+                    </ActionButton>
+                  )}
+                </div>
               ))}
             </>
           ) : (
@@ -200,18 +318,107 @@ export default function VaultNotePicker({ value, onChange, excludeFolders, label
           )}
         </div>
       )}
+      {deleteError && <p className="sg-obs-hint sg-obs-hint--error">{deleteError}</p>}
+
+      {creating && (
+        <div className="sg-vault-picker-new" onClick={e => e.stopPropagation()}>
+          <input
+            autoFocus
+            className="sg-obs-input"
+            placeholder={t('widget.vaultPicker.newNotePlaceholder')}
+            value={newName}
+            disabled={newBusy}
+            onChange={e => { setNewName(e.target.value); setNewError(null); }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') void createNote();
+              if (e.key === 'Escape') { setCreating(false); setNewName(''); setNewError(null); }
+            }}
+            onPointerDown={e => e.stopPropagation()}
+            onMouseDown={e => e.stopPropagation()}
+            onDragStart={e => e.stopPropagation()}
+          />
+          <ActionButton variant="ghost" fullWidth={false} onClick={() => void createNote()} disabled={newBusy || !newName.trim()}>
+            {t('widget.vaultPicker.createNote')}
+          </ActionButton>
+        </div>
+      )}
+      {creating && newError && <p className="sg-obs-hint sg-obs-hint--error">{newError}</p>}
+
+      {creatingFolder && (
+        <div className="sg-vault-picker-new sg-vault-picker-new--stacked" onClick={e => e.stopPropagation()}>
+          <input
+            autoFocus
+            className="sg-obs-input"
+            placeholder={t('widget.vaultPicker.newFolderPlaceholder')}
+            value={newFolderName}
+            disabled={folderBusy}
+            onChange={e => { setNewFolderName(e.target.value); setFolderError(null); }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') void createFolder();
+              if (e.key === 'Escape') { setCreatingFolder(false); setNewFolderName(''); setNewFolderNoteName(''); setFolderError(null); }
+            }}
+            onPointerDown={e => e.stopPropagation()}
+            onMouseDown={e => e.stopPropagation()}
+            onDragStart={e => e.stopPropagation()}
+          />
+          <input
+            className="sg-obs-input"
+            placeholder={t('widget.vaultPicker.newFolderNotePlaceholder')}
+            value={newFolderNoteName}
+            disabled={folderBusy}
+            onChange={e => { setNewFolderNoteName(e.target.value); setFolderError(null); }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') void createFolder();
+              if (e.key === 'Escape') { setCreatingFolder(false); setNewFolderName(''); setNewFolderNoteName(''); setFolderError(null); }
+            }}
+            onPointerDown={e => e.stopPropagation()}
+            onMouseDown={e => e.stopPropagation()}
+            onDragStart={e => e.stopPropagation()}
+          />
+          <ActionButton variant="ghost" fullWidth={false} onClick={() => void createFolder()} disabled={folderBusy || !newFolderName.trim()}>
+            {t('widget.vaultPicker.createFolder')}
+          </ActionButton>
+        </div>
+      )}
+      {creatingFolder && !folderError && <p className="sg-obs-hint">{t('widget.vaultPicker.newFolderNoteHint')}</p>}
+      {creatingFolder && folderError && <p className="sg-obs-hint sg-obs-hint--error">{folderError}</p>}
 
       <div className="sg-vault-picker-actions">
-        <ActionButton variant="ghost" fullWidth={false} onClick={() => void loadIndex(true)} disabled={loading}>
-          {t('widget.vaultPicker.rebuildIndex')}
+        <ActionButton
+          variant="ghost"
+          fullWidth={false}
+          disabled={!listing}
+          onClick={() => { setCreating(v => !v); setNewError(null); }}
+          title={t('widget.vaultPicker.newNote')}
+        >
+          <IconNewNote/>
+        </ActionButton>
+        <ActionButton
+          variant="ghost"
+          fullWidth={false}
+          disabled={!listing}
+          onClick={() => { setCreatingFolder(v => !v); setFolderError(null); }}
+          title={t('widget.vaultPicker.newFolder')}
+        >
+          <IconNewFolder/>
+        </ActionButton>
+        <ActionButton
+          variant="ghost"
+          fullWidth={false}
+          onClick={() => void loadIndex(true)}
+          disabled={loading}
+          title={t('widget.vaultPicker.rebuildIndex')}
+        >
+          <IconRefresh spinning={loading}/>
         </ActionButton>
         {connection?.vaultName && (
           <ActionButton
             variant="ghost"
             fullWidth={false}
             onClick={() => launchUri(buildOpenVaultUri(connection.vaultName as string))}
+            title={t('widget.vaultPicker.openVault')}
           >
-            {t('widget.vaultPicker.openVault')}
+            <IconOpenExternal/>
           </ActionButton>
         )}
       </div>

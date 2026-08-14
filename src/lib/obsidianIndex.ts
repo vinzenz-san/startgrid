@@ -115,6 +115,26 @@ export async function clearVaultIndex(): Promise<void> {
   await storageLocal.remove(INDEX_CACHE_KEY);
 }
 
+/** Patch a freshly-created note into the cached index in place, so the next
+ *  settings-panel open (a fresh getVaultIndex call against a still-warm
+ *  cache) sees it without waiting out the TTL or forcing a full walk. A
+ *  missing cache is left alone — the next load builds one from scratch and
+ *  will pick the note up anyway. */
+export async function addToVaultIndex(path: string): Promise<void> {
+  const cached = await storageLocal.get(INDEX_CACHE_KEY) as CachedIndex | undefined;
+  if (!cached || cached.paths.includes(path)) return;
+  await storageLocal.set(INDEX_CACHE_KEY, { ...cached, paths: [...cached.paths, path] } satisfies CachedIndex);
+}
+
+/** Counterpart to addToVaultIndex — drop a deleted note from the cached
+ *  index in place, same reasoning: without this it'd keep showing up in the
+ *  explorer until the TTL lapses or the user force-rebuilds. */
+export async function removeFromVaultIndex(path: string): Promise<void> {
+  const cached = await storageLocal.get(INDEX_CACHE_KEY) as CachedIndex | undefined;
+  if (!cached || !cached.paths.includes(path)) return;
+  await storageLocal.set(INDEX_CACHE_KEY, { ...cached, paths: cached.paths.filter(p => p !== path) } satisfies CachedIndex);
+}
+
 /** Pick a random entry, avoiding an immediate repeat where possible. */
 export function pickRandom(paths: string[], avoid?: string): string | null {
   if (paths.length === 0) return null;

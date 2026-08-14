@@ -2,6 +2,14 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.19.2] — Obsidian Pinned Note: create/delete notes and folders
+
+- **New note / new folder**: the vault note picker's file explorer gains icon buttons to create a note or a folder directly from the current folder, instead of only picking existing notes. "New folder" seeds the folder with a first note (name optional, defaults to "Untitled") since the Local REST API plugin has no directory-creation endpoint — a folder only exists once it contains a file — and no rename endpoint either, so the note can still be renamed later from inside Obsidian itself
+- **Delete**: off by default, gated behind a confirm dialog explaining that deletion follows the user's own Obsidian "Deleted files" setting. A separate "delete protection" toggle (on by default) controls whether the delete button's confirm click has a cooldown countdown or fires on the very next click; both toggles live below the widget's auto-refresh setting
+- Fixed the vault index cache going stale after creating a note — it now patches in place instead of requiring a manual "Rebuild vault index" ([#11](https://github.com/vinzenz-san/startgrid/issues/11))
+- Fixed the delete-confirm dialog closing the widget's whole settings panel instead of just itself, and the confirm click silently having no effect — the panel's outside-click-to-close handler didn't recognize the dialog's portal, so a pointerdown on it read as "outside" and closed the panel before the click could register
+- "Rebuild vault index" and "Open vault" buttons are now icon-only with tooltips, matching the new note/folder/delete buttons
+
 ## [1.19.1] — Unified slider component
 
 - Every slider in the app — widget settings, Background editor (Blur/Luminosity/Angle across all providers), and the global Settings sidebar (Transparency/Shadow/Glass/Gradient/Dimming, Grid Columns/Cell Size/Gap, Font Scale) — now renders through one shared `SettingsSlider` component instead of two divergent shapes (a self-contained labeled block vs. three grandfathered raw `<input type="range">`s in Calendar/OutlookCalendar/OutlookMail, exempted from the widgets-only ESLint rule banning them). The 3 raw inputs are migrated to the shared component and their exemption removed

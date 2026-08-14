@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import type { ObsidianNoteData } from '../../../types/widget';
 import { useObsidianNote } from './useObsidianNote';
 import { useObsidian } from '../../../hooks/useObsidian';
-import { SettingsRow, SettingsSlider } from '../../shared/Form';
+import { SettingsRow, SettingsSlider, SettingsSwitch } from '../../shared/Form';
 import VaultNotePicker from '../shared/VaultNotePicker';
+import ConfirmDialog from '../../shared/ConfirmDialog';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { isScreenshotMode } from '../../../lib/permissions';
 import { scaledFontSize } from '../../../lib/displayStyle';
@@ -32,6 +33,7 @@ interface SettingsProps {
 
 export function ObsidianNoteSettings({ data, onUpdateData }: SettingsProps) {
   const { t } = useSettings();
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   return (
     <div className="sg-obs-settings" onClick={e => e.stopPropagation()}>
@@ -39,6 +41,8 @@ export function ObsidianNoteSettings({ data, onUpdateData }: SettingsProps) {
         label={t('widget.obsidianNote.path')}
         value={data.path ?? ''}
         onChange={path => onUpdateData({ path: path || undefined })}
+        deleteEnabled={data.deleteEnabled ?? false}
+        deleteProtection={data.deleteProtection ?? true}
       />
 
       <SettingsRow label={t('widget.obsidianNote.section')}>
@@ -69,6 +73,43 @@ export function ObsidianNoteSettings({ data, onUpdateData }: SettingsProps) {
         onChange={v => onUpdateData({ refreshMinutes: v || undefined })}
         valueFormatter={v => (v ? `${v} min` : t('widget.obsidianNote.refreshOnLoad'))}
         defaultValue={0}
+      />
+
+      <SettingsRow label={t('widget.obsidianNote.enableDelete')}>
+        <SettingsSwitch
+          checked={data.deleteEnabled ?? false}
+          onChange={v => {
+            if (v) setConfirmingDelete(true);
+            else onUpdateData({ deleteEnabled: false });
+          }}
+        />
+      </SettingsRow>
+
+      {(data.deleteEnabled ?? false) && (
+        <SettingsRow label={t('widget.obsidianNote.deleteProtection')}>
+          <SettingsSwitch
+            checked={data.deleteProtection ?? true}
+            onChange={v => onUpdateData({ deleteProtection: v })}
+          />
+        </SettingsRow>
+      )}
+      {(data.deleteEnabled ?? false) && (
+        <p className="sg-obs-hint">
+          {t('widget.obsidianNote.deleteProtectionHint')}
+          <a href="https://obsidian.md/help/plugins/file-recovery" target="_blank" rel="noopener noreferrer">
+            {t('widget.obsidianNote.deleteProtectionLink')}
+          </a>
+          {t('widget.obsidianNote.deleteProtectionEnd')}
+        </p>
+      )}
+
+      <ConfirmDialog
+        open={confirmingDelete}
+        onClose={() => setConfirmingDelete(false)}
+        onConfirm={() => { onUpdateData({ deleteEnabled: true }); setConfirmingDelete(false); }}
+        title={t('widget.obsidianNote.enableDeleteTitle')}
+        body={t('widget.obsidianNote.enableDeleteWarning')}
+        confirmLabel={t('widget.obsidianNote.enableDeleteConfirm')}
       />
 
       <DetailedSettings title={t('widget.obsidian.sectionTitle')}>

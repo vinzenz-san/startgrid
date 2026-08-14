@@ -31,6 +31,7 @@
 }
 
 .sg-obs-hint--error { color: #f87171; }
+.sg-obs-hint a { color: var(--accent); }
 
 .sg-obs-hint code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -185,8 +186,33 @@
 .sg-vault-picker-row:hover { background: rgba(128, 128, 128, 0.12); }
 .sg-vault-picker-row--folder { font-weight: 500; }
 
+.sg-vault-picker-row-wrap {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.sg-vault-picker-row-wrap .sg-vault-picker-row { flex: 1; min-width: 0; }
+.sg-vault-picker-row-delete {
+  flex-shrink: 0;
+  padding: 4px 6px !important;
+  color: #f87171;
+}
+
 .sg-vault-picker-actions {
   display: flex;
   gap: 6px;
   margin-top: 6px;
+  flex-wrap: wrap;
 }
+
+.sg-vault-picker-new {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+.sg-vault-picker-new .sg-obs-input { flex: 1; }
+.sg-vault-picker-new--stacked {
+  flex-wrap: wrap;
+}
+.sg-vault-picker-new--stacked .sg-obs-input { flex-basis: 100%; }
+.sg-vault-picker-new--stacked .sg-action-btn { margin-left: auto; }

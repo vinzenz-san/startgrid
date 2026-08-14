@@ -56,7 +56,7 @@ export default function WidgetContainer({ widget }: Props) {
       // subtree — without this exemption, a pointerdown on either one reads
       // as "outside click" and closes the whole panel before the picker's/
       // dropdown's own click handler (which fires after pointerdown) can run.
-      if (target.closest('.ccp-panel') || target.closest('.sg-dropdown-menu') || target.closest('.sg-ql-links-panel')) return;
+      if (target.closest('.ccp-panel') || target.closest('.sg-dropdown-menu') || target.closest('.sg-ql-links-panel') || target.closest('.sg-confirm-dialog-backdrop')) return;
       if (!elRef.current?.contains(target) && !refs.floating.current?.contains(target))
         setSettingsOpen(false);
     };

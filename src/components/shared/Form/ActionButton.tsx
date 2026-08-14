@@ -13,6 +13,12 @@ interface Props {
   active?:       boolean;
   /** Full-width (default, matches Import/Export/Reset) or auto-width inline usage. */
   fullWidth?:    boolean;
+  /** Native tooltip — for icon-only buttons where children alone doesn't label the action. */
+  title?:        string;
+  /** Keep the arm→confirm two-click flow but skip the cooldown timer between
+   *  them — for a user-configurable "delete protection" toggle where the
+   *  confirm step itself should stay, just not the wait. Ignored for ghost. */
+  skipCooldown?: boolean;
 }
 
 export default function ActionButton({
@@ -24,6 +30,8 @@ export default function ActionButton({
   disabled = false,
   active = false,
   fullWidth = true,
+  title,
+  skipCooldown = false,
 }: Props) {
   const { developerOptionsEnabled } = useSettings();
   const [pending,   setPending]   = useState(false);
@@ -64,8 +72,8 @@ export default function ActionButton({
 
     if (!pending) {
       setPending(true);
-      // Dev mode: arm instantly with no cooldown; normal mode: arm + start timer
-      if (!developerOptionsEnabled) setCooldown(true);
+      // Dev mode / skipCooldown: arm instantly with no cooldown; normal mode: arm + start timer
+      if (!developerOptionsEnabled && !skipCooldown) setCooldown(true);
       return;
     }
     if (cooldown) return;
@@ -85,7 +93,7 @@ export default function ActionButton({
   ].filter(Boolean).join(' ');
 
   return (
-    <button className={cls} onClick={handleClick} disabled={disabled}>
+    <button className={cls} onClick={handleClick} disabled={disabled} title={title}>
       {variant !== 'ghost' && pending && !cooldown
         ? 'Confirm?'
         : <>{children}{variant !== 'ghost' && cooldown && <span className="sg-action-btn-countdown">({countdown}s)</span>}</>

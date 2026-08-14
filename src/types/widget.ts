@@ -158,6 +158,10 @@ export interface ObsidianNoteData {
   maxLines?:       number;
   /** Auto-refresh interval in minutes; 0/undefined = only on load. */
   refreshMinutes?: number;
+  /** Off by default — shows/hides the delete button in the vault explorer. */
+  deleteEnabled?:    boolean;
+  /** On by default — requires an armed confirm click + cooldown before delete fires. */
+  deleteProtection?: boolean;
 }
 
 export interface ObsidianSearchData {

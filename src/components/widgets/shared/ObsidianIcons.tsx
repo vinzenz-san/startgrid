@@ -53,6 +53,41 @@ export function IconShuffle() {
   );
 }
 
+/** Dog-eared page with a plus badge — create a new note. */
+export function IconNewNote() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ width: 13, height: 13 }}>
+      <path d="M4 1.5h5L12.5 5V13.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2.5a1 1 0 0 1 1-1Z"
+        stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
+      <path d="M9 1.5V5h3.5" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
+      <path d="M5.3 8.8h4.4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
+      <path d="M5.3 11h2.6" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
+/** Folder with a plus badge — create a new folder. */
+export function IconNewFolder() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ width: 13, height: 13 }}>
+      <path d="M2 4.2a1 1 0 0 1 1-1h2.8l1.2 1.4H13a1 1 0 0 1 1 1V12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4.2Z"
+        stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
+      <path d="M8 7.3v3.4M6.3 9h3.4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
+/** Trash can — delete a note. */
+export function IconTrash() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ width: 13, height: 13 }}>
+      <path d="M3 4.5h10M6.5 4.5V3a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1.5M4.5 4.5 5 13a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1l.5-8.5"
+        stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M6.7 7v4.2M9.3 7v4.2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
 export function SkeletonRow() {
   return (
     <div className="sg-cal-skeleton-group">

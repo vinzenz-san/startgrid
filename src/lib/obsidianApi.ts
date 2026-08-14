@@ -180,6 +180,14 @@ export async function appendToFile(path: string, content: string): Promise<void>
   });
 }
 
+/** Delete a note. Where it actually ends up (system trash, Obsidian's own
+ *  `.trash`, or gone for good) is the vault owner's own "Deleted files"
+ *  setting — not something this call controls. */
+export async function deleteFile(path: string): Promise<void> {
+  const conn = await ready();
+  await request(conn, `/vault/${encodeVaultPath(path)}`, { method: 'DELETE' });
+}
+
 export interface VaultEntry {
   /** Directory entries come back with a trailing slash; files don't. */
   name:        string;
