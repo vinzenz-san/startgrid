@@ -2,6 +2,12 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.19.4] — Add Widget now opens the Ctrl+K palette
+
+- Replaced the "Add Widget" button's own dropdown menu with the same Ctrl+K command palette used elsewhere — the dropdown was a plain `position: absolute` list with no flip/shift/viewport-boundary handling, so it could run off-screen on narrow browser windows; the palette is a centered portal overlay and doesn't have this problem
+- Removed the Settings Sidebar's own "Add Widget" button — the bottom-bar button (edit mode) and Ctrl+K are now the only two entry points, both opening the same palette
+- `CommandPalette`'s open state moved up into `Grid.tsx` (prop-drilled, no new context) so both entry points share it; `AddWidgetMenu.tsx`/`.css` removed entirely
+
 ## [1.19.3] — Middle-click background tabs for all link widgets
 
 - Fixed middle-click not opening a background tab in Bookmark Search results, Weather's "open detailed forecast on click", RSS Feed entries, and To-Do's Google Tasks row — all four rendered non-anchor `div`/`button` elements with only a left-click handler, so the browser's native middle-click behavior never had anywhere to attach

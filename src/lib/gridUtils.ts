@@ -34,10 +34,10 @@ export function findFreePosition(widgets: Widget[], columns: number, w: number, 
 }
 
 /** Builds a placeable widget of the given type at the first free position —
- *  the "add a widget from the menu" logic, shared by AddWidgetMenu.tsx and
- *  CommandPalette.tsx so both add widgets identically instead of duplicating
- *  the same findFreePosition + registry-defaults assembly. Caller still owns
- *  actually calling addWidget() with the result. */
+ *  the "add a widget from the menu" logic, used by CommandPalette.tsx (the
+ *  sole add-widget UI) so any future trigger adds widgets identically instead
+ *  of duplicating the same findFreePosition + registry-defaults assembly.
+ *  Caller still owns actually calling addWidget() with the result. */
 export function buildNewWidget(widgets: Widget[], columns: number, type: WidgetType): Omit<Widget, 'id'> {
   const { defaultSize, defaultData, defaultStyle } = WIDGET_REGISTRY[type];
   const { col, row } = findFreePosition(widgets, columns, defaultSize.w, defaultSize.h);

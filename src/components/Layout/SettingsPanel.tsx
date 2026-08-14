@@ -21,7 +21,6 @@ import { useApplyGridConfig } from '../../hooks/useApplyGridConfig';
 import { useEditHistory } from '../../contexts/EditHistoryContext';
 import { compactWidgets } from '../../lib/gridUtils';
 import { DEFAULT_BG } from '../../types/background';
-import AddWidgetMenu from '../shared/AddWidgetMenu';
 import LayoutPresets from '../shared/LayoutPresets';
 import type { Language } from '../../contexts/SettingsContext';
 import { runThemeTransition } from '../../lib/themeTransition';
@@ -273,9 +272,6 @@ export default function SettingsPanel({ onClose, isOpen, onReplayTour }: Props) 
             onMouseLeave={() => document.documentElement.classList.remove('sg-glow-all-widgets')}
           >
           <PanelSection title={t('widgets.sectionTitle')} collapsible persistenceKey="widgets">
-            {/* Add Widget */}
-            <AddWidgetMenu />
-
             <SwatchPicker
               isDark={isDark}
               presetId={globalPresetId}

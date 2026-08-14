@@ -4,7 +4,6 @@ import { useWidgets } from '../../contexts/WidgetContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useGridConfig } from '../../contexts/GridConfigContext';
 import RGLGrid from './RGLGrid';
-import AddWidgetMenu from '../shared/AddWidgetMenu';
 import ThemeToggle from '../shared/ThemeToggle';
 import GearIcon from '../shared/icons/GearIcon';
 import SettingsPanel from './SettingsPanel';
@@ -33,6 +32,7 @@ export default function Grid() {
   const [devPanelPos,       setDevPanelPos]       = useState<DevPanelPos | null>(null);
   const [tourOpen,          setTourOpen]          = useState(false);
   const [presetPickerOpen,  setPresetPickerOpen]  = useState(false);
+  const [addWidgetOpen,     setAddWidgetOpen]     = useState(false);
 
   // Auto-trigger the widget onboarding tour once widgets have loaded (never
   // flashes open on a dashboard that's still mid-restore). Gating differs by
@@ -101,7 +101,13 @@ export default function Grid() {
             Settings and a "Finish Editing" button. */}
       {isEditMode ? (
         <div className="sg-bottom-bar">
-          <AddWidgetMenu className="sg-controls-add-widget" />
+          <button
+            className="sg-controls-add-widget sg-bottom-bar-btn"
+            onPointerDown={e => { e.stopPropagation(); e.preventDefault(); }}
+            onClick={() => setAddWidgetOpen(true)}
+          >
+            <span>{t('widgets.addWidget')}</span>
+          </button>
 
           <button
             className={`sg-bottom-bar-btn${settingsPanelOpen ? ' active' : ''}`}
@@ -160,7 +166,7 @@ export default function Grid() {
         onClose={() => setPresetPickerOpen(false)}
       />
 
-      <CommandPalette />
+      <CommandPalette open={addWidgetOpen} onOpenChange={setAddWidgetOpen} />
 
       <div className="sg-edit-scrim" />
 

@@ -155,9 +155,6 @@
    exact structural parity with the Color Gradient panel's From/To swatches —
    see SettingsRow usage in the SETTINGS section below. */
 
-/* Add Widget section styles moved to shared/AddWidgetMenu.css — used by both
-   this sidebar and Grid.tsx's floating edit-mode button. */
-
 /* ── Data Management ─────────────────────────────────────────────────────── */
 .sg-data-mgmt-row {
   display: flex;

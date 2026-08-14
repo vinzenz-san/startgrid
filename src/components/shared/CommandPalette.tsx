@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { createPortal } from 'react-dom';
 import { useWidgets } from '../../contexts/WidgetContext';
 import { useGridConfig } from '../../contexts/GridConfigContext';
@@ -9,17 +9,21 @@ import { buildNewWidget } from '../../lib/gridUtils';
 import type { WidgetType } from '../../types/widget';
 import './CommandPalette.css';
 
-// Global Ctrl+K launcher for adding a widget by fuzzy(-ish) name search
-// instead of scrolling the Add-Widget menu — same "raw document keydown
-// listener, no shared shortcut registry" pattern BookmarkSearch.tsx already
-// uses for its own Ctrl+Shift+F, since the codebase has no shared shortcut
-// system and one more standalone listener isn't worth inventing one for.
-export default function CommandPalette() {
+interface Props {
+  open: boolean;
+  onOpenChange: Dispatch<SetStateAction<boolean>>;
+}
+
+// Global Ctrl+K launcher for adding a widget by fuzzy(-ish) name search.
+// `open` is lifted into Grid.tsx so the bottom bar's Add Widget button can
+// also open this same picker — one viewport-safe (centered, portal-rendered)
+// UI instead of that button's own small anchored dropdown, which had no
+// flip/shift and could run off-screen on narrow windows.
+export default function CommandPalette({ open, onOpenChange }: Props) {
   const { widgets, addWidget } = useWidgets();
   const { gridConfig } = useGridConfig();
   const { pushHistory } = useEditHistory();
   const { developerOptionsEnabled, t } = useSettings();
-  const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -27,14 +31,14 @@ export default function CommandPalette() {
     const handler = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'k' && (e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
         e.preventDefault();
-        setOpen(o => !o);
+        onOpenChange(o => !o);
       } else if (e.key === 'Escape' && open) {
-        setOpen(false);
+        onOpenChange(false);
       }
     };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [open]);
+  }, [open, onOpenChange]);
 
   useEffect(() => {
     if (open) { setQuery(''); inputRef.current?.focus(); }
@@ -51,13 +55,13 @@ export default function CommandPalette() {
   function addAndClose(type: WidgetType) {
     pushHistory('editHistory.addedWidget');
     addWidget(buildNewWidget(widgets, gridConfig.columns, type));
-    setOpen(false);
+    onOpenChange(false);
   }
 
   if (!open) return null;
 
   return createPortal(
-    <div className="sg-cmdk-backdrop" onPointerDown={() => setOpen(false)}>
+    <div className="sg-cmdk-backdrop" onPointerDown={() => onOpenChange(false)}>
       <div className="sg-cmdk-panel" onPointerDown={e => e.stopPropagation()}>
         <input
           ref={inputRef}

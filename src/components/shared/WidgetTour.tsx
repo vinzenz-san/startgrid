@@ -41,7 +41,7 @@ const STEPS: Step[] = [
   // only renders inside the bottom bar, which only appears while editing.
   { titleKey: 'tour.step3.title',           bodyKey: 'tour.step3.body', target: '.sg-idle-icons button:nth-child(2)', onAdvance: 'enableEditMode' },
   { titleKey: 'tour.editModeEnabled.title', bodyKey: 'tour.editModeEnabled.body' },
-  { titleKey: 'tour.step2.title',           bodyKey: 'tour.step2.body', target: '.sg-controls-add-widget .sg-widget-add-toggle' },
+  { titleKey: 'tour.step2.title',           bodyKey: 'tour.step2.body', target: '.sg-controls-add-widget' },
   { titleKey: 'tour.step4.title',           bodyKey: 'tour.step4.body', target: '.sg-widget' },
   { titleKey: 'tour.step5.title',           bodyKey: 'tour.step5.body', target: '.sg-widget' },
   { titleKey: 'tour.step6.title',           bodyKey: 'tour.step6.body' },
