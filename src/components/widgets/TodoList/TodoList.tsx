@@ -6,7 +6,7 @@ import { useGoogleAuth } from '../../../hooks/useGoogleAuth';
 import { useGoogleTasks } from '../../../hooks/useGoogleTasks';
 import { getValidToken } from '../../../lib/googleAuth';
 import { fetchTaskLists, type GoogleTaskList } from '../../../lib/googleTasksApi';
-import { isExtensionEnv } from '../../../lib/permissions';
+import { openLink, middleClickHandlers } from '../../../lib/openLink';
 import './TodoList.css';
 
 function generateId() {
@@ -17,15 +17,6 @@ function generateId() {
 // task (confirmed via search — no URL scheme exists for it), so this always
 // opens the app's own landing page; the user picks the list there themselves.
 const GOOGLE_TASKS_URL = 'https://tasks.google.com/tasks/';
-
-async function openGoogleTasks(): Promise<void> {
-  if (isExtensionEnv) {
-    const { default: browser } = await import('webextension-polyfill');
-    await browser.tabs.create({ url: GOOGLE_TASKS_URL });
-  } else {
-    window.open(GOOGLE_TASKS_URL, '_blank', 'noopener');
-  }
-}
 
 // ── Settings ───────────────────────────────────────────────────────────────
 
@@ -152,7 +143,8 @@ function GoogleTodoList({ data }: { data: TodoData }) {
             <button
               key={task.id}
               className="sg-todo-row sg-todo-row--readonly sg-todo-row--link"
-              onClick={() => void openGoogleTasks()}
+              onMouseDown={middleClickHandlers(GOOGLE_TASKS_URL).onMouseDown}
+              onClick={() => void openLink(GOOGLE_TASKS_URL)}
               title={t('widget.todoList.openInGoogleTasks')}
             >
               <span className={`sg-todo-check${task.status === 'completed' ? ' sg-todo-check--done' : ''}`}>

@@ -11,6 +11,7 @@ import { getForecastUrl, type ForecastProvider } from '../../../lib/forecastLink
 import { getWeatherCodeInfo } from '../../../lib/weatherCodes';
 import { resolveDisplayStyle, scaledFontSize } from '../../../lib/displayStyle';
 import { useClickDragGuard } from '../../../lib/clickDragGuard';
+import { openLink, middleClickHandlers } from '../../../lib/openLink';
 import './Weather.css';
 
 // Weather's old fixed sizes (icon 42 / temp 28 / condition 13 / feelslike+location
@@ -276,8 +277,9 @@ export default function Weather({ data }: Props) {
     ? getForecastUrl(data.forecastProvider ?? 'google', data)
     : null;
   const openForecast = forecastUrl
-    ? () => window.open(forecastUrl, '_blank', 'noopener')
+    ? () => void openLink(forecastUrl)
     : undefined;
+  const { onMouseDown: onForecastMiddleClick } = middleClickHandlers(forecastUrl);
 
   const dayFormatter = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
 
@@ -286,6 +288,7 @@ export default function Weather({ data }: Props) {
       className={`sg-weather sg-weather--align-${alignment}${data.allowOverflow ? ' sg-weather--overflow' : ''}${openForecast ? ' sg-weather--clickable' : ''}${showForecast ? ' sg-weather--with-forecast' : ''}`}
       style={wrapper}
       onPointerDown={onPointerDown}
+      onMouseDown={forecastUrl ? onForecastMiddleClick : undefined}
       onClick={e => { if (openForecast) guardClick(e, openForecast); }}
     >
       <div className="sg-weather-current">

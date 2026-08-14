@@ -6,6 +6,7 @@ import { SettingsRow, SettingsSlider, SettingsSwitch, Dropdown } from '../../sha
 import { useSettings } from '../../../contexts/SettingsContext';
 import { scaledFontSize } from '../../../lib/displayStyle';
 import { normalizeUrl } from '../../../lib/urlUtils';
+import { openLink } from '../../../lib/openLink';
 import type { TranslationKey } from '../../../i18n';
 import './Quicklinks.css';
 
@@ -69,7 +70,7 @@ function clipboardFallback(url: string, t: TFn) {
 function openInternalUrl(url: string, newTab: boolean, t: TFn) {
   const inExtension = typeof browser !== 'undefined' && !!browser.tabs;
   if (inExtension) {
-    const action = newTab ? browser.tabs.create({ url }) : browser.tabs.update({ url });
+    const action = newTab ? openLink(url, true) : browser.tabs.update({ url });
     action.catch(() => clipboardFallback(url, t));
   } else { clipboardFallback(url, t); }
 }

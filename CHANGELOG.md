@@ -2,6 +2,11 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.19.3] — Middle-click background tabs for all link widgets
+
+- Fixed middle-click not opening a background tab in Bookmark Search results, Weather's "open detailed forecast on click", RSS Feed entries, and To-Do's Google Tasks row — all four rendered non-anchor `div`/`button` elements with only a left-click handler, so the browser's native middle-click behavior never had anywhere to attach
+- New shared `src/lib/openLink.ts` (`openLink()` + `middleClickHandlers()`) replaces each widget's own bespoke tab-opening code, including Quicklinks', which is now the single implementation instead of four+ near-duplicates
+
 ## [1.19.2] — Obsidian Pinned Note: create/delete notes and folders
 
 - **New note / new folder**: the vault note picker's file explorer gains icon buttons to create a note or a folder directly from the current folder, instead of only picking existing notes. "New folder" seeds the folder with a first note (name optional, defaults to "Untitled") since the Local REST API plugin has no directory-creation endpoint — a folder only exists once it contains a file — and no rename endpoint either, so the note can still be renamed later from inside Obsidian itself

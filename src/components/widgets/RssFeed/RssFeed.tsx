@@ -3,21 +3,12 @@ import type { RssFeedData } from '../../../types/widget';
 import { SettingsRow, SettingsSlider, SettingsSwitch, Dropdown, ActionButton } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { useRssFeed } from '../../../hooks/useRssFeed';
-import { isExtensionEnv } from '../../../lib/permissions';
 import { useClickDragGuard } from '../../../lib/clickDragGuard';
+import { openLink, middleClickHandlers } from '../../../lib/openLink';
 import type { TranslationKey } from '../../../i18n';
 import './RssFeed.css';
 
 type Translate = (key: TranslationKey, vars?: Record<string, string | number>) => string;
-
-async function openUrl(url: string): Promise<void> {
-  if (isExtensionEnv) {
-    const { default: browser } = await import('webextension-polyfill');
-    await browser.tabs.create({ url });
-  } else {
-    window.open(url, '_blank', 'noopener');
-  }
-}
 
 function relativeTime(iso: string | undefined, t: Translate): string | undefined {
   if (!iso) return undefined;
@@ -163,7 +154,8 @@ export default function RssFeed({ data, onUpdateData }: Props) {
           <button
             className="sg-rss-item-link"
             onPointerDown={onPointerDown}
-            onClick={e => guardClick(e, () => item.link && openUrl(item.link))}
+            onMouseDown={middleClickHandlers(item.link).onMouseDown}
+            onClick={e => guardClick(e, () => item.link && void openLink(item.link))}
           >
             <span className="sg-rss-item-title">{item.title}</span>
             {showDescription && item.description && (

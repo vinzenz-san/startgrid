@@ -9,6 +9,7 @@ import { useBookmarkFolder } from '../BookmarkFolder/useBookmarkFolder';
 import type { BmNode } from '../BookmarkFolder/bookmarks.mock';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { isScreenshotMode } from '../../../lib/permissions';
+import { middleClickHandlers } from '../../../lib/openLink';
 import './BookmarkSearch.css';
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -59,8 +60,10 @@ function BookmarkRow({ node, onFolderClick, onBookmarkClick }: RowProps) {
     );
   }
 
+  const { onMouseDown } = middleClickHandlers(node.url);
+
   return (
-    <div className="sg-bks-item" onClick={() => node.url && onBookmarkClick(node.url)}>
+    <div className="sg-bks-item" onMouseDown={onMouseDown} onClick={() => node.url && onBookmarkClick(node.url)}>
       {icon}
       <div className="sg-bks-item-info">
         <span className="sg-bks-item-title">{node.title || hostname}</span>
