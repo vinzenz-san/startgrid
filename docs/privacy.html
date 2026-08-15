@@ -13,7 +13,7 @@
 <body>
   <div class="wrap">
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: 2026-08-13 (added disclosures for the Currency widget and the Iframe widget)</p>
+    <p class="updated">Last updated: 2026-08-15 (added the search permission disclosure)</p>
 
     <p>StartGrid is a browser extension (Firefox &amp; Chrome) that replaces your new tab page with a customizable widget grid. This policy explains what data StartGrid accesses, why, and how it's stored — in particular for the optional Google Calendar, Google Tasks, and Outlook Calendar/Mail widgets, which require signing in with your Google or Microsoft account, and the optional Obsidian widgets, which read notes from a vault on your own device. All of these are off by default and do nothing until you add the widget and connect it.</p>
 
@@ -59,6 +59,7 @@
       <tr><th>Permission</th><th>Why</th></tr>
       <tr><td><code>storage</code></td><td>Save your grid layout, widget settings, and account tokens in the browser's extension storage.</td></tr>
       <tr><td><code>identity</code></td><td>Open the Google or Microsoft sign-in window for the optional Calendar and Outlook widgets. Used only when you click "Connect".</td></tr>
+      <tr><td><code>search</code></td><td>Let the Bookmark Search widget's "no results" fallback hand your query to your browser's own search API, so it opens in your default search engine — whichever one you've chosen in your browser's settings — instead of a fixed one. StartGrid never sees or stores the query; the browser handles it directly. Only used when you type in the Bookmark Search widget and its Google/web-search fallback is enabled.</td></tr>
       <tr><td><code>bookmarks</code> (optional)</td><td>Read your bookmark tree for the Bookmark Folder, Bookmark Search, and Quicklinks widgets. Not granted at install — the browser asks the first time you add one of those widgets, and you can decline.</td></tr>
       <tr><td><code>http://127.0.0.1/*</code> (optional host permission)</td><td>Reach Obsidian on your own device for the optional Obsidian widgets. <code>127.0.0.1</code> is the loopback address — it refers to your computer and nothing else, so this grants no access to any website or to the internet at large. Not granted at install: the browser asks the first time you click "Allow local access" in an Obsidian widget's settings, and you can decline or revoke it later.</td></tr>
     </table>

@@ -8,7 +8,7 @@ import { SettingsSwitch } from '../../shared/Form';
 import { useBookmarkFolder } from '../BookmarkFolder/useBookmarkFolder';
 import type { BmNode } from '../BookmarkFolder/bookmarks.mock';
 import { useSettings } from '../../../contexts/SettingsContext';
-import { isScreenshotMode } from '../../../lib/permissions';
+import { isScreenshotMode, isExtensionEnv } from '../../../lib/permissions';
 import { middleClickHandlers } from '../../../lib/openLink';
 import './BookmarkSearch.css';
 
@@ -218,7 +218,7 @@ export default function BookmarkSearch({ data }: Props) {
       return;
     }
     if (e.key === 'Enter' && displayItems.length === 0 && !isInFolder && hasQuery && data.googleFallback) {
-      searchGoogle(query);
+      void searchWeb(query);
     }
   };
 
@@ -258,7 +258,16 @@ export default function BookmarkSearch({ data }: Props) {
     bookmarks.openUrl(url);
   }
 
-  function searchGoogle(q: string) {
+  async function searchWeb(q: string) {
+    if (isExtensionEnv) {
+      try {
+        const { default: browser } = await import('webextension-polyfill');
+        await browser.search.query({ text: q, disposition: 'NEW_TAB' });
+        return;
+      } catch {
+        // falls through to URL fallback (e.g. API unavailable/permission not granted)
+      }
+    }
     bookmarks.openUrl(`https://www.google.com/search?q=${encodeURIComponent(q)}`);
   }
 
@@ -306,7 +315,7 @@ export default function BookmarkSearch({ data }: Props) {
           <div className="sg-bks-empty">
             <span className="sg-bks-empty-icon">🔍</span>
             <span className="sg-bks-empty-text">{t('widget.bookmarkSearch.noResults')}</span>
-            <button className="sg-bks-grant-btn" onClick={() => searchGoogle(query)}>
+            <button className="sg-bks-grant-btn" onClick={() => void searchWeb(query)}>
               {t('widget.bookmarkSearch.searchGoogleFor', { query })}
             </button>
           </div>

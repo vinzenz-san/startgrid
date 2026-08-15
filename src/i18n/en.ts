@@ -552,8 +552,8 @@ export const en = {
   // ── Bookmark Search widget ───────────────────────────────────────────────
   'widget.bookmarkSearch.maxResults':       'Max results',
   'widget.bookmarkSearch.focusShortcut':    'Focus shortcut',
-  'widget.bookmarkSearch.googleFallback':   'Fall back to Google search',
-  'widget.bookmarkSearch.searchGoogleFor':  'Search Google for "{{query}}"',
+  'widget.bookmarkSearch.googleFallback':   'Fall back to web search',
+  'widget.bookmarkSearch.searchGoogleFor':  'Search the web for "{{query}}"',
   'widget.bookmarkSearch.searchPlaceholder':'Search bookmarks…',
   'widget.bookmarkSearch.previewBadge':     'Preview data (browser preview)',
   'widget.bookmarkSearch.loading':          'Loading…',

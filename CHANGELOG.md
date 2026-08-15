@@ -2,6 +2,12 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.19.6] — Bookmark Search fallback now respects your default search engine
+
+- Fixed Bookmark Search's "no results" fallback hardcoding `google.com/search` — it now calls the browser's `search` API (`browser.search.query`) so it opens results in whichever search engine you've actually set as default, on both Chrome and Firefox. This was also the cause of a Chrome Web Store rejection ("multiple unrelated purposes": a New Tab override paired with a search box that didn't go through the Search API), which this fixes
+- Added the `search` permission to both manifests and documented it in the privacy policy
+- Weather's "open detailed forecast" link is unaffected and still lets you pick Google/Windy/WetterOnline — the Search API only ever targets your one default engine, which would have removed that choice
+
 ## [1.19.5] — Widget menu collision fix, dev panel & edit-mode polish
 
 - Fixed a widget's floating settings/context-menu panel rendering partially behind the Settings sidebar when both were open — `flip()`/`shift()` collision middleware now accounts for the sidebar's reserved width via a new `SettingsPanelBoundsContext`, steering the panel away instead of only avoiding the raw viewport edge; panel z-index also bumped above the sidebar as a fallback for when there's no room to flip into
