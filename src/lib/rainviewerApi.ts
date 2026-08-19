@@ -20,6 +20,14 @@ interface WeatherMapsResponse {
   };
 }
 
+function isWeatherMapsResponse(v: unknown): v is WeatherMapsResponse {
+  if (v === null || typeof v !== 'object') return false;
+  const r = v as Record<string, unknown>;
+  if (typeof r.host !== 'string' || r.radar === null || typeof r.radar !== 'object') return false;
+  const radar = r.radar as Record<string, unknown>;
+  return Array.isArray(radar.past) && Array.isArray(radar.nowcast);
+}
+
 export interface RadarTimeline {
   host: string;
   frames: RadarFrame[]; // past + nowcast, chronological
@@ -27,10 +35,13 @@ export interface RadarTimeline {
   pastCount: number;
 }
 
+/** Fetches RainViewer's current radar frame list (past + nowcast, chronological). */
 export async function fetchRadarTimeline(): Promise<RadarTimeline> {
   const res = await fetch(FRAMES_URL);
   if (!res.ok) throw new Error(`RainViewer request failed: ${res.status}`);
-  const json: WeatherMapsResponse = await res.json();
+  const raw = await res.json() as unknown;
+  if (!isWeatherMapsResponse(raw)) throw new Error('Malformed RainViewer response');
+  const json = raw;
   return {
     host: json.host,
     frames: [...json.radar.past, ...json.radar.nowcast],
@@ -38,6 +49,7 @@ export async function fetchRadarTimeline(): Promise<RadarTimeline> {
   };
 }
 
+/** Builds a Leaflet-style `{z}/{x}/{y}` tile URL template for a given radar frame. */
 export function radarTileUrlTemplate(host: string, frame: RadarFrame): string {
   return `${host}${frame.path}/${TILE_SIZE}/{z}/{x}/{y}/${COLOR_SCHEME}/${SMOOTH}_${SNOW}.png`;
 }

@@ -5,7 +5,7 @@ import { BackgroundMode, BackgroundPanel, BackgroundPosition, UnsplashConfig, On
 import { COLOR_PRESETS } from '../../lib/presets';
 import { getAdaptiveColor } from '../../lib/colorUtils';
 import { MEDIA_PROXY_CONFIGURED } from '../../lib/mediaProxy';
-import { BACKGROUND_PROVIDERS } from './providers';
+import { BACKGROUND_PROVIDERS } from '../../lib/backgroundProviders';
 import CustomColorPicker from '../shared/CustomColorPicker';
 import { SettingsSlider, SettingsRow, SettingsSwitch, Dropdown } from '../shared/Form';
 import UnsplashSettings from './UnsplashSettings';

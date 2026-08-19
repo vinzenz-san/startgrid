@@ -9,6 +9,17 @@ import { debounce, type Debounced } from '../lib/debounce';
 // after the value settles instead.
 const SAVE_DEBOUNCE_MS = 400;
 
+/**
+ * Bridges a single `browser.storage.sync` key into React state: loads the
+ * initial value, debounces writes (see `SAVE_DEBOUNCE_MS`) to stay under
+ * sync storage's write-rate limit, and listens for `onChanged` so the value
+ * stays in sync across tabs/devices without re-fetching. Writes are
+ * self-filtered by comparing against the last value this hook itself wrote,
+ * so a remote change doesn't get echoed back.
+ * @returns `[value, setValue, loaded]` — `loaded` is false until the initial
+ * read completes, useful for gating logic that shouldn't run against a
+ * still-hydrating default value.
+ */
 export function useStorage<T>(key: string, defaultValue: T) {
   const [value, setValue] = useState<T>(defaultValue);
   const [loaded, setLoaded] = useState(false);

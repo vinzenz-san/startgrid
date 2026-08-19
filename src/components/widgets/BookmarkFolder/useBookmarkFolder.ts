@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { BmNode } from './bookmarks.mock';
 import { MOCK_TREE, flattenNodes, findNode } from './bookmarks.mock';
 import { isExtensionEnv, isScreenshotMode, hasBookmarksPermission, requestBookmarksPermission } from '../../../lib/permissions';
+import { openLink } from '../../../lib/openLink';
 
 async function getBrowser() {
   const { default: browser } = await import('webextension-polyfill');
@@ -88,12 +89,7 @@ export function useBookmarkFolder() {
   }
 
   async function openUrl(url: string): Promise<void> {
-    if (isExtensionEnv) {
-      const browser = await getBrowser();
-      await browser.tabs.create({ url });
-    } else {
-      window.open(url, '_blank', 'noopener');
-    }
+    await openLink(url);
   }
 
   // Stable primitive for effect dependency arrays — lets widgets/settings

@@ -10,6 +10,12 @@ interface GridConfigContextType {
 
 const Ctx = createContext<GridConfigContextType | null>(null);
 
+/**
+ * Persists grid geometry (columns, cell size, gap) via `useStorage` and
+ * mirrors it onto CSS custom properties (`--grid-cols`, `--cell-w`, etc.) so
+ * Grid.css can consume it without a build step. Does not itself orchestrate
+ * widget rescaling on a config change — see `useApplyGridConfig` for that.
+ */
 export function GridConfigProvider({ children }: { children: ReactNode }) {
   const [storedGridConfig, setGridConfigRaw, loaded] = useStorage<GridConfig>('gridConfig', DEFAULT_GRID_CONFIG);
 

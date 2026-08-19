@@ -2,6 +2,7 @@ import type { Widget, WidgetType } from '../types/widget';
 import type { TranslationKey } from '../i18n';
 import { buildNewWidget } from './gridUtils';
 import { WIDGET_REGISTRY } from '../components/widgets/registry';
+import { assertWidget } from './widgetGuards';
 
 export interface PresetLayoutItem {
   type: WidgetType;
@@ -92,12 +93,12 @@ export function applyPreset(presetId: string, columns: number): Widget[] {
   if (preset.layout) {
     return preset.layout.map((item, i) => {
       const { defaultData, defaultStyle } = WIDGET_REGISTRY[item.type];
-      return {
+      return assertWidget({
         id: `w-preset-${Date.now()}-${i}`, type: item.type, col: item.col, row: item.row,
         w: item.w, h: item.h,
         data: item.data ? { ...defaultData as object, ...item.data } : defaultData,
         ...defaultStyle,
-      } as Widget;
+      });
     });
   }
 
@@ -114,11 +115,11 @@ export function applyPreset(presetId: string, columns: number): Widget[] {
       // widget is the same width, as Focus's clock+search is, that lines
       // them up on a shared center the same as a single centered column would.
       const col = Math.max(1, Math.floor((columns - defaultSize.w) / 2) + 1);
-      placed.push({
+      placed.push(assertWidget({
         id: `w-preset-${Date.now()}-${i}`, type, col, row,
         w: defaultSize.w, h: defaultSize.h, data: defaultData,
         ...defaultStyle,
-      } as Widget);
+      }));
       return;
     }
     // Built up sequentially against `placed` so each new widget avoids every
@@ -126,7 +127,7 @@ export function applyPreset(presetId: string, columns: number): Widget[] {
     // use — just called in a loop here instead of once per user click
     // (buildNewWidget already merges the widget type's defaultStyle in).
     const widget = buildNewWidget(placed, columns, type);
-    placed.push({ ...widget, id: `w-preset-${Date.now()}-${i}` } as Widget);
+    placed.push(assertWidget({ ...widget, id: `w-preset-${Date.now()}-${i}` }));
   });
   return placed;
 }

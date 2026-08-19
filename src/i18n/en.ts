@@ -624,6 +624,7 @@ export const en = {
   'widget.quicklinks.couldNotReadImage':        'Could not read image.',
   'widget.quicklinks.couldNotReadFile':         'Could not read file.',
   'widget.quicklinks.internalUrlClipboard':     "Firefox security restricts opening this link directly. The URL '{{url}}' has been copied to your clipboard.",
+  'widget.quicklinks.confirmFileUrl':           'This will open a local file: {{url}}. Continue?',
   'widget.quicklinks.unsupportedUrlScheme':     "This link type isn't supported.",
 
 

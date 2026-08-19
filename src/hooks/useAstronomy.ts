@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { storageLocal } from '../lib/storageLocal';
 import { BackgroundConfig } from '../types/background';
-import { fetchApodImage } from '../components/Background/providers/astronomy';
+import { fetchApodImage } from '../lib/astronomyApi';
 
 interface ApodCache {
   url: string;
@@ -25,6 +25,12 @@ function resolveDateKey(config: BackgroundConfig): string {
   return todayKey();
 }
 
+/**
+ * Fetches and caches NASA's Astronomy Picture of the Day for the Background
+ * widget's `astronomy` mode, keyed by date (today, or a custom pick). A
+ * video-of-the-day response resolves to `null` and clears any stale cached
+ * image, letting the provider fall back to its gradient.
+ */
 export function useAstronomy(
   config: BackgroundConfig,
   setImageUrl: (url: string | null) => void,

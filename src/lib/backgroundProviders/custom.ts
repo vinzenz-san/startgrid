@@ -1,4 +1,4 @@
-import { CustomImageConfig, BackgroundProviderDef } from '../../../types/background';
+import { CustomImageConfig, BackgroundProviderDef } from '../../types/background';
 
 export const customProvider: BackgroundProviderDef<CustomImageConfig> = {
   mode: 'custom',

@@ -1,5 +1,6 @@
 import type { Widget, WidgetType } from '../types/widget';
 import { WIDGET_REGISTRY } from '../components/widgets/registry';
+import { assertWidgetData } from './widgetGuards';
 
 function intersects(
   aCol: number, aRow: number, aW: number, aH: number,
@@ -41,10 +42,8 @@ export function findFreePosition(widgets: Widget[], columns: number, w: number, 
 export function buildNewWidget(widgets: Widget[], columns: number, type: WidgetType): Omit<Widget, 'id'> {
   const { defaultSize, defaultData, defaultStyle } = WIDGET_REGISTRY[type];
   const { col, row } = findFreePosition(widgets, columns, defaultSize.w, defaultSize.h);
-  // defaultData is `unknown` here — WidgetEntry type-erases it for dynamic
-  // lookup by `type` (see registry.tsx), each entry's own `satisfies` check
-  // already guarantees it actually matches `type`.
-  return { type, col, row, w: defaultSize.w, h: defaultSize.h, data: defaultData, ...defaultStyle } as Omit<Widget, 'id'>;
+  // See assertWidgetData's own doc for why this cast is needed and how it's checked.
+  return assertWidgetData({ type, col, row, w: defaultSize.w, h: defaultSize.h, data: defaultData, ...defaultStyle });
 }
 
 /** Like findFreePosition, but searches outward from a preferred (col, row)

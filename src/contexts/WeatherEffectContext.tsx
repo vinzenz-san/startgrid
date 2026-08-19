@@ -31,6 +31,13 @@ interface WeatherEffectCtx {
 
 const Ctx = createContext<WeatherEffectCtx | null>(null);
 
+/**
+ * Drives the full-page background weather effect (rain/snow overlay): stores
+ * the enabled flag + effect location, fetches live weather for that location
+ * via `useWeather`, and maps the weather code to an effect type. A dev-panel
+ * `devOverride` can force a specific effect type for visual testing without
+ * touching the live-derived `liveEffectType`.
+ */
 export function WeatherEffectProvider({ children }: { children: ReactNode }) {
   const [config, setConfig] = useStorage<WeatherEffectConfig>(STORAGE_KEY, DEFAULTS);
   const [devOverride, setDevOverride] = useState<WeatherEffectType | null>(null);

@@ -1,4 +1,4 @@
-import type { FeedItem } from '../../../lib/rssApi';
+import type { FeedItem } from './rssApi';
 
 // Used only in the web preview (docs/preview — no host/extension environment
 // to reliably reach the real proxy Worker from every visitor's browser/CORS

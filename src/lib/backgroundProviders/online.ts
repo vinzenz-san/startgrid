@@ -1,4 +1,4 @@
-import { OnlineImageConfig, BackgroundProviderDef } from '../../../types/background';
+import { OnlineImageConfig, BackgroundProviderDef } from '../../types/background';
 
 export const onlineImageProvider: BackgroundProviderDef<OnlineImageConfig> = {
   mode: 'online',

@@ -3,6 +3,7 @@ import { useStorage } from '../hooks/useStorage';
 import { darkenHex, mixHex, getAdaptiveColor } from '../lib/colorUtils';
 import { COLOR_PRESETS } from '../lib/presets';
 import { useSettings } from './SettingsContext';
+import { mergeDefaults } from '../lib/mergeDefaults';
 
 const STORAGE_KEY = 'sg:theme';
 
@@ -48,6 +49,13 @@ interface ThemeCtx extends ThemeConfig {
 
 const Ctx = createContext<ThemeCtx | null>(null);
 
+/**
+ * Owns global widget appearance (background color/preset, opacity, dim,
+ * gradient intensity, shadow, glass blur, font scale), persisted via
+ * `useStorage`. Resolves the effective color through `getAdaptiveColor`
+ * (light/dark-aware) and mirrors the result onto `--widget-bg-color` and
+ * related CSS custom properties consumed by widget styling.
+ */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useStorage<ThemeConfig>(STORAGE_KEY, DEFAULTS);
   const { colorScheme } = useSettings();
@@ -57,15 +65,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Backwards-compat: if stored data has the old boolean and no numeric intensity, seed from it
   const legacyIntensity = t.globalGradient === false ? 0 : 100;
   const safeTheme = {
-    globalColor:             t.globalColor             ?? DEFAULTS.globalColor,
-    globalColorScheme:       t.globalColorScheme        ?? DEFAULTS.globalColorScheme,
-    globalOpacity:           t.globalOpacity           ?? DEFAULTS.globalOpacity,
-    globalDim:               t.globalDim               ?? DEFAULTS.globalDim,
+    ...mergeDefaults(t, DEFAULTS),
     globalGradientIntensity: t.globalGradientIntensity ?? legacyIntensity,
-    widgetShadowOpacity:     t.widgetShadowOpacity     ?? DEFAULTS.widgetShadowOpacity,
-    globalGlassIntensity:    t.globalGlassIntensity    ?? DEFAULTS.globalGlassIntensity,
-    globalPresetId:          t.globalPresetId,
-    globalFontScale:         t.globalFontScale         ?? DEFAULTS.globalFontScale,
+    globalPresetId: t.globalPresetId,
   };
 
   useEffect(() => {

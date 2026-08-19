@@ -23,6 +23,11 @@ function resolveDateKey(config: BackgroundConfig): string {
   return todayKey();
 }
 
+/**
+ * Fetches and caches the Wikimedia "Picture of the Day" for the Background
+ * widget's `wikimedia` mode, keyed by date (today, or a custom pick) so
+ * switching back to an already-seen date reuses the cache instead of refetching.
+ */
 export function useWikimedia(
   config: BackgroundConfig,
   setImageUrl: (url: string | null) => void,

@@ -5,7 +5,7 @@ import type { QuickLink, QuicklinksData } from '../../../types/widget';
 import { SettingsRow, SettingsSlider, SettingsSwitch, Dropdown } from '../../shared/Form';
 import { useSettings } from '../../../contexts/SettingsContext';
 import { scaledFontSize } from '../../../lib/displayStyle';
-import { normalizeUrl } from '../../../lib/urlUtils';
+import { normalizeUrl, isDangerousUrlScheme } from '../../../lib/urlUtils';
 import { openLink } from '../../../lib/openLink';
 import type { TranslationKey } from '../../../i18n';
 import './Quicklinks.css';
@@ -68,6 +68,7 @@ function clipboardFallback(url: string, t: TFn) {
 }
 
 function openInternalUrl(url: string, newTab: boolean, t: TFn) {
+  if (/^file:/i.test(url) && !confirm(t('widget.quicklinks.confirmFileUrl', { url }))) return;
   const inExtension = typeof browser !== 'undefined' && !!browser.tabs;
   if (inExtension) {
     const action = newTab ? openLink(url, true) : browser.tabs.update({ url });
@@ -96,6 +97,7 @@ function LinkItem({ link, iconSize, showTitle, showWhiteBadge, textSize, applyTi
   const [faviconIdx, setFaviconIdx] = useState(0);
   const [customImgError, setCustomImgError] = useState(false);
   const isInternal = INTERNAL_URL.test(link.url);
+  const isDangerous = !isInternal && isDangerousUrlScheme(link.url);
   const label = displayTitle(link);
   const iconSource = link.iconSource ?? 'auto';
   const hostname = hostnameOf(link.url);
@@ -131,6 +133,16 @@ function LinkItem({ link, iconSize, showTitle, showWhiteBadge, textSize, applyTi
 
   const titleStyle = { fontSize: textSize };
   const tileStyle = applyTileWidth ? { width: iconTilePx(iconSize) } : undefined;
+
+  if (isDangerous) {
+    return (
+      <button className="sg-ql-link" style={tileStyle} title={t('widget.quicklinks.unsupportedUrlScheme')}
+        onClick={() => alert(t('widget.quicklinks.unsupportedUrlScheme'))}>
+        {iconContent}
+        {showTitle && <span className="sg-ql-title" style={titleStyle}>{label}</span>}
+      </button>
+    );
+  }
 
   if (isInternal) {
     return (
@@ -297,6 +309,13 @@ export function QuicklinksSettings({ data, onUpdateData }: SettingsProps) {
                   <div className="sg-ql-table-row">
                     <input className="sg-ql-input" placeholder={t('widget.quicklinks.urlPlaceholder')} draggable={false}
                       value={link.url} onChange={e => updateLink(link.id, { url: e.target.value })}
+                      onBlur={e => {
+                        const raw = e.target.value.trim();
+                        if (!raw) return;
+                        const normalized = normalizeUrl(raw);
+                        if (!normalized) { alert(t('widget.quicklinks.unsupportedUrlScheme')); updateLink(link.id, { url: '' }); return; }
+                        if (normalized !== link.url) updateLink(link.id, { url: normalized });
+                      }}
                       onPointerDown={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}
                       onDragStart={e => e.stopPropagation()} />
                     <input className="sg-ql-input" placeholder={t('widget.quicklinks.titlePlaceholder')} draggable={false}

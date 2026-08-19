@@ -16,6 +16,7 @@ function slugifyCityName(locationName: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
+/** Builds a deep link to an external forecast site for the given provider; returns `null` if the required location data isn't available. */
 export function getForecastUrl(
   provider: ForecastProvider,
   { latitude, longitude, locationName }: Pick<WeatherData, 'latitude' | 'longitude' | 'locationName'>,

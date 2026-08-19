@@ -1,4 +1,4 @@
-import { UnsplashConfig, BackgroundProviderDef } from '../../../types/background';
+import { UnsplashConfig, BackgroundProviderDef } from '../../types/background';
 
 export const unsplashProvider: BackgroundProviderDef<UnsplashConfig> = {
   mode: 'unsplash',

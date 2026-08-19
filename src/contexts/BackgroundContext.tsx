@@ -2,8 +2,9 @@ import { createContext, useContext, useState, useEffect, useRef, ReactNode } fro
 import { storage } from '../lib/storage';
 import { storageLocal } from '../lib/storageLocal';
 import { debounce, type Debounced } from '../lib/debounce';
+import { createFastCache } from '../lib/fastCache';
 import { BackgroundConfig, DEFAULT_BG } from '../types/background';
-import { resolveBackgroundCss } from '../components/Background/providers';
+import { resolveBackgroundCss } from '../lib/backgroundProviders';
 import { useSettings } from './SettingsContext';
 import { useUnsplash, UnsplashAttribution } from '../hooks/useUnsplash';
 import { useBing } from '../hooks/useBing';
@@ -20,55 +21,11 @@ const FAST_BING_URL_KEY = 'sg:bing:fastUrl';
 const FAST_APOD_URL_KEY = 'sg:apod:fastUrl';
 const FAST_WIKIMEDIA_URL_KEY = 'sg:wikimedia:fastUrl';
 
-function readFastConfig(): BackgroundConfig | null {
-  try {
-    const raw = localStorage.getItem(FAST_CONFIG_KEY);
-    return raw ? (JSON.parse(raw) as BackgroundConfig) : null;
-  } catch { return null; }
-}
-function writeFastConfig(cfg: BackgroundConfig): void {
-  try { localStorage.setItem(FAST_CONFIG_KEY, JSON.stringify(cfg)); } catch {}
-}
-
-function readFastUrl(): string | null {
-  try { return localStorage.getItem(FAST_URL_KEY); } catch { return null; }
-}
-function writeFastUrl(url: string | null): void {
-  try {
-    if (url) localStorage.setItem(FAST_URL_KEY, url);
-    else localStorage.removeItem(FAST_URL_KEY);
-  } catch {}
-}
-
-function readFastBingUrl(): string | null {
-  try { return localStorage.getItem(FAST_BING_URL_KEY); } catch { return null; }
-}
-function writeFastBingUrl(url: string | null): void {
-  try {
-    if (url) localStorage.setItem(FAST_BING_URL_KEY, url);
-    else localStorage.removeItem(FAST_BING_URL_KEY);
-  } catch {}
-}
-
-function readFastApodUrl(): string | null {
-  try { return localStorage.getItem(FAST_APOD_URL_KEY); } catch { return null; }
-}
-function writeFastApodUrl(url: string | null): void {
-  try {
-    if (url) localStorage.setItem(FAST_APOD_URL_KEY, url);
-    else localStorage.removeItem(FAST_APOD_URL_KEY);
-  } catch {}
-}
-
-function readFastWikimediaUrl(): string | null {
-  try { return localStorage.getItem(FAST_WIKIMEDIA_URL_KEY); } catch { return null; }
-}
-function writeFastWikimediaUrl(url: string | null): void {
-  try {
-    if (url) localStorage.setItem(FAST_WIKIMEDIA_URL_KEY, url);
-    else localStorage.removeItem(FAST_WIKIMEDIA_URL_KEY);
-  } catch {}
-}
+const fastConfig      = createFastCache<BackgroundConfig>(FAST_CONFIG_KEY, { json: true });
+const fastUrl          = createFastCache<string>(FAST_URL_KEY);
+const fastBingUrl      = createFastCache<string>(FAST_BING_URL_KEY);
+const fastApodUrl      = createFastCache<string>(FAST_APOD_URL_KEY);
+const fastWikimediaUrl = createFastCache<string>(FAST_WIKIMEDIA_URL_KEY);
 
 interface BackgroundCtx {
   config: BackgroundConfig;
@@ -112,17 +69,27 @@ interface BackgroundCtx {
 
 const Ctx = createContext<BackgroundCtx | null>(null);
 
+/**
+ * Owns the New Tab background: the `BackgroundConfig` (persisted to
+ * `storage.sync`, debounced) plus custom-image data (`storage.local`), and
+ * wires in the per-provider fetch hooks (`useUnsplash`/`useBing`/
+ * `useAstronomy`/`useWikimedia`) whose results feed `resolveBackgroundCss`
+ * (`lib/backgroundProviders`) to produce the final CSS. Every piece of state
+ * also has a synchronous localStorage "fast cache" mirror (`createFastCache`)
+ * so the correct background paints on the very first frame instead of
+ * flashing to `DEFAULT_BG` while async storage hydrates.
+ */
 export function BackgroundProvider({ children }: { children: ReactNode }) {
   const { colorScheme } = useSettings();
   const isDark = colorScheme !== 'light';
 
   // Initialise synchronously from localStorage fast-path — avoids first-frame flash
-  const [config, setConfigState]            = useState<BackgroundConfig>(() => readFastConfig() ?? DEFAULT_BG);
+  const [config, setConfigState]            = useState<BackgroundConfig>(() => fastConfig.read() ?? DEFAULT_BG);
   const [customImageUrl, setCustomImageUrl] = useState<string | null>(null);
-  const [unsplashImageUrl, setUnsplashImageUrlRaw] = useState<string | null>(readFastUrl);
-  const [bingImageUrl, setBingImageUrlRaw]  = useState<string | null>(readFastBingUrl);
-  const [apodImageUrl, setApodImageUrlRaw]  = useState<string | null>(readFastApodUrl);
-  const [wikimediaImageUrl, setWikimediaImageUrlRaw] = useState<string | null>(readFastWikimediaUrl);
+  const [unsplashImageUrl, setUnsplashImageUrlRaw] = useState<string | null>(() => fastUrl.read());
+  const [bingImageUrl, setBingImageUrlRaw]  = useState<string | null>(() => fastBingUrl.read());
+  const [apodImageUrl, setApodImageUrlRaw]  = useState<string | null>(() => fastApodUrl.read());
+  const [wikimediaImageUrl, setWikimediaImageUrlRaw] = useState<string | null>(() => fastWikimediaUrl.read());
   const [loaded, setLoaded]                 = useState(false);
   const lastSaved                           = useRef('');
   const debouncedSyncSave                   = useRef<Debounced<[BackgroundConfig]> | null>(null);
@@ -132,22 +99,22 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
 
   const setUnsplashImageUrl = (url: string | null) => {
     setUnsplashImageUrlRaw(url);
-    writeFastUrl(url);
+    fastUrl.write(url);
   };
 
   const setBingImageUrl = (url: string | null) => {
     setBingImageUrlRaw(url);
-    writeFastBingUrl(url);
+    fastBingUrl.write(url);
   };
 
   const setApodImageUrl = (url: string | null) => {
     setApodImageUrlRaw(url);
-    writeFastApodUrl(url);
+    fastApodUrl.write(url);
   };
 
   const setWikimediaImageUrl = (url: string | null) => {
     setWikimediaImageUrlRaw(url);
-    writeFastWikimediaUrl(url);
+    fastWikimediaUrl.write(url);
   };
 
   const { attribution, isFetching, error, fetchNow } = useUnsplash(config, setUnsplashImageUrl);
@@ -165,7 +132,7 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
         const c = cfg as BackgroundConfig;
         lastSaved.current = JSON.stringify(c);
         setConfigState(c);
-        writeFastConfig(c);
+        fastConfig.write(c);
       }
       if (img) setCustomImageUrl(img as string);
       setLoaded(true);
@@ -184,13 +151,13 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
     const serialized = JSON.stringify(config);
     if (serialized === lastSaved.current) return;
     lastSaved.current = serialized;
-    writeFastConfig(config);
+    fastConfig.write(config);
     debouncedSyncSave.current!(config);
   }, [config, loaded]);
 
   const setConfig = (cfg: BackgroundConfig) => {
     setConfigState(cfg);
-    writeFastConfig(cfg); // write immediately so fast-path is always current
+    fastConfig.write(cfg); // write immediately so fast-path is always current
   };
 
   const setCustomImage = (dataUrl: string) => {

@@ -1,5 +1,5 @@
-import { getAdaptiveColor } from '../../../lib/colorUtils';
-import { ColorConfig, BackgroundProviderDef, BackgroundRenderCtx } from '../../../types/background';
+import { getAdaptiveColor } from '../colorUtils';
+import { ColorConfig, BackgroundProviderDef, BackgroundRenderCtx } from '../../types/background';
 
 // customColor + customColorScheme is the single stored anchor; the
 // counterpart for whichever theme is currently active is derived

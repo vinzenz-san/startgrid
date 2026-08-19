@@ -1,3 +1,4 @@
+/** Converts HSV (h: 0-360, s/v: 0-1) to a `#rrggbb` hex string. */
 export function hsv2hex(h: number, s: number, v: number): string {
   const f = (n: number) => {
     const k = (n + h / 60) % 6;
@@ -6,6 +7,7 @@ export function hsv2hex(h: number, s: number, v: number): string {
   return `#${f(5).toString(16).padStart(2, '0')}${f(3).toString(16).padStart(2, '0')}${f(1).toString(16).padStart(2, '0')}`;
 }
 
+/** Converts a `#rrggbb` hex string to HSV as `[h(0-360), s(0-1), v(0-1)]`. */
 export function hex2hsv(hex: string): [number, number, number] {
   const h = hex.replace('#', '').padEnd(6, '0');
   const r = parseInt(h.slice(0, 2), 16) / 255;
@@ -24,6 +26,7 @@ export function hex2hsv(hex: string): [number, number, number] {
   return [hue, s, v];
 }
 
+/** Darkens a hex color toward black by `factor` (0-1). */
 export function darkenHex(hex: string, factor = 0.45): string {
   const h = hex.replace('#', '');
   const r = Math.round(parseInt(h.slice(0, 2), 16) * (1 - factor));
@@ -32,6 +35,7 @@ export function darkenHex(hex: string, factor = 0.45): string {
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
+/** Linearly interpolates between two hex colors; `t=0` returns `a`, `t=1` returns `b`. */
 export function mixHex(a: string, b: string, t: number): string {
   const ha = a.replace('#', '').padEnd(6, '0');
   const hb = b.replace('#', '').padEnd(6, '0');
@@ -41,6 +45,7 @@ export function mixHex(a: string, b: string, t: number): string {
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${bl.toString(16).padStart(2, '0')}`;
 }
 
+/** Lightens a hex color toward white by `factor` (0-1). */
 export function lightenHex(hex: string, factor = 0.2): string {
   const h = hex.replace('#', '');
   const r = Math.min(255, Math.round(parseInt(h.slice(0, 2), 16) + (255 - parseInt(h.slice(0, 2), 16)) * factor));
@@ -49,15 +54,18 @@ export function lightenHex(hex: string, factor = 0.2): string {
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
+/** Builds a 3-stop diagonal CSS gradient (darker → base → slightly-less-dark) from one hex color. */
 export function generateGradient(hex: string): string {
   return `linear-gradient(135deg, ${darkenHex(hex, 0.5)} 0%, ${hex} 50%, ${darkenHex(hex, 0.35)} 100%)`;
 }
 
+/** Converts a `#rrggbb` hex string to `[r, g, b]` (0-255 each). */
 export function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace('#', '').padEnd(6, '0');
   return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
 }
 
+/** Converts a `#rrggbb` hex string to HSL as `[h(0-360), s(0-100), l(0-100)]`. */
 export function hex2hsl(hex: string): [number, number, number] {
   const [rr, gg, bb] = hexToRgb(hex);
   const r = rr / 255, g = gg / 255, b = bb / 255;
@@ -73,6 +81,7 @@ export function hex2hsl(hex: string): [number, number, number] {
   return [h, s * 100, l * 100];
 }
 
+/** Converts HSL (h: any, wraps; s/l: 0-100, clamped) to a `#rrggbb` hex string. */
 export function hsl2hex(h: number, s: number, l: number): string {
   const hh = ((h % 360) + 360) % 360;
   const ss = Math.max(0, Math.min(100, s)) / 100;

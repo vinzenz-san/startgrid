@@ -1,5 +1,4 @@
-import { AstronomyConfig, BackgroundProviderDef } from '../../../types/background';
-import { MEDIA_PROXY_URL } from '../../../lib/mediaProxy';
+import { MEDIA_PROXY_URL } from './mediaProxy';
 
 // NASA APOD API. When APP_MEDIA_PROXY_URL is set (see .env.example), requests
 // go through the Cloudflare Worker in worker/api-proxy.ts, which attaches the
@@ -24,10 +23,6 @@ if (MEDIA_PROXY_URL) {
   }
   APOD_BASE = `https://api.nasa.gov/planetary/apod?api_key=${NASA_API_KEY || 'DEMO_KEY'}`;
 }
-
-// Dark space-themed fallback — used when NASA's Picture of the Day is a
-// video (media_type !== 'image') or the fetch fails outright.
-const FALLBACK_CSS = 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)';
 
 export interface ApodImageResult {
   url: string;
@@ -58,13 +53,3 @@ export async function fetchApodImage(date?: string): Promise<ApodImageResult | n
   if (!imageUrl) throw new Error('No image in APOD response');
   return { url: imageUrl, title: data.title, copyright: data.copyright };
 }
-
-export const astronomyProvider: BackgroundProviderDef<AstronomyConfig> = {
-  mode: 'astronomy',
-  label: 'Astronomy Picture of the Day',
-  panel: 'astronomy',
-  resolveCss(_config, ctx) {
-    if (!ctx.apodImageUrl) return FALLBACK_CSS;
-    return `url("${ctx.apodImageUrl}") center center / cover no-repeat`;
-  },
-};

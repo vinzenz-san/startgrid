@@ -1,4 +1,4 @@
-import { BackgroundConfig, BackgroundMode, BackgroundProviderDef, BackgroundRenderCtx } from '../../../types/background';
+import { BackgroundConfig, BackgroundMode, BackgroundProviderDef, BackgroundRenderCtx } from '../../types/background';
 import { presetProvider } from './preset';
 import { colorProvider, gradientProvider } from './color';
 import { customProvider } from './custom';
@@ -24,11 +24,13 @@ const BACKGROUND_PROVIDERS: Record<BackgroundMode, BackgroundProviderDef> = {
   wikimedia:      wikimediaProvider      as BackgroundProviderDef,
 };
 
+/** Resolves the current background's CSS via its mode's provider; falls back to a flat dark color if the mode has no registered provider. */
 export function resolveBackgroundCss(config: BackgroundConfig, ctx: BackgroundRenderCtx): string {
   const provider = BACKGROUND_PROVIDERS[config.mode];
   return provider ? provider.resolveCss(config, ctx) : '#0f1117';
 }
 
+/** Human-readable label for a background mode, for use in settings UI. */
 export function getProviderLabel(mode: BackgroundMode): string {
   return BACKGROUND_PROVIDERS[mode]?.label ?? mode;
 }

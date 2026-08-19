@@ -23,6 +23,11 @@ interface Params {
   enabled: boolean;
 }
 
+/**
+ * Fetches a multi-day daily forecast for a lat/lon, caching to
+ * `storage.local` with a 1-hour TTL (forecasts change far slower than
+ * current conditions). No-ops entirely while `enabled` is false.
+ */
 export function useWeatherForecast({ latitude, longitude, units, days, enabled }: Params) {
   const hasLocation = latitude !== undefined && longitude !== undefined;
 

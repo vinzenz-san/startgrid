@@ -36,6 +36,11 @@ function isEditableTarget(target: EventTarget | null): boolean {
   return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable;
 }
 
+/**
+ * Undo stack (max 10 entries) for layout/grid edits, wired to Ctrl/Cmd+Z.
+ * Requires both `WidgetProvider` and `GridConfigProvider` above it in the
+ * tree since an undo restores both widgets and gridConfig together.
+ */
 export function EditHistoryProvider({ children }: { children: ReactNode }) {
   const { widgets, replaceAllWidgets } = useWidgets();
   const { gridConfig, setGridConfig } = useGridConfig();

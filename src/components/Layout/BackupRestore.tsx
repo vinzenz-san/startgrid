@@ -1,4 +1,5 @@
 import { SETTINGS_DEFAULTS } from '../../contexts/SettingsContext';
+import { isAllowedLinkUrl } from '../../lib/openLink';
 
 // Backup / restore / factory-reset storage logic. Pure functions — SettingsPanel
 // renders the Data Management UI and calls directly into these.
@@ -111,6 +112,32 @@ interface BackupEnvelope {
   local: Record<string, unknown>;
 }
 
+const HAS_URL_SCHEME = /^[a-z][a-z0-9+.-]*:/i;
+const ICON_KEY_PATTERN = /icon/i;
+
+/** Recursively walks a parsed backup tree and throws on the first string
+ *  value that looks like a URL (has an explicit scheme) but isn't safe to
+ *  store/render later — icon fields get a `data:image/` carve-out (StartGrid
+ *  itself writes uploaded-icon data URIs there), everything else must pass
+ *  the same scheme allowlist used before ever opening a link (lib/openLink.ts). */
+function assertNoDangerousUrls(value: unknown, keyHint?: string): void {
+  if (typeof value === 'string') {
+    if (!HAS_URL_SCHEME.test(value)) return;
+    if (keyHint && ICON_KEY_PATTERN.test(keyHint) && value.startsWith('data:image/')) return;
+    if (!isAllowedLinkUrl(value)) {
+      throw new Error(`Backup contains a disallowed URL${keyHint ? ` in "${keyHint}"` : ''}.`);
+    }
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) assertNoDangerousUrls(item, keyHint);
+    return;
+  }
+  if (value && typeof value === 'object') {
+    for (const [k, v] of Object.entries(value)) assertNoDangerousUrls(v, k);
+  }
+}
+
 function isValidEnvelope(data: unknown): data is BackupEnvelope {
   if (!data || typeof data !== 'object') return false;
   const d = data as Record<string, unknown>;
@@ -155,6 +182,8 @@ export function importBackup(file: File): Promise<void> {
         if (!isValidEnvelope(parsed)) {
           throw new Error('Invalid backup file. Expected a Startpage backup with version, sync, and local keys.');
         }
+        assertNoDangerousUrls(parsed.sync);
+        assertNoDangerousUrls(parsed.local);
         await writeAllStorage(parsed.sync, withoutSensitiveKeys(parsed.local));
         resolve();
       } catch (err) {

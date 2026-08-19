@@ -23,6 +23,12 @@ export interface MsAuthState {
   disconnect: () => Promise<void>;
 }
 
+/**
+ * Global Microsoft OAuth connection state, backed by `storage.local` rather
+ * than per-widget state — listens for `storage.onChanged` so connecting or
+ * disconnecting from one widget's settings immediately reflects in every
+ * other mounted widget that reads this hook, without a shared context.
+ */
 export function useMsAuth(): MsAuthState {
   const [isConnected,  setIsConnected]  = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -31,9 +37,15 @@ export function useMsAuth(): MsAuthState {
 
   // Read initial auth state from storage on mount
   useEffect(() => {
+    let cancelled = false;
+
     checkIsMsConnected().then(connected => {
+      if (cancelled) return;
       setIsConnected(connected);
-      if (connected) getConnectedMsEmail().then(setEmail);
+      if (connected) getConnectedMsEmail().then(email => {
+        if (cancelled) return;
+        setEmail(email);
+      });
     });
 
     // React to storage changes from any other widget / tab that triggers
@@ -52,12 +64,14 @@ export function useMsAuth(): MsAuthState {
 
     if (isExtension) {
       import('webextension-polyfill').then(({ default: b }) => {
+        if (cancelled) return;
         browser = b;
         browser.storage.local.onChanged.addListener(listener);
       });
     }
 
     return () => {
+      cancelled = true;
       browser?.storage.local.onChanged.removeListener(listener);
     };
   }, []);

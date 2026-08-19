@@ -49,20 +49,24 @@ export default function ExcalidrawEmbed({ target }: { target: string }) {
       }
 
       setState({ status: 'loading' });
-      const { paths } = await getVaultIndex();
-      const notePath = resolveExcalidrawPath(paths, target);
-      if (!notePath) {
-        if (!cancelled) setState({ status: 'unavailable', reason: 'UNRESOLVED' });
-        return;
-      }
+      try {
+        const { paths } = await getVaultIndex();
+        const notePath = resolveExcalidrawPath(paths, target);
+        if (!notePath) {
+          if (!cancelled) setState({ status: 'unavailable', reason: 'UNRESOLVED' });
+          return;
+        }
 
-      const result = await fetchExcalidrawSvg(notePath);
-      if (cancelled) return;
-      if (!result.svg) {
-        setState({ status: 'unavailable', reason: result.errorCode ?? 'HTTP_ERROR' });
-        return;
+        const result = await fetchExcalidrawSvg(notePath);
+        if (cancelled) return;
+        if (!result.svg) {
+          setState({ status: 'unavailable', reason: result.errorCode ?? 'HTTP_ERROR' });
+          return;
+        }
+        setState({ status: 'ready', dataUri: svgToDataUri(result.svg), isStale: result.isStale });
+      } catch {
+        if (!cancelled) setState({ status: 'unavailable', reason: 'HTTP_ERROR' });
       }
-      setState({ status: 'ready', dataUri: svgToDataUri(result.svg), isStale: result.isStale });
     }
 
     run();

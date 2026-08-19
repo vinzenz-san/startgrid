@@ -8,6 +8,12 @@ interface EditModeContextType {
 
 const EditModeContext = createContext<EditModeContextType | null>(null);
 
+/**
+ * Tracks whether the grid is in edit mode (drag/resize/settings enabled),
+ * toggleable via Ctrl/Cmd+E. Persists only a `locked` flag to storage.sync —
+ * edit mode itself always starts off on load, but a session left locked
+ * stays locked across a reload.
+ */
 export function EditModeProvider({ children }: { children: ReactNode }) {
   const [isEditMode, setIsEditMode] = useState(false);
 

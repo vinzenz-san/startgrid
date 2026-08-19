@@ -626,6 +626,7 @@ export const de: Record<TranslationKey, string> = {
   'widget.quicklinks.couldNotReadImage':        'Bild konnte nicht gelesen werden.',
   'widget.quicklinks.couldNotReadFile':         'Datei konnte nicht gelesen werden.',
   'widget.quicklinks.internalUrlClipboard':     'Firefox verhindert das direkte Öffnen dieses Links. Die URL „{{url}}“ wurde in die Zwischenablage kopiert.',
+  'widget.quicklinks.confirmFileUrl':           'Dadurch wird eine lokale Datei geöffnet: {{url}}. Fortfahren?',
   'widget.quicklinks.unsupportedUrlScheme':     'Dieser Link-Typ wird nicht unterstützt.',
 
 

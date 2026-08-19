@@ -25,11 +25,20 @@ interface GeocodeApiEntry {
   timezone: string;
 }
 
+function isGeocodeApiEntry(v: unknown): v is GeocodeApiEntry {
+  if (v === null || typeof v !== 'object') return false;
+  const e = v as Record<string, unknown>;
+  return typeof e.name === 'string' && typeof e.latitude === 'number'
+    && typeof e.longitude === 'number' && typeof e.timezone === 'string';
+}
+
+/** Looks up up to 5 candidate locations for a city-name query via Open-Meteo's geocoding API. */
 export async function geocodeCity(query: string): Promise<GeocodeResult[]> {
   const url = `${GEOCODE_ENDPOINT}?name=${encodeURIComponent(query)}&count=5&format=json`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Error ${res.status}`);
-  const data = await res.json() as { results?: GeocodeApiEntry[] };
+  const raw = await res.json() as { results?: unknown };
+  const data = { results: Array.isArray(raw.results) ? raw.results.filter(isGeocodeApiEntry) : [] };
   return (data.results ?? []).map(r => ({
     name: r.name,
     country: r.country,
@@ -58,6 +67,18 @@ interface ForecastApiResponse {
   };
 }
 
+function isForecastApiResponse(v: unknown): v is ForecastApiResponse {
+  if (v === null || typeof v !== 'object') return false;
+  const r = v as Record<string, unknown>;
+  if (r.current === undefined) return true; // caller handles "no current" itself
+  if (r.current === null || typeof r.current !== 'object') return false;
+  const c = r.current as Record<string, unknown>;
+  return typeof c.temperature_2m === 'number' && typeof c.apparent_temperature === 'number'
+    && typeof c.weather_code === 'number' && typeof c.wind_speed_10m === 'number'
+    && typeof c.is_day === 'number';
+}
+
+/** Fetches current conditions for a lat/lon; throws on a non-OK response or an unexpected response shape. */
 export async function fetchCurrentWeather(
   lat: number,
   lon: number,
@@ -72,7 +93,8 @@ export async function fetchCurrentWeather(
   });
   const res = await fetch(`${FORECAST_ENDPOINT}?${params.toString()}`);
   if (!res.ok) throw new Error(`Error ${res.status}`);
-  const data = await res.json() as ForecastApiResponse;
+  const data = await res.json() as unknown;
+  if (!isForecastApiResponse(data)) throw new Error('Malformed Open-Meteo forecast response');
   const c = data.current;
   if (!c) throw new Error('No current weather in response');
   return {
@@ -102,6 +124,17 @@ interface DailyForecastApiResponse {
   };
 }
 
+function isDailyForecastApiResponse(v: unknown): v is DailyForecastApiResponse {
+  if (v === null || typeof v !== 'object') return false;
+  const r = v as Record<string, unknown>;
+  if (r.daily === undefined) return true; // caller handles "no daily" itself
+  if (r.daily === null || typeof r.daily !== 'object') return false;
+  const d = r.daily as Record<string, unknown>;
+  return Array.isArray(d.time) && Array.isArray(d.weather_code)
+    && Array.isArray(d.temperature_2m_max) && Array.isArray(d.temperature_2m_min);
+}
+
+/** Fetches a multi-day daily forecast for a lat/lon; throws on a non-OK response or an unexpected response shape. */
 export async function fetchDailyForecast(
   lat: number,
   lon: number,
@@ -117,7 +150,8 @@ export async function fetchDailyForecast(
   });
   const res = await fetch(`${FORECAST_ENDPOINT}?${params.toString()}`);
   if (!res.ok) throw new Error(`Error ${res.status}`);
-  const data = await res.json() as DailyForecastApiResponse;
+  const data = await res.json() as unknown;
+  if (!isDailyForecastApiResponse(data)) throw new Error('Malformed Open-Meteo daily forecast response');
   const d = data.daily;
   if (!d) throw new Error('No daily forecast in response');
   return d.time.map((date, i) => ({

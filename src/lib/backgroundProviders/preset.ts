@@ -1,6 +1,6 @@
-import { COLOR_PRESETS } from '../../../lib/presets';
-import { getAdaptiveColor } from '../../../lib/colorUtils';
-import { PresetConfig, BackgroundProviderDef } from '../../../types/background';
+import { COLOR_PRESETS } from '../presets';
+import { getAdaptiveColor } from '../colorUtils';
+import { PresetConfig, BackgroundProviderDef } from '../../types/background';
 
 export const presetProvider: BackgroundProviderDef<PresetConfig> = {
   mode: 'preset',

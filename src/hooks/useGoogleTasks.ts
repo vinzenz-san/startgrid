@@ -20,6 +20,12 @@ interface Params {
   taskListId?: string;
 }
 
+/**
+ * Fetches Google Tasks for a given task list, caching to `storage.local`
+ * (15-minute TTL). Resolves to `'unauthenticated'` status if no valid OAuth
+ * token is available, and falls back to cached tasks (flagging `isStale`)
+ * rather than erroring when a refetch fails but a prior cache exists.
+ */
 export function useGoogleTasks({ taskListId }: Params) {
   const hasList = !!taskListId;
 

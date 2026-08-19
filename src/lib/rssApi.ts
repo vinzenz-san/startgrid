@@ -58,6 +58,7 @@ function parseAtomLink(entry: Element): string {
   return alt?.getAttribute('href') ?? links[0]?.getAttribute('href') ?? '';
 }
 
+/** Parses an RSS 2.0 or Atom XML document; throws if it's neither. */
 export function parseFeed(xmlText: string): ParsedFeed {
   const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
   if (doc.querySelector('parsererror')) {
@@ -113,6 +114,7 @@ function decodeXml(buf: ArrayBuffer, contentType: string | null): string {
   }
 }
 
+/** Fetches and parses a feed via the media-proxy `/rss` route (bypasses per-feed CORS restrictions); throws if the proxy is unconfigured or the fetch fails. */
 export async function fetchFeed(feedUrl: string): Promise<ParsedFeed> {
   if (!MEDIA_PROXY_URL) {
     throw new Error('Feed proxy not configured (APP_MEDIA_PROXY_URL unset)');

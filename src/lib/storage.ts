@@ -29,8 +29,10 @@ const localListeners = new Set<ChangeListener>();
 
 function addChangeListener(listener: ChangeListener): () => void {
   if (isExtension) {
+    let cancelled = false;
     let cleanup: (() => void) | null = null;
     import('webextension-polyfill').then(({ default: browser }) => {
+      if (cancelled) return;
       const wrapped = (
         changes: Record<string, { newValue?: unknown }>,
         area: string,
@@ -43,7 +45,10 @@ function addChangeListener(listener: ChangeListener): () => void {
       browser.storage.onChanged.addListener(wrapped);
       cleanup = () => browser.storage.onChanged.removeListener(wrapped);
     });
-    return () => cleanup?.();
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
   }
 
   localListeners.add(listener);

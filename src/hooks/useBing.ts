@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { storageLocal } from '../lib/storageLocal';
 import { BackgroundConfig } from '../types/background';
-import { fetchBingImage } from '../components/Background/providers/bing';
+import { fetchBingImage } from '../lib/backgroundProviders/bing';
 
 interface BingCache {
   url: string;
@@ -25,6 +25,11 @@ function resolveDateKey(config: BackgroundConfig): string {
   return todayKey();
 }
 
+/**
+ * Fetches and caches the Bing wallpaper of the day for the Background
+ * widget's `bing` mode, keyed by date (today, or a custom pick). Falls back
+ * to the last cached wallpaper (any date, flagging `isStale`) if a refetch fails.
+ */
 export function useBing(
   config: BackgroundConfig,
   setImageUrl: (url: string | null) => void,

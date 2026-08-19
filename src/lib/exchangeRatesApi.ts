@@ -15,11 +15,19 @@ interface LatestApiResponse {
   rates: Record<string, number>;
 }
 
+function isLatestApiResponse(v: unknown): v is LatestApiResponse {
+  if (v === null || typeof v !== 'object') return false;
+  const r = v as Record<string, unknown>;
+  return typeof r.base === 'string' && r.rates !== null && typeof r.rates === 'object';
+}
+
+/** Fetches the latest ECB-sourced exchange rates for `base` against `symbols` from Frankfurter. */
 export async function fetchExchangeRates(base: string, symbols: string[]): Promise<Record<string, number>> {
   const params = new URLSearchParams({ base, symbols: symbols.join(',') });
   const res = await fetch(`${LATEST_ENDPOINT}?${params.toString()}`);
   if (!res.ok) throw new Error(`Error ${res.status}`);
-  const data = await res.json() as LatestApiResponse;
+  const data = await res.json() as unknown;
+  if (!isLatestApiResponse(data)) throw new Error('Malformed exchange-rates response');
   return data.rates ?? {};
 }
 

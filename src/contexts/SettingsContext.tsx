@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, type ReactNode } from 'react';
 import { useStorage } from '../hooks/useStorage';
 import { lightenHex } from '../lib/colorUtils';
+import { mergeDefaults } from '../lib/mergeDefaults';
 import { DICTIONARIES, interpolate, type TranslationKey } from '../i18n';
 
 const STORAGE_KEY = 'sg:settings';
@@ -73,25 +74,17 @@ interface SettingsCtx extends AppSettings {
 
 const Ctx = createContext<SettingsCtx | null>(null);
 
+/**
+ * Owns app-wide settings (language, color scheme, accent color, developer
+ * options, etc.), persisted via `useStorage`. Also injects `--accent`/
+ * `--accent-hover` CSS variables and `data-scheme` onto `<html>`, and
+ * exposes the `t()` i18n translator derived from the current language.
+ */
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings, loaded] = useStorage<AppSettings>(STORAGE_KEY, SETTINGS_DEFAULTS);
 
   // Defensive: guard against undefined/null/partial from storage on first load or reset
-  const s: AppSettings = {
-    language:                (settings ?? SETTINGS_DEFAULTS).language                ?? SETTINGS_DEFAULTS.language,
-    colorScheme:             (settings ?? SETTINGS_DEFAULTS).colorScheme             ?? SETTINGS_DEFAULTS.colorScheme,
-    accentColor:             (settings ?? SETTINGS_DEFAULTS).accentColor             ?? SETTINGS_DEFAULTS.accentColor,
-    developerOptionsEnabled: (settings ?? SETTINGS_DEFAULTS).developerOptionsEnabled ?? SETTINGS_DEFAULTS.developerOptionsEnabled,
-    enableCustomContextMenu: (settings ?? SETTINGS_DEFAULTS).enableCustomContextMenu ?? SETTINGS_DEFAULTS.enableCustomContextMenu,
-    settingsPinned:          (settings ?? SETTINGS_DEFAULTS).settingsPinned          ?? SETTINGS_DEFAULTS.settingsPinned,
-    elementInspectorEnabled: (settings ?? SETTINGS_DEFAULTS).elementInspectorEnabled ?? SETTINGS_DEFAULTS.elementInspectorEnabled,
-    disableGridGlow:         (settings ?? SETTINGS_DEFAULTS).disableGridGlow         ?? SETTINGS_DEFAULTS.disableGridGlow,
-    disableWidgetGlow:       (settings ?? SETTINGS_DEFAULTS).disableWidgetGlow       ?? SETTINGS_DEFAULTS.disableWidgetGlow,
-    disableBackgroundBlur:   (settings ?? SETTINGS_DEFAULTS).disableBackgroundBlur   ?? SETTINGS_DEFAULTS.disableBackgroundBlur,
-    widgetTourSeen:          (settings ?? SETTINGS_DEFAULTS).widgetTourSeen          ?? SETTINGS_DEFAULTS.widgetTourSeen,
-    widgetTourSeenVersion:   (settings ?? SETTINGS_DEFAULTS).widgetTourSeenVersion   ?? SETTINGS_DEFAULTS.widgetTourSeenVersion,
-    editHistoryPanelEnabled: (settings ?? SETTINGS_DEFAULTS).editHistoryPanelEnabled ?? SETTINGS_DEFAULTS.editHistoryPanelEnabled,
-  };
+  const s: AppSettings = mergeDefaults<AppSettings>(settings, SETTINGS_DEFAULTS);
 
   // Inject --accent / --accent-hover CSS variables globally
   useEffect(() => {

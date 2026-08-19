@@ -28,16 +28,36 @@ interface RawTasksResponse {
   items?: GoogleTask[];
 }
 
+function isRawTaskListsResponse(v: unknown): v is RawTaskListsResponse {
+  if (v === null || typeof v !== 'object') return false;
+  const r = v as Record<string, unknown>;
+  return r.items === undefined || (Array.isArray(r.items)
+    && r.items.every(i => i !== null && typeof i === 'object' && typeof (i as Record<string, unknown>).id === 'string'));
+}
+
+function isRawTasksResponse(v: unknown): v is RawTasksResponse {
+  if (v === null || typeof v !== 'object') return false;
+  const r = v as Record<string, unknown>;
+  return r.items === undefined || (Array.isArray(r.items)
+    && r.items.every(i => i !== null && typeof i === 'object' && typeof (i as Record<string, unknown>).id === 'string'
+      && typeof (i as Record<string, unknown>).position === 'string'));
+}
+
+/** Lists the user's Google Tasks task lists; throws `'UNAUTHORIZED'` on a 401. */
 export async function fetchTaskLists(token: string): Promise<GoogleTaskList[]> {
   const res = await fetch(`${TASKS_BASE}/users/@me/lists`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (res.status === 401) throw new Error('UNAUTHORIZED');
   if (!res.ok) throw new Error(`Error ${res.status}`);
-  const data = await res.json() as RawTaskListsResponse;
+  const data = await res.json() as unknown;
+  // A guard failure means the response shape changed, not "no lists exist" —
+  // distinguish that from `items` genuinely being absent/empty by throwing.
+  if (!isRawTaskListsResponse(data)) throw new Error('Malformed Google Tasks lists response');
   return data.items ?? [];
 }
 
+/** Fetches all tasks (including completed/hidden) for a list, sorted by Google's own drag-order `position` field; throws `'UNAUTHORIZED'` on a 401. */
 export async function fetchTasks(token: string, taskListId: string): Promise<GoogleTask[]> {
   // showHidden must also be true, or tasks completed via first-party clients
   // (the Tasks web UI, mobile apps) are dropped even with showCompleted=true —
@@ -50,7 +70,8 @@ export async function fetchTasks(token: string, taskListId: string): Promise<Goo
   });
   if (res.status === 401) throw new Error('UNAUTHORIZED');
   if (!res.ok) throw new Error(`Error ${res.status}`);
-  const data = await res.json() as RawTasksResponse;
+  const data = await res.json() as unknown;
+  if (!isRawTasksResponse(data)) throw new Error('Malformed Google Tasks response');
   const items = data.items ?? [];
   // tasks.list documents no default sort order and has no orderBy param —
   // verified against Google's own reference, not assumed. The Tasks web UI

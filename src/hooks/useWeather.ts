@@ -19,6 +19,11 @@ interface Params {
   units: 'metric' | 'imperial';
 }
 
+/**
+ * Fetches current weather for a lat/lon, caching to `storage.local` with a
+ * 15-minute TTL. On a failed refetch it falls back to the last cached value
+ * (regardless of TTL) and flags `isStale` rather than surfacing a bare error.
+ */
 export function useWeather({ latitude, longitude, units }: Params) {
   const hasLocation = latitude !== undefined && longitude !== undefined;
 

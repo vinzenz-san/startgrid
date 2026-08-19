@@ -19,16 +19,26 @@ interface FeaturedContentResponse {
   };
 }
 
+function isFeaturedContentResponse(v: unknown): v is FeaturedContentResponse {
+  if (v === null || typeof v !== 'object') return false;
+  const r = v as Record<string, unknown>;
+  if (r.image === undefined) return true; // caller throws on missing image itself
+  return r.image !== null && typeof r.image === 'object';
+}
+
 // yyyy-MM-dd -> yyyy/MM/dd, as required by the feed endpoint.
 function formatDateForApi(date: string): string {
   return date.replaceAll('-', '/');
 }
 
+/** Fetches Wikimedia's "Picture of the Day" for `date` (defaults to today); throws if the response is malformed or has no image. */
 export async function fetchWikimediaImage(date?: string): Promise<WikimediaImageResult> {
   const formattedDate = formatDateForApi(date ?? new Date().toISOString().slice(0, 10));
   const res = await fetch(`${FEED_BASE}/${formattedDate}`);
   if (!res.ok) throw new Error(`Error ${res.status}`);
-  const data = await res.json() as FeaturedContentResponse;
+  const raw = await res.json() as unknown;
+  if (!isFeaturedContentResponse(raw)) throw new Error('Malformed Wikimedia response');
+  const data = raw;
   const url = data.image?.image?.source;
   if (!url) throw new Error('No image in Wikimedia response');
   return {

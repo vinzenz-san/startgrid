@@ -1,4 +1,4 @@
-import { ColorGradientConfig, BackgroundProviderDef } from '../../../types/background';
+import { ColorGradientConfig, BackgroundProviderDef } from '../../types/background';
 
 const DEFAULT_FROM = '#3498db';
 const DEFAULT_TO = '#9b59b6';
@@ -8,6 +8,7 @@ const DEFAULT_ANGLE = 135;
 // A "random gradient fetched from a third-party JSON endpoint" option is
 // deliberately not implemented: resolveCss must stay a pure, synchronous
 // function with no network side effects.
+/** Builds a linear or radial CSS gradient from a from/to color pair; pure and synchronous by design (no network-fetched gradient option). */
 export function resolveGradientCss(config: ColorGradientConfig): string {
   const from = config.from ?? DEFAULT_FROM;
   const to = config.to ?? DEFAULT_TO;

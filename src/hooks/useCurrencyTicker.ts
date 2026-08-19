@@ -19,6 +19,12 @@ interface Params {
   refreshIntervalMin?: number;
 }
 
+/**
+ * Fetches exchange rates for a base currency against a set of target
+ * currencies, caching to `storage.local` (TTL defaults to 60 minutes since
+ * upstream rates only update once daily). Falls back to the last cached
+ * rates on a failed refetch, flagging `isStale` instead of erroring out.
+ */
 export function useCurrencyTicker({ baseCurrency, targetCurrencies, refreshIntervalMin }: Params) {
   const base = baseCurrency ?? 'EUR';
   const targets = targetCurrencies ?? [];

@@ -1,4 +1,4 @@
-import { WikimediaConfig, BackgroundProviderDef } from '../../../types/background';
+import { WikimediaConfig, BackgroundProviderDef } from '../../types/background';
 
 // Dark space-themed fallback — same constant used by astronomy.ts — shown
 // when the feed fetch fails or hasn't resolved yet.

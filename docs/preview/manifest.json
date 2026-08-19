@@ -21,6 +21,6 @@
   "optional_host_permissions": [
     "http://127.0.0.1/*"
   ],
-  "version": "1.19.6",
+  "version": "1.19.7",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqWdMnfZ4y0x7GB1t72znw4BNBMEfAbCMIOfqJm0rGeNPB1uoHN/waqRdvihW6MsshZ88Qlyd3q3rZP8/+kBcnDbZmbbLuUHYfLiVv6dduXWSnYvHq+xQpMOMJ74PHzA50rANGhIWcoh+LHZOMH2AJxhevmH6g0UF3xalAkRXhcmwyQMnTttPnadXXGbY0Onzw7iNqMyXTRBSovJise+ZZK/nFcWLjT6M9NZGCbyH7+zDu9l2BHjC7U5YWRkAuLcnvQsbk9ZFJBrzd697ul6cK9moeLghLXNLsBsnEH5Ennr2bgAenyqta0v65MSZicBa0Q13zs//dlkxStAMPFqeRwIDAQAB"
 }

@@ -1,5 +1,5 @@
-import { BingConfig, BackgroundProviderDef } from '../../../types/background';
-import { fetchBingImageDirect, BingImageResult } from '../../../lib/bingApi';
+import { BingConfig, BackgroundProviderDef } from '../../types/background';
+import { fetchBingImageDirect, BingImageResult } from '../bingApi';
 
 export type { BingImageResult };
 

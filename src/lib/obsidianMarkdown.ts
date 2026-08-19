@@ -48,6 +48,7 @@ function safeHref(href: string): string | null {
   return null;
 }
 
+/** Tokenizes one line/span of inline Markdown (bold, italic, code, links, wikilinks, embeds, tags) into `InlineToken`s — never HTML. */
 export function parseInline(source: string): InlineToken[] {
   const tokens: InlineToken[] = [];
   let cursor = 0;
@@ -135,6 +136,7 @@ function indentDepth(indent: string): number {
   return Math.min(Math.floor(spaces / 2), 4);
 }
 
+/** Splits raw Markdown source into block-level `MdBlock`s (headings, tasks, bullets, quotes, code fences, paragraphs), each tagged with its source `lineIndex`. */
 export function parseMarkdown(source: string): MdBlock[] {
   const lines = source.split(/\r?\n/);
   const blocks: MdBlock[] = [];

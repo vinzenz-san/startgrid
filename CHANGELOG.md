@@ -2,6 +2,13 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.19.7] — Quicklinks XSS fix, bookmark link safety, internal refactor & docs
+
+- **Security fix**: Quicklinks' link-edit field skipped URL-scheme validation (only the "add new link" field validated), and restoring a backup wrote its widget data to storage with no per-field sanitization — either path could plant a `javascript:` URL that executed when the tile was clicked. Both are now validated (edit field on blur, backup import via a recursive scheme check with an `isAllowedLinkUrl` allowlist), plus a render-time guard so a link that already carries a dangerous scheme is never rendered as a clickable tile, only a disabled one with a warning
+- Bookmark Search / Bookmark Folder's primary click path now goes through the same scheme allowlist (`openLink()`) as every other link-opening path in the app — previously it called `browser.tabs.create`/`window.open` directly with no validation
+- Fixed Excalidraw drawing embeds getting stuck on "Loading" forever if the Obsidian vault request failed, instead of falling back to the usual "Preview Unavailable" state
+- Internal: moved several fetch/CSS-resolution modules (RSS demo data, the Astronomy/APOD API client, all New Tab background providers) out of `src/components/` into `src/lib/`, fixing a dependency-layering inversion flagged by a code audit; added JSDoc across `src/hooks/`, `src/lib/`, `src/contexts/`; new `ARCHITECTURE.md` documenting the app's data flow, manifest/provider separation, and security model
+
 ## [1.19.6] — Bookmark Search fallback now respects your default search engine
 
 - Fixed Bookmark Search's "no results" fallback hardcoding `google.com/search` — it now calls the browser's `search` API (`browser.search.query`) so it opens results in whichever search engine you've actually set as default, on both Chrome and Firefox. This was also the cause of a Chrome Web Store rejection ("multiple unrelated purposes": a New Tab override paired with a search box that didn't go through the Search API), which this fixes

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { storageLocal } from '../lib/storageLocal';
 import { fetchFeed, type FeedItem } from '../lib/rssApi';
 import { isExtensionEnv } from '../lib/permissions';
-import { MOCK_FEED_ITEMS, MOCK_FEED_TITLE } from '../components/widgets/RssFeed/rssFeed.mock';
+import { MOCK_FEED_ITEMS, MOCK_FEED_TITLE } from '../lib/rssFeedMock';
 
 const DEFAULT_TTL_MIN = 30;
 
@@ -23,6 +23,12 @@ interface Params {
   refreshIntervalMin?: number;
 }
 
+/**
+ * Fetches and caches an RSS/Atom feed (via the shared feed-proxy), falling
+ * back to the last cached items (flagging `isStale`) on a failed refetch.
+ * In non-extension web preview with no cache and no reachable proxy, falls
+ * back further to labelled mock data (`isDemo`) rather than a bare error.
+ */
 export function useRssFeed({ feedUrl, refreshIntervalMin }: Params) {
   const hasFeed = !!feedUrl;
   const ttlMs = (refreshIntervalMin ?? DEFAULT_TTL_MIN) * 60 * 1000;

@@ -28,9 +28,11 @@ export function getSprite(key: SpriteKey): HTMLImageElement {
   return img;
 }
 
-// Resolves once every requested sprite has either loaded or failed — callers
-// don't need to block the animation loop on this, just kick it off before
-// seeding particles so the first frame isn't drawing half-loaded images.
+/**
+ * Resolves once every requested sprite has either loaded or failed — callers
+ * don't need to block the animation loop on this, just kick it off before
+ * seeding particles so the first frame isn't drawing half-loaded images.
+ */
 export function preloadSprites(keys: readonly SpriteKey[]): Promise<void> {
   return Promise.all(keys.map(key => {
     const img = getSprite(key);

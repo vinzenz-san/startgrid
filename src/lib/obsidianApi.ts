@@ -26,6 +26,25 @@ import { hasObsidianHostPermission } from './permissions';
 export const OBSIDIAN_CONN_KEY = 'sg_obsidian_conn';
 export const DEFAULT_BASE_URL  = 'http://127.0.0.1:27123';
 
+/** Strict check that a connection target is exactly the loopback host over
+ *  plain HTTP with no path/query/credentials — the browser permission
+ *  (`http://127.0.0.1/*`) can't itself be scoped to a single port (no port
+ *  syntax in match patterns), so this is the application-level backstop:
+ *  it rejects `localhost`, `0.0.0.0`, `[::1]`, or any other loopback alias
+ *  a user or malformed config might supply, accepting only the literal
+ *  `127.0.0.1` hostname. */
+export function isValidObsidianBaseUrl(url: string): boolean {
+  let parsed: URL;
+  try { parsed = new URL(url); } catch { return false; }
+  if (parsed.protocol !== 'http:') return false;
+  if (parsed.hostname !== '127.0.0.1') return false;
+  if (parsed.username || parsed.password) return false;
+  if (parsed.pathname !== '/' && parsed.pathname !== '') return false;
+  if (parsed.search || parsed.hash) return false;
+  const port = Number(parsed.port || '80');
+  return Number.isInteger(port) && port > 0 && port <= 65535;
+}
+
 export interface ObsidianConnection {
   baseUrl:    string;
   apiKey:     string;
@@ -66,8 +85,12 @@ export async function getConnection(): Promise<ObsidianConnection | null> {
 }
 
 export async function setConnection(conn: ObsidianConnection): Promise<void> {
+  const baseUrl = conn.baseUrl.replace(/\/+$/, '') || DEFAULT_BASE_URL;
+  if (!isValidObsidianBaseUrl(baseUrl)) {
+    throw new ObsidianError('HTTP_ERROR', 'Invalid Obsidian connection URL');
+  }
   await storageLocal.set(OBSIDIAN_CONN_KEY, {
-    baseUrl:   conn.baseUrl.replace(/\/+$/, '') || DEFAULT_BASE_URL,
+    baseUrl,
     apiKey:    conn.apiKey,
     vaultName: conn.vaultName,
   });
@@ -134,6 +157,11 @@ async function request(
 async function ready(): Promise<ObsidianConnection> {
   const conn = await getConnection();
   if (!conn) throw new ObsidianError('NOT_CONFIGURED');
+  // Defense-in-depth: catches a bad value that got into storage before this
+  // validation existed (e.g. from an older version).
+  if (!isValidObsidianBaseUrl(conn.baseUrl)) {
+    throw new ObsidianError('HTTP_ERROR', 'Invalid Obsidian connection URL');
+  }
   if (!(await hasObsidianHostPermission())) throw new ObsidianError('NO_PERMISSION');
   return conn;
 }
@@ -200,7 +228,10 @@ export async function listDirectory(path = ''): Promise<VaultEntry[]> {
   const conn = await ready();
   const encoded = path ? `${encodeVaultPath(path)}/` : '';
   const res = await request(conn, `/vault/${encoded}`, { accept: 'application/json' });
-  const data = await res.json() as { files?: string[] };
+  const raw = await res.json() as unknown;
+  const data = raw !== null && typeof raw === 'object' && Array.isArray((raw as { files?: unknown }).files)
+    ? raw as { files?: string[] }
+    : {};
   return (data.files ?? []).map(name => ({
     name: name.replace(/\/$/, ''),
     isDirectory: name.endsWith('/'),
@@ -220,11 +251,9 @@ export async function simpleSearch(query: string, contextLength = 100): Promise<
     method: 'POST',
     accept: 'application/json',
   });
-  const data = await res.json() as Array<{
-    filename?: string;
-    matches?: Array<{ context?: string }>;
-  }>;
-  return (Array.isArray(data) ? data : []).map(hit => ({
+  const raw = await res.json() as unknown;
+  const data: Array<{ filename?: string; matches?: Array<{ context?: string }> }> = Array.isArray(raw) ? raw : [];
+  return data.map(hit => ({
     path: hit.filename ?? '',
     context: hit.matches?.[0]?.context ?? '',
   })).filter(hit => hit.path);
@@ -271,11 +300,13 @@ export async function testConnection(candidate: ObsidianConnection): Promise<Con
 
   if (!(await hasObsidianHostPermission())) return { ok: false, code: 'NO_PERMISSION' };
   if (!conn.apiKey) return { ok: false, code: 'NOT_CONFIGURED' };
+  if (!isValidObsidianBaseUrl(conn.baseUrl)) return { ok: false, code: 'HTTP_ERROR' };
 
   let version: string | undefined;
   try {
     const res = await request(conn, '/', { anonymous: true, accept: 'application/json' });
-    const status = await res.json().catch(() => ({})) as { versions?: { self?: string } };
+    const raw = await res.json().catch(() => ({})) as unknown;
+    const status = raw !== null && typeof raw === 'object' ? raw as { versions?: { self?: string } } : {};
     version = status.versions?.self;
   } catch (err) {
     return { ok: false, code: err instanceof ObsidianError ? err.code : 'UNREACHABLE' };

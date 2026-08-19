@@ -21,6 +21,10 @@ const SEARCH_DEBOUNCE_MS = 450;
 // Accepts either a bare collection id/slug or a full Unsplash collection URL
 // (e.g. https://unsplash.com/de/kollektionen/3jMstqgu2e4/summer-light) and
 // returns just the id/slug segment, trimmed of whitespace.
+/**
+ * Extracts the collection id/slug from either a bare id/slug or a full
+ * Unsplash collection URL (e.g. `.../collections/3jMstqgu2e4/summer-light`).
+ */
 export function extractCollectionId(raw: string): string {
   const trimmed = raw.trim();
   const match = trimmed.match(/\/(?:collections|kollektionen)\/([a-zA-Z0-9_-]+)/i);
@@ -33,6 +37,14 @@ export function extractCollectionId(raw: string): string {
 const PROXY_URL = MEDIA_PROXY_URL;
 const UNSPLASH_API_ORIGIN = 'https://api.unsplash.com';
 
+/**
+ * Fetches and caches an Unsplash photo for the Background widget's
+ * `unsplash` mode (official/search/topics/collection sources, all proxied
+ * through the shared media-proxy Worker so the API key never ships client-side).
+ * Handles debounced refetch-on-query-change, a rotation timer (0 = fetch
+ * fresh on every new tab instead of on an interval), and the Unsplash
+ * download-location ping required whenever a photo is actually displayed.
+ */
 export function useUnsplash(
   config: BackgroundConfig,
   setImageUrl: (url: string | null) => void,

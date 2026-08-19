@@ -12,6 +12,7 @@ export const SETTINGS_PANEL_WIDTH = 340;
 // from that reserved strip instead of only avoiding the raw viewport edge.
 export const SettingsPanelBoundsContext = createContext(false);
 
+/** Whether the settings sidebar is currently occupying the right edge of the viewport. */
 export function useSettingsPanelVisible(): boolean {
   return useContext(SettingsPanelBoundsContext);
 }

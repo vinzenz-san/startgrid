@@ -38,6 +38,7 @@ export const WEATHER_CODE_MAP: Record<number, WeatherCodeInfo> = {
   95: THUNDERSTORM, 96: THUNDERSTORM, 99: THUNDERSTORM,
 };
 
+/** Looks up the icon/label for a WMO weather code; unknown codes fall back to `OVERCAST`. */
 export function getWeatherCodeInfo(code: number): WeatherCodeInfo {
   return WEATHER_CODE_MAP[code] ?? OVERCAST;
 }

@@ -349,5 +349,6 @@ export type Widget =
   | (WidgetBase & { type: 'todoList';       data: TodoData })
   | (WidgetBase & { type: 'currencyTicker'; data: CurrencyTickerData })
   | (WidgetBase & { type: 'rainRadar';      data: RainRadarData })
+  | (WidgetBase & { type: 'iframe';         data: IframeData })
   | (WidgetBase & { type: 'placeholder';    data: PlaceholderData })
   | (WidgetBase & { type: 'invisible-spacer'; data: SpacerData });

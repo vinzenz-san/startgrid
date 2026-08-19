@@ -27,6 +27,7 @@ export interface ProviderConfig {
 
 // ── PKCE helpers (Web Crypto — always available in extension pages) ────────────
 
+/** Base64url-encodes bytes (no padding, `+`/`/` swapped for `-`/`_`) per RFC 7636. */
 export function base64urlEncode(buf: Uint8Array): string {
   return btoa(String.fromCharCode(...buf))
     .replace(/\+/g, '-')
@@ -135,11 +136,13 @@ async function refreshAccessToken<T extends StoredAuthBase>(
 
 // ── Public generic API ──────────────────────────────────────────────────────────
 
+/** True if any auth (possibly expired) is stored for this provider config. */
 export async function checkIsConnectedGeneric(config: ProviderConfig): Promise<boolean> {
   const stored = await readStoredAuth(config.storageKey);
   return stored !== null;
 }
 
+/** Returns a valid access token, silently refreshing via `refreshAccessToken` if expired; `null` if unauthenticated or the refresh fails. */
 export async function getValidTokenGeneric<T extends StoredAuthBase>(
   config: ProviderConfig,
 ): Promise<string | null> {
@@ -152,17 +155,20 @@ export async function getValidTokenGeneric<T extends StoredAuthBase>(
   return refreshed?.accessToken ?? null;
 }
 
+/** Returns the display email decoded from the stored id_token, if any. */
 export async function getConnectedEmailGeneric(config: ProviderConfig): Promise<string | undefined> {
   const stored = await readStoredAuth(config.storageKey);
   return stored?.email;
 }
 
+/** Raw stored auth record for this provider, or `null` if never authenticated. */
 export async function readStoredAuthGeneric<T extends StoredAuthBase>(
   config: ProviderConfig,
 ): Promise<T | null> {
   return readStoredAuth<T>(config.storageKey);
 }
 
+/** Clears the stored auth record — client-side sign-out only. */
 export async function clearStoredAuthGeneric(config: ProviderConfig): Promise<void> {
   await clearStoredAuth(config.storageKey);
 }
