@@ -13,7 +13,7 @@
 <body>
   <div class="wrap">
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: 2026-08-15 (added the search permission disclosure)</p>
+    <p class="updated">Last updated: 2026-08-28 (Rain Radar's CARTO map tiles now go through StartGrid's Cloudflare Worker instead of directly to CARTO)</p>
 
     <p>StartGrid is a browser extension (Firefox &amp; Chrome) that replaces your new tab page with a customizable widget grid. This policy explains what data StartGrid accesses, why, and how it's stored — in particular for the optional Google Calendar, Google Tasks, and Outlook Calendar/Mail widgets, which require signing in with your Google or Microsoft account, and the optional Obsidian widgets, which read notes from a vault on your own device. All of these are off by default and do nothing until you add the widget and connect it.</p>
 
@@ -115,18 +115,19 @@
     <p>If you turn on the Weather widget's optional "Open detailed forecast on click" setting (off by default), clicking the widget opens a new browser tab to a forecast page at the provider you chose in its settings — Google Search, Windy, or WetterOnline. This is an ordinary outbound link, the same as clicking any other link on a web page: StartGrid does not send anything to that site itself, but your browser's normal navigation request (which includes your IP address and, depending on the provider, the city name or coordinates in the URL so the right forecast loads) goes directly to whichever site you picked, subject to that site's own privacy policy.</p>
 
     <h2>Rain Radar widget (map and radar tiles)</h2>
-    <p>The optional Rain Radar widget, if you add it, shows a map with a live precipitation overlay for a location you choose. It is off by default and does nothing until added. Rendering it requires two third-party tile services, contacted directly by your browser:</p>
+    <p>The optional Rain Radar widget, if you add it, shows a map with a live precipitation overlay for a location you choose. It is off by default and does nothing until added. Rendering it requires two tile services:</p>
     <ul>
-      <li><strong><a href="https://carto.com" target="_blank" rel="noopener">CARTO</a></strong> (<code>basemaps.cartocdn.com</code>) — supplies the base map image tiles (streets, borders, place names). Requests are for map tiles by coordinate grid reference, not a raw latitude/longitude query parameter, though the tiles requested do reveal the general area being viewed, the same as loading any online map.</li>
-      <li><strong><a href="https://www.rainviewer.com/api.html" target="_blank" rel="noopener">RainViewer</a></strong> (<code>api.rainviewer.com</code>, <code>tile.rainviewer.com</code>) — supplies the radar precipitation overlay, the same way.</li>
+      <li><strong><a href="https://carto.com" target="_blank" rel="noopener">CARTO</a></strong> (<code>basemaps.cartocdn.com</code>) — supplies the base map image tiles (streets, borders, place names). These requests are routed through StartGrid's Cloudflare Worker (like Unsplash and NASA below), which attaches an API key server-side — CARTO now requires one and no longer serves these tiles anonymously. Because the Worker makes the request, CARTO sees the Worker's network location, not yours. Requests are for map tiles by coordinate grid reference, not a raw latitude/longitude query parameter, though the tiles requested do reveal the general area being viewed, the same as loading any online map; the Worker does not log, store, or inspect this beyond what is needed to forward the call.</li>
+      <li><strong><a href="https://www.rainviewer.com/api.html" target="_blank" rel="noopener">RainViewer</a></strong> (<code>api.rainviewer.com</code>, <code>tile.rainviewer.com</code>) — supplies the radar precipitation overlay, contacted directly by your browser. This is a free public tile service that requires no API key or account; StartGrid's developer never receives or stores any of these requests, and it is not passed your Google Account, email, or any other personal data — only your IP address, as with any web request, and the map area currently in view.</li>
     </ul>
-    <p>Both are free public tile services that require no API key or account; StartGrid's developer never receives or stores any of these requests, and neither service is passed your Google Account, email, or any other personal data — only your IP address, as with any web request, and the map area currently in view. The city name and coordinates you configure for this widget are saved with its settings in the browser's sync storage described above; removing the widget removes them.</p>
+    <p>The city name and coordinates you configure for this widget are saved with its settings in the browser's sync storage described above; removing the widget removes them.</p>
 
     <h2>Other data StartGrid accesses</h2>
     <p>Optional background-image providers fetch a public photo URL and its attribution text. Each sends your IP address to the provider, as any web request does; none involves your Google Account or any personal data:</p>
     <ul>
       <li><strong>Unsplash</strong> — routed through StartGrid's Cloudflare Worker so the API key stays server-side. If you use search or collection mode, the search text or collection ID you type is included in the request. The photo itself is then loaded directly from Unsplash's image CDN.</li>
       <li><strong>NASA Astronomy Picture of the Day</strong> — routed through the same Worker for the same reason.</li>
+      <li><strong>CARTO map tiles (Rain Radar widget)</strong> — routed through the same Worker for the same reason; see "Rain Radar widget" above.</li>
       <li><strong>Bing daily wallpaper</strong> — fetched from the community-run mirror <code>bing.npanuhin.me</code> (not operated by Microsoft or by StartGrid), because Microsoft's own endpoint does not permit direct browser requests.</li>
       <li><strong>Wikimedia Picture of the Day</strong> — fetched directly from <code>api.wikimedia.org</code>.</li>
       <li><strong>Online Image / custom icon URL</strong> — if you paste an image URL yourself, your browser loads it directly from whatever host you specified.</li>
