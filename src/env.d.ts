@@ -6,6 +6,7 @@ interface ImportMetaEnv {
   readonly APP_VERSION: string;
   readonly APP_MEDIA_PROXY_URL: string;
   readonly APP_NASA_API_KEY: string;
+  readonly APP_CARTO_API_KEY: string;
 }
 
 interface ImportMeta {

@@ -6,6 +6,7 @@ import { SettingsRow, SettingsSlider, Dropdown, ActionButton, IconButton } from 
 import { useSettings } from '../../../contexts/SettingsContext';
 import { geocodeCity, type GeocodeResult } from '../../../lib/openMeteoApi';
 import { fetchRadarTimeline, radarTileUrlTemplate, type RadarTimeline } from '../../../lib/rainviewerApi';
+import { MEDIA_PROXY_URL } from '../../../lib/mediaProxy';
 import './RainRadar.css';
 
 const DEFAULT_ZOOM = 9; // city-level, not the country-wide view zoom 6 gave
@@ -31,6 +32,32 @@ const SEARCH_DEBOUNCE_MS = 450;
 // itself already burned us once), boost it with a CSS filter on the tile
 // layer's own container instead.
 const VOYAGER_FILTER = 'saturate(2.4) brightness(0.85) contrast(1.2)';
+
+// CARTO stopped serving basemaps.cartocdn.com tiles anonymously — an unkeyed
+// request now returns a real (small) tile stamped "API KEY REQUIRED" instead
+// of an error, so it fails silently rather than throwing. Free key:
+// carto.com/basemaps/apikey.
+//
+// When a Worker proxy is configured (every real build), tile requests go
+// through worker/api-proxy.ts's /carto/* route instead of straight to CARTO
+// — that route has its own, much higher rate-limit bucket
+// (TILE_RATE_LIMIT_MAX) separate from the Worker's default 60/min, since a
+// single map pan/zoom easily fires 15-30+ tile requests at once. This also
+// keeps the key out of the shipped extension bundle entirely, same
+// motivation as NASA_API_KEY.
+//
+// Without a proxy configured (a fresh clone doing local dev), falls back to
+// calling CARTO directly with APP_CARTO_API_KEY if set — safe to embed
+// client-side in that case since CARTO's tile URLs are designed to carry the
+// key in the query string, protected by the domain allowlist set at signup
+// rather than by secrecy.
+const CARTO_API_KEY = import.meta.env.APP_CARTO_API_KEY || '';
+
+function cartoTileUrl(style: string): string {
+  if (MEDIA_PROXY_URL) return `${MEDIA_PROXY_URL}/carto/${style}/{z}/{x}/{y}{r}.png`;
+  const base = `https://{s}.basemaps.cartocdn.com/${style}/{z}/{x}/{y}{r}.png`;
+  return CARTO_API_KEY ? `${base}?key=${CARTO_API_KEY}` : base;
+}
 
 // Deliberately no CSS opacity transition here: the two layers hold different
 // radar frames, so a gradual cross-fade between them shows both at reduced
@@ -202,14 +229,16 @@ export default function RainRadar({ data }: Props) {
   // Create the map once — initial zoom only; the next effect keeps zoom in
   // sync with settings changes without recreating the map.
   //
-  // Base tiles come from CARTO's free basemaps, not tile.openstreetmap.org:
+  // Base tiles come from CARTO's basemaps, not tile.openstreetmap.org:
   // OSM's own tile servers are volunteer-run and their Tile Usage Policy
   // (osm.wiki/Tile_usage_policy) explicitly disallows bulk/embedded use from
   // distributed apps like a browser extension — that's what the 403 "Referer
   // is required" block (osm.wiki/Blocked) was actually about, not a missing
-  // header. CARTO's basemaps are built on the same OSM data, explicitly
-  // permit this kind of use, and need no API key — just the attribution
-  // below, which the tile license requires (attributionControl must stay on).
+  // header. CARTO's basemaps are built on the same OSM data and explicitly
+  // permit this kind of use, but (unlike when this comment was first written)
+  // now require the free API key above — see CARTO_API_KEY — plus the
+  // attribution below, which the tile license requires (attributionControl
+  // must stay on).
   useEffect(() => {
     if (!mapRef.current || !hasLocation || leafletMapRef.current) return;
     const map = L.map(mapRef.current, {
@@ -224,7 +253,7 @@ export default function RainRadar({ data }: Props) {
       fadeAnimation: false,
     });
     const style = mapStyle === 'voyager' ? 'rastertiles/voyager' : (isDark ? 'dark_all' : 'light_all');
-    baseLayerRef.current = L.tileLayer(`https://{s}.basemaps.cartocdn.com/${style}/{z}/{x}/{y}{r}.png`, {
+    baseLayerRef.current = L.tileLayer(cartoTileUrl(style), {
       maxZoom: 19,
       subdomains: 'abcd',
       // Keep more off-screen tiles cached (default 2) so fast panning is
@@ -278,7 +307,7 @@ export default function RainRadar({ data }: Props) {
   // isDark exclusion above — recreating the map would drop them).
   useEffect(() => {
     const style = mapStyle === 'voyager' ? 'rastertiles/voyager' : (isDark ? 'dark_all' : 'light_all');
-    baseLayerRef.current?.setUrl(`https://{s}.basemaps.cartocdn.com/${style}/{z}/{x}/{y}{r}.png`);
+    baseLayerRef.current?.setUrl(cartoTileUrl(style));
     const el = baseLayerRef.current?.getContainer();
     if (el) el.style.filter = mapStyle === 'voyager' ? VOYAGER_FILTER : '';
   }, [isDark, mapStyle]);

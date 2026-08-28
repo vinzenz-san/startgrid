@@ -7,12 +7,15 @@
 // reasoning — see src/lib/msAuth.ts), /rss forwards to whatever feed URL the
 // caller passes via ?url= (most RSS/Atom feeds send no CORS headers, so the
 // extension can't fetch them directly without host_permissions — see
-// src/lib/rssApi.ts), everything else forwards to api.unsplash.com
-// (Client-ID auth header) — keeps a single Worker/deploy for all of these
-// rather than one per provider.
+// src/lib/rssApi.ts), /carto/* forwards to basemaps.cartocdn.com (key as a
+// query param, see src/components/widgets/RainRadar/RainRadar.tsx — it has
+// its own, much higher rate-limit bucket, see TILE_RATE_LIMIT_MAX below),
+// everything else forwards to api.unsplash.com (Client-ID auth header) —
+// keeps a single Worker/deploy for all of these rather than one per provider.
 export interface Env {
   UNSPLASH_ACCESS_KEY: string;
   NASA_API_KEY: string;
+  CARTO_API_KEY: string;
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
   MS_CLIENT_ID: string;
@@ -96,10 +99,20 @@ export function resolveAllowedOrigin(origin: string | null, env: Env): string | 
 const RATE_LIMIT_MAX = 60;
 const RATE_LIMIT_WINDOW_SECONDS = 60;
 
-async function checkRateLimit(ip: string, env: Env): Promise<boolean> {
-  const key = `rl:${ip}`;
+// CARTO base-map tiles get their own, much higher bucket: a single map
+// pan/zoom in the Rain Radar widget easily fires 15-30 tile requests at
+// once (Leaflet's keepBuffer prefetches beyond the viewport, and a zoom
+// level change reloads the whole visible set) — sharing the 60/min bucket
+// above would 429 the map into blank tiles after one or two interactions,
+// and burn the same widget's/other widgets' shared NASA/Unsplash budget
+// for the rest of the minute besides.
+const TILE_RATE_LIMIT_MAX = 300;
+
+async function checkRateLimit(ip: string, env: Env, bucket = 'rl'): Promise<boolean> {
+  const key = `${bucket}:${ip}`;
+  const max = bucket === 'rl' ? RATE_LIMIT_MAX : TILE_RATE_LIMIT_MAX;
   const current = Number((await env.RATE_LIMIT.get(key)) ?? '0');
-  if (current >= RATE_LIMIT_MAX) return false;
+  if (current >= max) return false;
   await env.RATE_LIMIT.put(key, String(current + 1), { expirationTtl: RATE_LIMIT_WINDOW_SECONDS });
   return true;
 }
@@ -112,6 +125,8 @@ const GOOGLE_TOKEN_PATH = '/google-token';
 const MS_TOKEN_UPSTREAM = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
 const MS_TOKEN_PATH = '/ms-token';
 const RSS_PATH = '/rss';
+const CARTO_UPSTREAM = 'https://basemaps.cartocdn.com';
+const CARTO_PREFIX = '/carto';
 
 async function relay(upstreamRes: Response, corsHeaders: Record<string, string>): Promise<Response> {
   const body = await upstreamRes.arrayBuffer();
@@ -126,13 +141,23 @@ async function relay(upstreamRes: Response, corsHeaders: Record<string, string>)
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    const url = new URL(request.url);
+    const isCartoPath = url.pathname.startsWith(CARTO_PREFIX);
     const origin = request.headers.get('Origin');
     const allowedOrigin = resolveAllowedOrigin(origin, env);
 
     // Refuse outright rather than relying on the browser to throw the
     // response away, so the keys behind this Worker can't be spent from an
     // unknown page — or, now, from a request that skips Origin entirely.
-    if (allowedOrigin === null) {
+    //
+    // /carto/* is exempt: Leaflet loads tiles as plain <img> elements, and
+    // confirmed live in Firefox, a cross-site no-cors image load from a
+    // moz-extension: page sends neither Origin nor Referer (Sec-Fetch-Site:
+    // cross-site, Sec-Fetch-Storage-Access: none) — origin-gating this path
+    // would permanently 403 every tile. There's no reliable per-caller signal
+    // available for an <img>-initiated request, so TILE_RATE_LIMIT_MAX below
+    // is this path's actual abuse control instead of origin-checking.
+    if (allowedOrigin === null && !isCartoPath) {
       return new Response(`Origin not allowed: ${origin ?? '(none)'}`, { status: 403 });
     }
 
@@ -152,11 +177,10 @@ export default {
     }
 
     const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
-    if (!(await checkRateLimit(ip, env))) {
+    const bucket = isCartoPath ? 'rl:carto' : 'rl';
+    if (!(await checkRateLimit(ip, env, bucket))) {
       return new Response('Rate limit exceeded', { status: 429, headers: corsHeaders });
     }
-
-    const url = new URL(request.url);
 
     if (url.pathname === GOOGLE_TOKEN_PATH) {
       if (request.method !== 'POST') {
@@ -219,6 +243,15 @@ export default {
       const params = new URLSearchParams(url.search);
       params.set('api_key', env.NASA_API_KEY);
       const upstreamRes = await fetch(`${NASA_UPSTREAM}${nasaPath}?${params}`);
+      return relay(upstreamRes, corsHeaders);
+    }
+
+    if (url.pathname.startsWith(CARTO_PREFIX)) {
+      // No {s} subdomain round-robin here — that was only ever to spread load
+      // across browser per-host connection limits on the client; a single
+      // Worker origin doesn't have that constraint.
+      const cartoPath = url.pathname.slice(CARTO_PREFIX.length) || '/';
+      const upstreamRes = await fetch(`${CARTO_UPSTREAM}${cartoPath}?key=${env.CARTO_API_KEY}`);
       return relay(upstreamRes, corsHeaders);
     }
 

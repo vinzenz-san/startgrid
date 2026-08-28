@@ -54,6 +54,10 @@ export default (env: { target?: string; production?: boolean; store?: boolean } 
   // with no private value needed (see README's build steps).
   const mediaProxyUrl = envVars.APP_MEDIA_PROXY_URL || '';
   const nasaApiKey = mediaProxyUrl ? '' : (envVars.APP_NASA_API_KEY || '');
+  // Same reasoning as nasaApiKey above: RainRadar.tsx only consults this in
+  // its no-proxy fallback branch, so blank it out once a proxy is configured
+  // rather than ship it as a dead-but-unprovable-dead string constant.
+  const cartoApiKey = mediaProxyUrl ? '' : (envVars.APP_CARTO_API_KEY || '');
 
   const config: Configuration = {
     entry: {
@@ -115,6 +119,7 @@ export default (env: { target?: string; production?: boolean; store?: boolean } 
       // rather than the build crashing on undefined.
       new rspack.DefinePlugin({
         'import.meta.env.APP_NASA_API_KEY': JSON.stringify(nasaApiKey),
+        'import.meta.env.APP_CARTO_API_KEY': JSON.stringify(cartoApiKey),
         'import.meta.env.APP_MEDIA_PROXY_URL': JSON.stringify(mediaProxyUrl),
         'import.meta.env.APP_VERSION': JSON.stringify(version),
       }),
