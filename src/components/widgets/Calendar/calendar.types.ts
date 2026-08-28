@@ -5,6 +5,7 @@ export interface CalendarData {
   showAllDay: boolean;           // include all-day events, default true
   viewMode?: 'agenda' | 'monthly'; // default 'agenda'
   firstDayOfWeek?: 0 | 1;         // 0=Sunday, 1=Monday; monthly view only, default 0
+  showWeekNumbers?: boolean;     // ISO week number column; monthly view only, default false
   calendarIds?: string[];        // Google calendar IDs to pull events from; 'primary' is the API's alias for the main calendar. Default ['primary']
 }
 

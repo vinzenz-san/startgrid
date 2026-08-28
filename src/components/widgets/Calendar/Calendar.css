@@ -152,6 +152,30 @@
 .sg-cal-empty-icon { font-size: 20px; opacity: 0.35; }
 .sg-cal-empty-text { font-size: 12px; opacity: 0.4; text-align: center; }
 
+.sg-cal-day-heading--today {
+  display: inline-flex;
+  align-items: center;
+  opacity: 1;
+  color: #fff;
+  background: var(--accent);
+  padding: 2px 9px;
+  margin: 5px 12px 4px;
+  border-radius: 999px;
+}
+
+.sg-cal-day-empty {
+  font-size: 12px;
+  opacity: 0.4;
+  padding: 0 12px 8px;
+}
+
+.sg-cal-day-body--today {
+  background: rgba(128, 128, 128, 0.13);
+  border-radius: var(--radius);
+  margin: 0 6px;
+  padding: 2px 0;
+}
+
 /* ── Skeleton loader ──────────────────────────────────────────────────────── */
 
 .sg-cal-skeleton-group {
@@ -394,6 +418,19 @@
   gap: 2px;
   flex: 1;
   min-height: 0;
+}
+
+.sg-cal-monthly-grid--weeks {
+  grid-template-columns: 18px repeat(7, 1fr);
+}
+
+.sg-cal-monthly-week-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 500;
+  opacity: 0.35;
 }
 
 .sg-cal-monthly-dow {

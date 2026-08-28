@@ -49,6 +49,7 @@ export function OutlookCalendarSettings({ data, onUpdateData }: SettingsProps) {
   const showAllDay = data.showAllDay ?? true;
   const viewMode   = data.viewMode   ?? 'agenda';
   const firstDayOfWeek = data.firstDayOfWeek ?? 1;
+  const showWeekNumbers = data.showWeekNumbers ?? false;
   const calendarIds = data.calendarIds ?? ['default'];
   const { isConnected, isConnecting, email, error, connect, disconnect } = useMsAuth();
   const { calendars } = useOutlookCalendarList(isConnected);
@@ -79,6 +80,12 @@ export function OutlookCalendarSettings({ data, onUpdateData }: SettingsProps) {
             value={firstDayOfWeek === 1 ? 'monday' : 'sunday'}
             onChange={v => onUpdateData({ firstDayOfWeek: v === 'monday' ? 1 : 0 })}
           />
+        </SettingsRow>
+      )}
+
+      {viewMode === 'monthly' && (
+        <SettingsRow label={t('widget.outlookCalendar.showWeekNumbers')}>
+          <SettingsSwitch checked={showWeekNumbers} onChange={v => onUpdateData({ showWeekNumbers: v })} />
         </SettingsRow>
       )}
 
@@ -165,6 +172,7 @@ export default function OutlookCalendar({ data }: Props) {
   const showAllDay = data.showAllDay ?? true;
   const viewMode   = data.viewMode   ?? 'agenda';
   const firstDayOfWeek = data.firstDayOfWeek ?? 1;
+  const showWeekNumbers = data.showWeekNumbers ?? false;
   const calendarIds = data.calendarIds ?? ['default'];
   const calendarIdsKey = calendarIds.join(',');
 
@@ -214,6 +222,7 @@ export default function OutlookCalendar({ data }: Props) {
             showAllDay={showAllDay}
             locale={locale}
             firstDayOfWeek={firstDayOfWeek}
+            showWeekNumbers={showWeekNumbers}
             prevMonthLabel={t('widget.outlookCalendar.prevMonth')}
             nextMonthLabel={t('widget.outlookCalendar.nextMonth')}
             allDayLabel={t('widget.outlookCalendar.allDay')}
@@ -238,6 +247,7 @@ export default function OutlookCalendar({ data }: Props) {
               todayLabel={t('widget.outlookCalendar.today')}
               tomorrowLabel={t('widget.outlookCalendar.tomorrow')}
               allDayLabel={t('widget.outlookCalendar.allDay')}
+              noEventsLabel={t('widget.outlookCalendar.noEventsForDay')}
               eventColor={eventColor}
             />
           ));

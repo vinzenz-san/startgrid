@@ -49,6 +49,7 @@ export function CalendarSettings({ data, onUpdateData }: SettingsProps) {
   const showAllDay = data.showAllDay ?? true;
   const viewMode   = data.viewMode   ?? 'agenda';
   const firstDayOfWeek = data.firstDayOfWeek ?? 1;
+  const showWeekNumbers = data.showWeekNumbers ?? false;
   const calendarIds = data.calendarIds ?? ['primary'];
   const { isConnected, isConnecting, email, error, connect, disconnect } = useGoogleAuth();
   const { calendars } = useGoogleCalendarList(isConnected);
@@ -79,6 +80,12 @@ export function CalendarSettings({ data, onUpdateData }: SettingsProps) {
             value={firstDayOfWeek === 1 ? 'monday' : 'sunday'}
             onChange={v => onUpdateData({ firstDayOfWeek: v === 'monday' ? 1 : 0 })}
           />
+        </SettingsRow>
+      )}
+
+      {viewMode === 'monthly' && (
+        <SettingsRow label={t('widget.calendar.showWeekNumbers')}>
+          <SettingsSwitch checked={showWeekNumbers} onChange={v => onUpdateData({ showWeekNumbers: v })} />
         </SettingsRow>
       )}
 
@@ -165,6 +172,7 @@ export default function Calendar({ data, onUpdateData: _onUpdateData }: Props) {
   const showAllDay = data.showAllDay ?? true;
   const viewMode   = data.viewMode   ?? 'agenda';
   const firstDayOfWeek = data.firstDayOfWeek ?? 1;
+  const showWeekNumbers = data.showWeekNumbers ?? false;
   const calendarIds = data.calendarIds ?? ['primary'];
   const calendarIdsKey = calendarIds.join(',');
 
@@ -214,6 +222,7 @@ export default function Calendar({ data, onUpdateData: _onUpdateData }: Props) {
             showAllDay={showAllDay}
             locale={locale}
             firstDayOfWeek={firstDayOfWeek}
+            showWeekNumbers={showWeekNumbers}
             prevMonthLabel={t('widget.calendar.prevMonth')}
             nextMonthLabel={t('widget.calendar.nextMonth')}
             allDayLabel={t('widget.calendar.allDay')}
@@ -238,6 +247,7 @@ export default function Calendar({ data, onUpdateData: _onUpdateData }: Props) {
               todayLabel={t('widget.calendar.today')}
               tomorrowLabel={t('widget.calendar.tomorrow')}
               allDayLabel={t('widget.calendar.allDay')}
+              noEventsLabel={t('widget.calendar.noEventsForDay')}
               eventColor={eventColor}
             />
           ));

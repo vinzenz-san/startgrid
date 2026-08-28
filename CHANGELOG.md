@@ -2,6 +2,13 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.19.8] — Calendar week numbers & agenda "Today" state
+
+- Monthly view (Calendar + Outlook Calendar) can now show an ISO-8601 calendar-week column, off by default (per-widget toggle)
+- Agenda view's "Today" heading is now a contrasted pill so it stands out from the other days, and always shows even when there are no events for today, with a "No events for this day" placeholder instead of skipping the day entirely
+- Today's entries (or the "no events" placeholder) now also sit on a subtle background pill, so the whole day-group reads as distinct, not just the heading
+- RSS Feed's timestamp ("X ago") now dims the same way Calendar's secondary text does (inherited color + opacity) instead of a separate fixed muted color, so both widgets' secondary text behaves consistently against the widget's own background/tint
+
 ## [1.19.7] — Quicklinks XSS fix, bookmark link safety, internal refactor & docs
 
 - **Security fix**: Quicklinks' link-edit field skipped URL-scheme validation (only the "add new link" field validated), and restoring a backup wrote its widget data to storage with no per-field sanitization — either path could plant a `javascript:` URL that executed when the tile was clicked. Both are now validated (edit field on blur, backup import via a recursive scheme check with an `isAllowedLinkUrl` allowlist), plus a render-time guard so a link that already carries a dangerous scheme is never rendered as a clickable tile, only a disabled one with a warning

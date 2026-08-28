@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import type { CalendarEvent } from './calendarEvent.types';
@@ -61,6 +61,8 @@ export function formatHeaderDate(locale: string): string {
 
 export interface DayGroup { dateKey: string; events: CalendarEvent[]; }
 
+// Always includes today's group, even with zero events, so the agenda view
+// can surface a "nothing today" state instead of just skipping the day.
 export function groupEventsByDay(events: CalendarEvent[], maxDays: number, showAllDay: boolean): DayGroup[] {
   const today = new Date(); today.setHours(0,0,0,0);
   const cutoff = new Date(today.getTime() + maxDays * 86_400_000);
@@ -76,10 +78,24 @@ export function groupEventsByDay(events: CalendarEvent[], maxDays: number, showA
     if (!map.has(key)) map.set(key, []);
     map.get(key)!.push(evt);
   }
+  const todayKey = localDateKey(new Date());
+  if (!map.has(todayKey)) map.set(todayKey, []);
   return Array.from(map.entries()).sort(([a],[b]) => a.localeCompare(b)).map(([dateKey, evts]) => ({
     dateKey,
     events: evts.sort((a,b) => (a.start.date?'':(a.start.dateTime??'')).localeCompare(b.start.date?'':(b.start.dateTime??''))),
   }));
+}
+
+// ISO 8601 week number (nearest-Thursday rule) — used by the monthly grid's
+// optional week-number column.
+export function getISOWeekNumber(date: Date): number {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = (d.getUTCDay() + 6) % 7; // Mon=0..Sun=6
+  d.setUTCDate(d.getUTCDate() - dayNum + 3); // nearest Thursday
+  const firstThursday = new Date(Date.UTC(d.getUTCFullYear(), 0, 4));
+  const firstThursdayDay = (firstThursday.getUTCDay() + 6) % 7;
+  firstThursday.setUTCDate(firstThursday.getUTCDate() - firstThursdayDay + 3);
+  return 1 + Math.round((d.getTime() - firstThursday.getTime()) / (7 * 86_400_000));
 }
 
 // ── SVG icons ─────────────────────────────────────────────────────────────────
@@ -141,11 +157,16 @@ export function EventRow({ event, allDayLabel, eventColor }: { event: CalendarEv
   );
 }
 
-export function DayGroupView({ group, locale, todayLabel, tomorrowLabel, allDayLabel, eventColor }: { group: DayGroup; locale: string; todayLabel: string; tomorrowLabel: string; allDayLabel: string; eventColor: (event: CalendarEvent) => string }) {
+export function DayGroupView({ group, locale, todayLabel, tomorrowLabel, allDayLabel, noEventsLabel, eventColor }: { group: DayGroup; locale: string; todayLabel: string; tomorrowLabel: string; allDayLabel: string; noEventsLabel: string; eventColor: (event: CalendarEvent) => string }) {
+  const isToday = group.dateKey === localDateKey(new Date());
   return (
     <div className="sg-cal-day">
-      <div className="sg-cal-day-heading">{formatDayHeading(group.dateKey, locale, todayLabel, tomorrowLabel)}</div>
-      {group.events.map(evt => <EventRow key={evt.id} event={evt} allDayLabel={allDayLabel} eventColor={eventColor}/>)}
+      <div className={`sg-cal-day-heading${isToday ? ' sg-cal-day-heading--today' : ''}`}>{formatDayHeading(group.dateKey, locale, todayLabel, tomorrowLabel)}</div>
+      <div className={`sg-cal-day-body${isToday ? ' sg-cal-day-body--today' : ''}`}>
+        {group.events.length === 0
+          ? <div className="sg-cal-day-empty">{noEventsLabel}</div>
+          : group.events.map(evt => <EventRow key={evt.id} event={evt} allDayLabel={allDayLabel} eventColor={eventColor}/>)}
+      </div>
     </div>
   );
 }
@@ -238,6 +259,7 @@ export interface MonthlyCalendarProps {
   showAllDay: boolean;
   locale: string;
   firstDayOfWeek: 0 | 1;
+  showWeekNumbers?: boolean;
   prevMonthLabel: string;
   nextMonthLabel: string;
   allDayLabel: string;
@@ -248,7 +270,7 @@ export interface MonthlyCalendarProps {
   eventColor: (event: CalendarEvent) => string;
 }
 
-export function MonthlyCalendar({ events, showAllDay, locale, firstDayOfWeek, prevMonthLabel, nextMonthLabel, allDayLabel, noEventsLabel, closeAriaLabel, locationLabel, descriptionLabel, eventColor }: MonthlyCalendarProps) {
+export function MonthlyCalendar({ events, showAllDay, locale, firstDayOfWeek, showWeekNumbers = false, prevMonthLabel, nextMonthLabel, allDayLabel, noEventsLabel, closeAriaLabel, locationLabel, descriptionLabel, eventColor }: MonthlyCalendarProps) {
   const [display, setDisplay] = useState(() => { const d = new Date(); d.setDate(1); d.setHours(0,0,0,0); return d; });
   const [selected, setSelected] = useState<SelectedDay | null>(null);
   const dowLabels = getDowLabels(locale, firstDayOfWeek);
@@ -270,6 +292,9 @@ export function MonthlyCalendar({ events, showAllDay, locale, firstDayOfWeek, pr
 
   const cells: (number|null)[] = [...Array(firstDow).fill(null), ...Array.from({length: daysInMonth}, (_,i)=>i+1)];
   while (cells.length % 7 !== 0) cells.push(null);
+  const rows: (number|null)[][] = [];
+  for (let i = 0; i < cells.length; i += 7) rows.push(cells.slice(i, i + 7));
+  const gridStart = new Date(year, month, 1 - firstDow);
 
   return (
     <div className="sg-cal-monthly">
@@ -278,28 +303,37 @@ export function MonthlyCalendar({ events, showAllDay, locale, firstDayOfWeek, pr
         <span className="sg-cal-monthly-nav-label">{monthLabel} {year}</span>
         <button className="sg-cal-monthly-nav-btn" onClick={() => setDisplay(new Date(year,month+1,1))} aria-label={nextMonthLabel}>›</button>
       </div>
-      <div className="sg-cal-monthly-grid">
+      <div className={`sg-cal-monthly-grid${showWeekNumbers ? ' sg-cal-monthly-grid--weeks' : ''}`}>
+        {showWeekNumbers && <div className="sg-cal-monthly-dow sg-cal-monthly-week-num"/>}
         {dowLabels.map((d,i) => <div key={i} className="sg-cal-monthly-dow">{d}</div>)}
-        {cells.map((day,i) => {
-          if (!day) return <div key={`e${i}`} className="sg-cal-monthly-cell sg-cal-monthly-cell--empty"/>;
-          const key = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-          const dayEvts = eventsByDay.get(key) ?? [];
+        {rows.map((row, ri) => {
+          const rowDate = new Date(gridStart); rowDate.setDate(gridStart.getDate() + ri * 7);
           return (
-            <div
-              key={key}
-              className={`sg-cal-monthly-cell${key===today?' sg-cal-monthly-cell--today':''}`}
-              onClick={e => setSelected({ dateKey: key, anchor: e.currentTarget.getBoundingClientRect() })}
-              role="button"
-              tabIndex={0}
-            >
-              <span className="sg-cal-monthly-day-num">{day}</span>
-              {dayEvts.length > 0 && (
-                <div className="sg-cal-monthly-dots">
-                  {dayEvts.slice(0,3).map(evt => <span key={evt.id} className="sg-cal-monthly-dot" style={{background:eventColor(evt)}}/>)}
-                  {dayEvts.length > 3 && <span className="sg-cal-monthly-more">+{dayEvts.length-3}</span>}
-                </div>
-              )}
-            </div>
+            <Fragment key={ri}>
+              {showWeekNumbers && <div className="sg-cal-monthly-week-num">{getISOWeekNumber(rowDate)}</div>}
+              {row.map((day, ci) => {
+                if (!day) return <div key={`e${ri}-${ci}`} className="sg-cal-monthly-cell sg-cal-monthly-cell--empty"/>;
+                const key = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                const dayEvts = eventsByDay.get(key) ?? [];
+                return (
+                  <div
+                    key={key}
+                    className={`sg-cal-monthly-cell${key===today?' sg-cal-monthly-cell--today':''}`}
+                    onClick={e => setSelected({ dateKey: key, anchor: e.currentTarget.getBoundingClientRect() })}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <span className="sg-cal-monthly-day-num">{day}</span>
+                    {dayEvts.length > 0 && (
+                      <div className="sg-cal-monthly-dots">
+                        {dayEvts.slice(0,3).map(evt => <span key={evt.id} className="sg-cal-monthly-dot" style={{background:eventColor(evt)}}/>)}
+                        {dayEvts.length > 3 && <span className="sg-cal-monthly-more">+{dayEvts.length-3}</span>}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </Fragment>
           );
         })}
       </div>

@@ -60,7 +60,8 @@
 }
 
 .sg-rss-item-time {
-  color: var(--text-muted);
+  color: inherit;
+  opacity: 0.45;
   font-size: calc(11px * var(--sg-font-scale, 1));
 }
 
