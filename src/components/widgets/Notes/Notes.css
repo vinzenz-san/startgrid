@@ -30,9 +30,9 @@
   text-align: right;
   font-size: 10px;
   font-variant-numeric: tabular-nums;
-  color: var(--text-muted);
+  color: inherit;
   padding: 3px 10px 5px;
-  opacity: 0.65;
+  opacity: 0.45;
   transition: color 0.2s, opacity 0.2s;
 }
 

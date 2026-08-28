@@ -17,7 +17,8 @@
 .sg-rss-stale-banner {
   list-style: none;
   font-size: calc(11px * var(--sg-font-scale, 1));
-  color: var(--text-muted);
+  color: inherit;
+  opacity: 0.6;
   background: color-mix(in srgb, var(--text) 6%, transparent);
   border-radius: 6px;
   padding: 4px 8px;
@@ -50,7 +51,8 @@
 }
 
 .sg-rss-item-desc {
-  color: var(--text-muted);
+  color: inherit;
+  opacity: 0.6;
   font-size: calc(12px * var(--sg-font-scale, 1));
   line-height: 1.3;
   display: -webkit-box;
@@ -82,12 +84,13 @@
 }
 
 .sg-rss-empty-text {
-  color: var(--text-muted);
+  color: inherit;
+  opacity: 0.6;
   font-size: calc(13px * var(--sg-font-scale, 1));
 }
 
 .sg-rss-empty-detail {
-  color: var(--text-muted);
+  color: inherit;
+  opacity: 0.45;
   font-size: calc(11px * var(--sg-font-scale, 1));
-  opacity: 0.8;
 }

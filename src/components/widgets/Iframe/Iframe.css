@@ -36,6 +36,7 @@
 }
 
 .sg-iframe-empty-text {
-  color: var(--text-muted);
+  color: inherit;
+  opacity: 0.6;
   font-size: calc(13px * var(--sg-font-scale, 1));
 }

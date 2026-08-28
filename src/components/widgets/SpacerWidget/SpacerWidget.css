@@ -38,7 +38,7 @@
 
 .sg-spacer-label {
   font-size: 10px;
-  color: var(--text-muted);
-  opacity: 0.6;
+  color: inherit;
+  opacity: 0.45;
   line-height: 1.4;
 }

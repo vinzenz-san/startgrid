@@ -91,7 +91,8 @@
 
 .sg-bf-breadcrumb-btn {
   font-size: 10.5px;
-  color: var(--text-muted);
+  color: inherit;
+  opacity: 0.6;
   cursor: pointer;
   padding: 1px 3px;
   border-radius: 3px;
@@ -102,8 +103,8 @@
   text-overflow: ellipsis;
 }
 
-.sg-bf-breadcrumb-btn:hover { background: rgba(128, 128, 128, 0.12); color: var(--text); }
-.sg-bf-breadcrumb-btn--current { color: var(--text); cursor: default; font-weight: 500; }
+.sg-bf-breadcrumb-btn:hover { background: rgba(128, 128, 128, 0.12); opacity: 1; }
+.sg-bf-breadcrumb-btn--current { opacity: 1; cursor: default; font-weight: 500; }
 .sg-bf-breadcrumb-btn--current:hover { background: transparent; }
 
 /* ── Body ─────────────────────────────────────────────────────────────────── */

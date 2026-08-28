@@ -53,13 +53,14 @@ html[data-scheme="dark"] .sg-rainradar-map { background: #17191d; }
 
 .sg-rainradar-empty-text {
   font-size: calc(13px * var(--sg-font-scale, 1));
-  color: var(--text-muted);
+  color: inherit;
+  opacity: 0.6;
 }
 
 .sg-rainradar-empty-hint {
   font-size: calc(11px * var(--sg-font-scale, 1));
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: inherit;
+  opacity: 0.45;
 }
 
 .sg-rainradar-error-overlay {

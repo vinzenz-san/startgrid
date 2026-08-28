@@ -118,7 +118,8 @@
 
 .sg-weather-forecast-day-label {
   font-size: calc(10px * var(--sg-font-scale, 1));
-  color: var(--text-muted);
+  color: inherit;
+  opacity: 0.6;
   text-transform: uppercase;
 }
 
@@ -136,7 +137,7 @@
 }
 
 .sg-weather-forecast-day-max { color: var(--text); font-weight: 500; }
-.sg-weather-forecast-day-min { color: var(--text-muted); }
+.sg-weather-forecast-day-min { color: inherit; opacity: 0.6; }
 
 /* ── Empty / loading / error states ──────────────── */
 .sg-weather--empty {
@@ -149,13 +150,14 @@
 
 .sg-weather-empty-text {
   font-size: 13px;
-  color: var(--text-muted);
+  color: inherit;
+  opacity: 0.6;
 }
 
 .sg-weather-empty-hint {
   font-size: 11px;
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: inherit;
+  opacity: 0.45;
 }
 
 /* ── Settings ─────────────────────────────────────── */

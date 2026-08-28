@@ -75,7 +75,8 @@
 
 .sg-todo-stale-banner {
   font-size: calc(11px * var(--sg-font-scale, 1));
-  color: var(--text-muted);
+  color: inherit;
+  opacity: 0.6;
   background: color-mix(in srgb, var(--text) 6%, transparent);
   border-radius: 6px;
   padding: 4px 8px;
@@ -114,7 +115,8 @@
 }
 
 .sg-todo-text--done {
-  color: var(--text-muted);
+  color: inherit;
+  opacity: 0.6;
   text-decoration: line-through;
 }
 
@@ -128,7 +130,8 @@
 }
 
 .sg-todo-empty {
-  color: var(--text-muted);
+  color: inherit;
+  opacity: 0.6;
   font-size: calc(13px * var(--sg-font-scale, 1));
   text-align: center;
   padding: 12px;

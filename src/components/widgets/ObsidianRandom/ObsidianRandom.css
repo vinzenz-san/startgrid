@@ -12,8 +12,8 @@
   display: block;
   margin-bottom: 5px;
   font-size: 10px;
-  color: var(--text-muted);
-  opacity: 0.6;
+  color: inherit;
+  opacity: 0.45;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -32,7 +32,8 @@
   padding: 4px 8px;
   border-radius: 5px;
   background: rgba(128, 128, 128, 0.12);
-  color: var(--text-muted);
+  color: inherit;
+  opacity: 0.6;
   font-size: 10px;
   line-height: 1.4;
 }

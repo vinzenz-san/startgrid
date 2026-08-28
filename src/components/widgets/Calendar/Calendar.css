@@ -620,7 +620,8 @@
 
 .sg-cal-stale-banner {
   font-size: 11px;
-  color: var(--text-muted);
+  color: inherit;
+  opacity: 0.6;
   background: color-mix(in srgb, var(--text) 6%, transparent);
   border-radius: 6px;
   padding: 4px 8px;

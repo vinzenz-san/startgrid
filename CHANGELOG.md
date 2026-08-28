@@ -2,6 +2,12 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [Unreleased] — Unified secondary-text styling across widgets
+
+- Every widget's secondary/muted text inside its own (transparent, user-themeable) content area now dims via `color: inherit; opacity: N` instead of a fixed `var(--text-muted)` color — matches the approach Calendar/RSS already used, and adapts correctly regardless of how transparent the widget's own background is set. Previously three different techniques coexisted (plain `--text-muted`, `--text-muted` further dimmed by an extra `opacity`, and `inherit` + `opacity`), giving inconsistent contrast between widgets and even within the same widget (Calendar's agenda view vs. its monthly popover)
+- Left untouched: text inside portaled floating panels (Bookmark Search, Obsidian Search results, Calendar's monthly-view event popover) and widget Settings panels — those already render on a solid theme surface, not the widget's own tinted background, so `var(--text-muted)` is correct there
+- Widgets touched: Weather, CurrencyTicker, TodoList, RainRadar, BookmarkFolder (breadcrumb), ObsidianCapture, ObsidianRandom, Notes, Spacer, the shared MarkdownView (used by Obsidian Note/Daily/Random) and Obsidian "not set up yet" state, RSS Feed, Calendar (stale banner)
+
 ## [1.19.8] — Calendar week numbers & agenda "Today" state
 
 - Monthly view (Calendar + Outlook Calendar) can now show an ISO-8601 calendar-week column, off by default (per-widget toggle)
