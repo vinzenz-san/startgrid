@@ -2,6 +2,14 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.21.0] — New Google Services widget & faster Weather/RSS on new tab
+
+- **New Google Services widget**: a Quicklinks-style grid of shortcuts to Google apps (Gmail, Calendar, Drive, Docs, Sheets, Slides, Photos, Maps, Meet, Keep by default, with Forms, Contacts, Translate, News, Chat, YouTube, Earth, and Google Account available as opt-in extras), reorderable via the same drag-and-drop as Quicklinks. Each tile can personalize its link with an `authuser` parameter — either from the Google Account already connected via the Calendar/To-Do widgets, or a different address typed directly into this widget's settings (unverified, just used for the link). No new permissions required
+- Tile icons prefer Google's own branding CDN (`gstatic.com/images/branding/product`) for an accurate app icon, falling back to the existing DuckDuckGo → Google favicon → unavatar.io chain used by Quicklinks
+- Fixed the "Manage Apps" settings panel visibly jittering when checking/unchecking several apps in a row — the reorder buttons are now always mounted (just hidden) instead of mounting/unmounting per row, which was changing row height and triggering `@floating-ui`'s auto-reposition
+- Weather and RSS Feed (and any other widget reading its settings from the shared widget list) now show their last-known state immediately on a new tab instead of waiting on a `storage.sync` round trip: the widget list is mirrored into a synchronous `localStorage` fast-cache, the same first-paint pattern `BackgroundContext` already used for the background image. Cross-device sync via `storage.sync` is unaffected — this is a local read-ahead only
+- Minor: the `webextension-polyfill` module is now imported once and reused, instead of being re-imported on every single storage read/write
+
 ## [1.20.0] — New Google Mail widget
 
 - **New Google Mail widget**: shows your unread Gmail inbox (sender, subject, preview snippet, relative time) and opens the message in a new tab on click — same look and behavior as the Outlook Mail widget. Unlike Outlook Mail, it needs no OAuth sign-in: it reads Gmail's own undocumented per-account Atom feed (`mail.google.com/mail/u/{n}/feed/atom/`) using your browser's existing Google session cookie, gated behind a new optional `https://mail.google.com/*` host permission that's requested (and can be revoked) the same way the Obsidian widgets' loopback permission already works

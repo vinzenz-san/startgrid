@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { WidgetDataMap, WidgetType, WidgetBase, ClockData, QuicklinksData, BookmarksData, BookmarkSearchData, CalendarData, OutlookCalendarData, OutlookMailData, GmailFeedData, NotesData, ObsidianCaptureData, ObsidianDailyData, ObsidianNoteData, ObsidianSearchData, ObsidianRandomData, GreetingData, WeatherData, RssFeedData, TodoData, CurrencyTickerData, RainRadarData, IframeData, PlaceholderData, SpacerData } from '../../types/widget';
+import type { WidgetDataMap, WidgetType, WidgetBase, ClockData, QuicklinksData, BookmarksData, BookmarkSearchData, CalendarData, OutlookCalendarData, OutlookMailData, GmailFeedData, GoogleServicesData, NotesData, ObsidianCaptureData, ObsidianDailyData, ObsidianNoteData, ObsidianSearchData, ObsidianRandomData, GreetingData, WeatherData, RssFeedData, TodoData, CurrencyTickerData, RainRadarData, IframeData, PlaceholderData, SpacerData } from '../../types/widget';
 import type { TranslationKey } from '../../i18n';
 import Clock, { ClockSettings } from './Clock/Clock';
 import Quicklinks, { QuicklinksSettings } from './Quicklinks/Quicklinks';
@@ -9,6 +9,8 @@ import Calendar, { CalendarSettings } from './Calendar/Calendar';
 import OutlookCalendar, { OutlookCalendarSettings } from './OutlookCalendar/OutlookCalendar';
 import OutlookMail, { OutlookMailSettings } from './OutlookMail/OutlookMail';
 import GmailFeed, { GmailFeedSettings } from './GmailFeed/GmailFeed';
+import GoogleServices, { GoogleServicesSettings } from './GoogleServices/GoogleServices';
+import { DEFAULT_GOOGLE_SERVICE_APPS } from '../../lib/googleServicesApps';
 import Notes, { NotesSettings } from './Notes/Notes';
 import ObsidianCapture, { ObsidianCaptureSettings } from './ObsidianCapture/ObsidianCapture';
 import ObsidianDaily, { ObsidianDailySettings } from './ObsidianDaily/ObsidianDaily';
@@ -177,6 +179,18 @@ const _registry = {
     renderComponent: (data, onUpdateData) => <GmailFeed data={data} onUpdateData={onUpdateData} />,
     renderSettings:  (data, onUpdateData) => <GmailFeedSettings data={data} onUpdateData={onUpdateData} />,
   } satisfies TypedEntry<GmailFeedData>,
+
+  googleServices: {
+    label:                 'Google Services',
+    icon:                  '▦',
+    defaultSize:           { w: 3, h: 2 },
+    defaultData:           { apps: DEFAULT_GOOGLE_SERVICE_APPS, layout: 'grid' } satisfies GoogleServicesData,
+    titleBehavior:         'optional',
+    defaultTitle:          'Google Services',
+    defaultShowCustomTitle: false,
+    renderComponent: (data, onUpdateData) => <GoogleServices data={data} onUpdateData={onUpdateData} />,
+    renderSettings:  (data, onUpdateData) => <GoogleServicesSettings data={data} onUpdateData={onUpdateData} />,
+  } satisfies TypedEntry<GoogleServicesData>,
 
   notes: {
     label:                 'Notes',
@@ -373,6 +387,7 @@ export const WIDGET_TYPE_LABEL_KEYS: Record<WidgetType, TranslationKey> = {
   outlookCalendar: 'widgets.type.outlookCalendar',
   outlookMail:    'widgets.type.outlookMail',
   gmailFeed:      'widgets.type.gmailFeed',
+  googleServices: 'widgets.type.googleServices',
   notes:          'widgets.type.notes',
   obsidianCapture: 'widgets.type.obsidianCapture',
   obsidianDaily:  'widgets.type.obsidianDaily',
@@ -392,5 +407,5 @@ export const WIDGET_TYPE_LABEL_KEYS: Record<WidgetType, TranslationKey> = {
 
 // Ordered list for the "Add Widget" menu (excludes placeholder handled separately if desired).
 export const WIDGET_MENU_TYPES: WidgetType[] = [
-  'clock', 'quicklinks', 'bookmarks', 'bookmarkSearch', 'calendar', 'outlookCalendar', 'outlookMail', 'gmailFeed', 'notes', 'obsidianCapture', 'obsidianDaily', 'obsidianNote', 'obsidianSearch', 'obsidianRandom', 'greeting', 'weather', 'rssFeed', 'todoList', 'currencyTicker', 'rainRadar', 'iframe', 'invisible-spacer', 'placeholder',
+  'clock', 'quicklinks', 'bookmarks', 'bookmarkSearch', 'calendar', 'outlookCalendar', 'outlookMail', 'gmailFeed', 'googleServices', 'notes', 'obsidianCapture', 'obsidianDaily', 'obsidianNote', 'obsidianSearch', 'obsidianRandom', 'greeting', 'weather', 'rssFeed', 'todoList', 'currencyTicker', 'rainRadar', 'iframe', 'invisible-spacer', 'placeholder',
 ];

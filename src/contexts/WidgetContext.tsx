@@ -30,9 +30,16 @@ const WidgetContext = createContext<WidgetContextType | null>(null);
  * Owns the widget list (persisted via `useStorage('widgets', ...)`) and its
  * CRUD operations. Falls back to the "Focus" layout preset on first run or
  * after a factory reset.
+ *
+ * `fastCache: true` — other widgets (Weather, RSS Feed, …) read their own
+ * settings out of this list's `data`, so until it hydrates they can't even
+ * start their own logic and sit in an empty/unconfigured state. The
+ * synchronous localStorage mirror lets this list (and everything depending
+ * on it) paint with last-known-good data on the very first frame of every
+ * new tab, instead of waiting on a `storage.sync` round trip each time.
  */
 export function WidgetProvider({ children }: { children: ReactNode }) {
-  const [widgets, setWidgets, loaded] = useStorage<Widget[]>('widgets', DEFAULT_WIDGETS);
+  const [widgets, setWidgets, loaded] = useStorage<Widget[]>('widgets', DEFAULT_WIDGETS, { fastCache: true });
 
   const updateWidget = (id: string, updates: Partial<Widget>) => {
     setWidgets(prev => prev.map(w => w.id === id ? { ...w, ...updates } as Widget : w));

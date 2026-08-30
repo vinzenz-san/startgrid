@@ -124,6 +124,23 @@ export interface GmailFeedData {
   showPreview?: boolean; // default true — show the message snippet under the subject
 }
 
+export type GoogleServiceAppId =
+  | 'gmail' | 'calendar' | 'drive' | 'docs' | 'sheets' | 'slides'
+  | 'photos' | 'maps' | 'meet' | 'keep'
+  | 'forms' | 'contacts' | 'translate' | 'news' | 'chat' | 'youtube' | 'earth' | 'account';
+
+export interface GoogleServicesData {
+  apps: GoogleServiceAppId[]; // ordered, enabled apps only — no per-app URL/icon customization
+  accountMode?: 'connected' | 'custom'; // default 'connected' — reuses the shared sg_google_auth OAuth
+  /** Only used when accountMode === 'custom'. Free-text email/username, not
+   *  verified against any browser session — see lib/googleServicesApps.ts. */
+  customAccount?: string;
+  iconSize?: number;   // px, 18-48, default 30 — mirrors QuicklinksData
+  showTitles?: boolean; // default true
+  layout?: 'grid' | 'list'; // default 'grid'
+  alignment?: WidgetAlignment;
+}
+
 export interface NotesData {
   content:      string;
   storageMode?: 'local' | 'synced';
@@ -299,6 +316,7 @@ export interface WidgetDataMap {
   outlookCalendar: OutlookCalendarData;
   outlookMail:     OutlookMailData;
   gmailFeed:       GmailFeedData;
+  googleServices:  GoogleServicesData;
   notes:           NotesData;
   obsidianCapture: ObsidianCaptureData;
   obsidianDaily:   ObsidianDailyData;
@@ -351,6 +369,7 @@ export type Widget =
   | (WidgetBase & { type: 'outlookCalendar'; data: OutlookCalendarData })
   | (WidgetBase & { type: 'outlookMail';     data: OutlookMailData })
   | (WidgetBase & { type: 'gmailFeed';       data: GmailFeedData })
+  | (WidgetBase & { type: 'googleServices';  data: GoogleServicesData })
   | (WidgetBase & { type: 'notes';          data: NotesData })
   | (WidgetBase & { type: 'obsidianCapture'; data: ObsidianCaptureData })
   | (WidgetBase & { type: 'obsidianDaily';   data: ObsidianDailyData })
