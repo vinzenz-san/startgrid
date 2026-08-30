@@ -2,6 +2,12 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.20.0] — New Google Mail widget
+
+- **New Google Mail widget**: shows your unread Gmail inbox (sender, subject, preview snippet, relative time) and opens the message in a new tab on click — same look and behavior as the Outlook Mail widget. Unlike Outlook Mail, it needs no OAuth sign-in: it reads Gmail's own undocumented per-account Atom feed (`mail.google.com/mail/u/{n}/feed/atom/`) using your browser's existing Google session cookie, gated behind a new optional `https://mail.google.com/*` host permission that's requested (and can be revoked) the same way the Obsidian widgets' loopback permission already works
+- Because several Google accounts can be signed in in the same browser at once, and the feed's session index (`u/0`, `u/1`, …) depends on sign-in order rather than which address it is, the widget probes every signed-in session in parallel and matches the one whose own feed confirms the address you configured — verified live in Firefox before shipping, including the CORS/cookie behavior of a cross-origin fetch from an extension page. Accepts the address as a bare username, `@gmail.com`, or the legacy `@googlemail.com` — all three resolve to the same account
+- **New "Show preview text" toggle** on both the Outlook Mail and the new Google Mail widget — hides the message body snippet so the list shows only sender and subject
+
 ## [1.19.9] — Rain Radar map tiles fixed & unified secondary-text styling
 
 - Fixed Rain Radar's base map showing an "API KEY REQUIRED" watermark (or, briefly while this was being fixed, not rendering at all): CARTO stopped serving `basemaps.cartocdn.com` tiles anonymously. Tile requests now route through the Worker's new `/carto/*` proxy using a free CARTO API key, instead of embedding the key client-side

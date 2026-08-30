@@ -113,6 +113,15 @@ export interface OutlookCalendarData {
 export interface OutlookMailData {
   maxResults: number;      // 1–25, default 8
   showUnreadOnly?: boolean; // default false
+  showPreview?: boolean;    // default true — show the message body snippet under the subject
+}
+
+export interface GmailFeedData {
+  maxResults: number;   // 1–25, default 8 — client-side display cap; the feed
+                         // itself returns every unread message, uncapped
+  accountEmail: string; // Gmail address to match against the browser's logged-in
+                         // Google sessions — see lib/gmailFeed.ts
+  showPreview?: boolean; // default true — show the message snippet under the subject
 }
 
 export interface NotesData {
@@ -289,6 +298,7 @@ export interface WidgetDataMap {
   calendar:        CalendarData;
   outlookCalendar: OutlookCalendarData;
   outlookMail:     OutlookMailData;
+  gmailFeed:       GmailFeedData;
   notes:           NotesData;
   obsidianCapture: ObsidianCaptureData;
   obsidianDaily:   ObsidianDailyData;
@@ -340,6 +350,7 @@ export type Widget =
   | (WidgetBase & { type: 'calendar';       data: CalendarData })
   | (WidgetBase & { type: 'outlookCalendar'; data: OutlookCalendarData })
   | (WidgetBase & { type: 'outlookMail';     data: OutlookMailData })
+  | (WidgetBase & { type: 'gmailFeed';       data: GmailFeedData })
   | (WidgetBase & { type: 'notes';          data: NotesData })
   | (WidgetBase & { type: 'obsidianCapture'; data: ObsidianCaptureData })
   | (WidgetBase & { type: 'obsidianDaily';   data: ObsidianDailyData })

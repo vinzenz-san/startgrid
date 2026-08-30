@@ -78,7 +78,7 @@ function SkeletonRow() {
 
 // ── Message row ───────────────────────────────────────────────────────────────
 
-function MessageRow({ message, locale, todayLabel }: { message: MailMessage; locale: string; todayLabel: string }) {
+function MessageRow({ message, locale, todayLabel, showPreview }: { message: MailMessage; locale: string; todayLabel: string; showPreview: boolean }) {
   return (
     <a
       className={`sg-omail-item${!message.isRead ? ' sg-omail-item--unread' : ''}`}
@@ -93,7 +93,7 @@ function MessageRow({ message, locale, todayLabel }: { message: MailMessage; loc
         <span className="sg-omail-time">{formatRelativeTime(message.receivedDateTime, locale, todayLabel)}</span>
       </div>
       <div className="sg-omail-subject">{message.subject}</div>
-      <div className="sg-omail-preview">{message.bodyPreview}</div>
+      {showPreview && <div className="sg-omail-preview">{message.bodyPreview}</div>}
     </a>
   );
 }
@@ -109,6 +109,7 @@ export function OutlookMailSettings({ data, onUpdateData }: SettingsProps) {
   const { t } = useSettings();
   const maxResults     = data.maxResults ?? DEFAULT_MAX_RESULTS;
   const showUnreadOnly = data.showUnreadOnly ?? false;
+  const showPreview    = data.showPreview ?? true;
   const { isConnected, isConnecting, email, error, connect, disconnect } = useMsAuth();
 
   return (
@@ -124,6 +125,10 @@ export function OutlookMailSettings({ data, onUpdateData }: SettingsProps) {
 
       <SettingsRow label={t('widget.outlookMail.unreadOnly')}>
         <SettingsSwitch checked={showUnreadOnly} onChange={v => onUpdateData({ showUnreadOnly: v })} />
+      </SettingsRow>
+
+      <SettingsRow label={t('widget.outlookMail.showPreview')}>
+        <SettingsSwitch checked={showPreview} onChange={v => onUpdateData({ showPreview: v })} />
       </SettingsRow>
 
       <div className="sg-cal-settings-divider"/>
@@ -165,6 +170,7 @@ export default function OutlookMail({ data }: Props) {
   const { isConnected, connect, isConnecting } = useMsAuth();
   const maxResults     = data.maxResults ?? DEFAULT_MAX_RESULTS;
   const showUnreadOnly = data.showUnreadOnly ?? false;
+  const showPreview    = data.showPreview ?? true;
 
   useEffect(() => { refresh(maxResults, showUnreadOnly); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { refresh(maxResults, showUnreadOnly); }, [isConnected, maxResults, showUnreadOnly]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -213,7 +219,7 @@ export default function OutlookMail({ data }: Props) {
           </div>
         ) : (
           <div className="sg-omail-list">
-            {messages.map(m => <MessageRow key={m.id} message={m} locale={locale} todayLabel={t('widget.outlookMail.justNow')}/>)}
+            {messages.map(m => <MessageRow key={m.id} message={m} locale={locale} todayLabel={t('widget.outlookMail.justNow')} showPreview={showPreview}/>)}
           </div>
         )}
       </div>

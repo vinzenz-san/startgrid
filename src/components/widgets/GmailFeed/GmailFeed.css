@@ -1,0 +1,77 @@
+/* Reuses the Calendar widget's shared chrome (header/refresh/skeleton/empty/
+   settings/connect classnames — sg-cal-*) for visual consistency across all
+   account-connected widgets. Only mail-specific list rows (sg-gmail-*) are
+   defined here — near-identical to OutlookMail.css's sg-omail-* rules, minus
+   the read/unread toggle: every entry in Gmail's feed is unread by definition. */
+@import '../Calendar/Calendar.css';
+
+/* ── Message list ────────────────────────────────────────────────────────── */
+
+.sg-gmail-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.sg-gmail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.1s;
+  min-width: 0;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.08);
+}
+
+.sg-gmail-item:last-child { border-bottom: none; }
+.sg-gmail-item:hover { background: rgba(128, 128, 128, 0.1); }
+
+.sg-gmail-item-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sg-gmail-unread-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ea4335;
+  flex-shrink: 0;
+}
+
+.sg-gmail-from {
+  font-size: calc(12px * var(--sg-font-scale, 1));
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.sg-gmail-time {
+  font-size: calc(10px * var(--sg-font-scale, 1));
+  opacity: 0.45;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.sg-gmail-subject {
+  font-size: calc(11.5px * var(--sg-font-scale, 1));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 13px;
+}
+
+.sg-gmail-preview {
+  font-size: calc(10.5px * var(--sg-font-scale, 1));
+  opacity: 0.45;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 13px;
+}

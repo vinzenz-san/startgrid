@@ -113,3 +113,42 @@ export function removeObsidianHostPermission(): Promise<boolean> {
     .then((browser) => browser.permissions.remove({ origins: [OBSIDIAN_ORIGIN_PATTERN] }))
     .catch(() => false);
 }
+
+// ── Gmail host permission ────────────────────────────────────────────────────
+//
+// The Gmail widget reads mail.google.com's undocumented Atom feed
+// (lib/gmailFeed.ts) using the browser's own Google session cookies — no
+// OAuth. That still needs a host permission for fetch() to read the response
+// cross-origin. Declared under `optional_host_permissions` like the Obsidian
+// pattern above (not static `host_permissions`): verified live that Firefox
+// makes every host permission individually toggleable in about:addons
+// regardless of which manifest key it's declared under, so requesting it
+// explicitly on first use is the only path that gives the user a clear
+// consent moment instead of a silently-inactive permission.
+export const GMAIL_ORIGIN_PATTERN = 'https://mail.google.com/*';
+
+export async function hasGmailHostPermission(): Promise<boolean> {
+  if (!browserPromise) return false;
+  try {
+    const browser = await browserPromise;
+    return await browser.permissions.contains({ origins: [GMAIL_ORIGIN_PATTERN] });
+  } catch {
+    return false;
+  }
+}
+
+// Same gesture constraint as requestBookmarksPermission above — call straight
+// from a click handler, with no await in between.
+export function requestGmailHostPermission(): Promise<boolean> {
+  if (!browserPromise) return Promise.resolve(false);
+  return browserPromise
+    .then((browser) => browser.permissions.request({ origins: [GMAIL_ORIGIN_PATTERN] }))
+    .catch(() => false);
+}
+
+export function removeGmailHostPermission(): Promise<boolean> {
+  if (!browserPromise) return Promise.resolve(false);
+  return browserPromise
+    .then((browser) => browser.permissions.remove({ origins: [GMAIL_ORIGIN_PATTERN] }))
+    .catch(() => false);
+}
