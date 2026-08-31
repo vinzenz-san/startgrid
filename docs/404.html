@@ -8,18 +8,46 @@
 <link rel="icon" type="image/x-icon" href="/startgrid/icons/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/startgrid/icons/favicon-32.png">
 <link rel="apple-touch-icon" href="/startgrid/icons/apple-touch-icon.png">
-<link rel="stylesheet" href="/startgrid/style.css">
 <style>
-  .error-code { font-size: 4rem; font-weight: 700; letter-spacing: -0.02em; color: var(--accent); margin: 0 0 8px; }
-  .wrap.error { text-align: center; }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 24px;
+    background: #020617;
+    color: #e2e8f0;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 36rem; margin: 0 auto; width: 100%; text-align: center; }
+  .error-code { font-size: 4rem; font-weight: 700; letter-spacing: -0.025em; color: #34d399; margin-bottom: 8px; }
+  h1 { font-size: 1.875rem; font-weight: 700; letter-spacing: -0.025em; color: #ffffff; margin-bottom: 8px; }
+  p { color: #94a3b8; font-size: 1rem; line-height: 1.625; margin-bottom: 40px; }
+  a.home-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    background: rgba(16, 185, 129, 0.1);
+    color: #34d399;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 150ms, border-color 150ms;
+  }
+  a.home-link:hover { background: #1e293b; border-color: #334155; }
 </style>
 </head>
 <body>
-  <div class="wrap error">
-    <h1 class="error-code">404</h1>
-    <p style="font-size: 1.1rem; font-weight: 700; color: var(--heading); margin: 0 0 8px;">This page doesn't exist.</p>
-    <p style="color: var(--text-muted); margin: 0 0 32px;">The link may be outdated, or the page was moved.</p>
-    <a href="/startgrid/" style="color: var(--accent); text-decoration: none; font-weight: 600;">Back to StartGrid</a>
-  </div>
+  <main>
+    <p class="error-code">404</p>
+    <h1>This page doesn't exist.</h1>
+    <p>The link may be outdated, or the page was moved.</p>
+    <a class="home-link" href="/">Back to home</a>
+  </main>
 </body>
 </html>
