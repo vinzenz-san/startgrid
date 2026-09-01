@@ -52,20 +52,38 @@ header { margin-bottom: 48px; }
   border-radius: 12px;
   border: 1px solid var(--border);
   overflow: hidden;
+  position: relative;
   background-color: #0a0a0a;
-  background-image:
-    repeating-linear-gradient(0deg, rgba(168, 85, 247, 0.35) 0px, rgba(168, 85, 247, 0.35) 1px, transparent 1px, transparent 40px),
-    repeating-linear-gradient(90deg, rgba(168, 85, 247, 0.35) 0px, rgba(168, 85, 247, 0.35) 1px, transparent 1px, transparent 40px);
-  background-position: 20px 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 5%;
 }
+/* Tilted grid — perspective(rotateX) on a pseudo-element rather than the
+   tile itself, so the logo/wordmark on top stay flat and legible.
+   Oversized insets keep the rotated plane covering the box's corners at
+   any width. */
+.hero-tile::before {
+  content: "";
+  position: absolute;
+  left: -300%;
+  right: -300%;
+  top: -900%;
+  bottom: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0px, rgba(168, 85, 247, 0.6) 0.75px, rgba(168, 85, 247, 0.6) 1.25px, transparent 2px, transparent 40px),
+    repeating-linear-gradient(90deg, transparent 0px, rgba(168, 85, 247, 0.6) 0.75px, rgba(168, 85, 247, 0.6) 1.25px, transparent 2px, transparent 40px);
+  transform: perspective(900px) rotateX(40deg) translateZ(0);
+  transform-origin: center bottom;
+  backface-visibility: hidden;
+  will-change: transform;
+}
 .hero-tile-logo {
   width: 21%;
   height: auto;
   filter: invert(1);
+  position: relative;
+  z-index: 1;
 }
 .hero-tile-word {
   color: #fff;
@@ -73,6 +91,8 @@ header { margin-bottom: 48px; }
   font-weight: 600;
   letter-spacing: 0.5px;
   line-height: 1;
+  position: relative;
+  z-index: 1;
 }
 
 /* Store badges — every cell is the same 206x58 box (official badge dimensions) */

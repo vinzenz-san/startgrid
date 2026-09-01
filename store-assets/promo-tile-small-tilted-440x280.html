@@ -1,0 +1,40 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;padding:0;}
+  .tile{
+    width:440px;height:280px;
+    background-color:#0a0a0a;
+    position:relative;
+    overflow:hidden;
+    box-sizing:border-box;
+    font-family:'Segoe UI',-apple-system,sans-serif;
+  }
+  .grid{
+    position:absolute;
+    left:-300%;right:-300%;top:-900%;bottom:0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent 0px, rgba(168,85,247,0.6) 0.75px, rgba(168,85,247,0.6) 1.25px, transparent 2px, transparent 40px),
+      repeating-linear-gradient(90deg, transparent 0px, rgba(168,85,247,0.6) 0.75px, rgba(168,85,247,0.6) 1.25px, transparent 2px, transparent 40px);
+    transform:perspective(900px) rotateX(40deg) translateZ(0);
+    transform-origin:center bottom;
+    backface-visibility:hidden;
+    will-change:transform;
+  }
+  .content{
+    position:relative;z-index:1;
+    height:100%;
+    display:flex;align-items:center;justify-content:center;gap:22px;
+  }
+  .logo{width:92px;height:92px;filter:invert(1);}
+  .word{color:#fff;font-size:56px;font-weight:600;letter-spacing:0.5px;}
+</style></head>
+<body>
+  <div class="tile">
+  <div class="grid"></div>
+  <div class="content">
+    <img class="logo" src="data:image/png;base64,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">
+    <span class="word">StartGrid</span>
+  </div>
+  </div>
+</body></html>
