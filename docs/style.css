@@ -95,7 +95,7 @@ header { margin-bottom: 48px; }
   z-index: 1;
 }
 
-/* Store badges — every cell is the same 206x58 box (official badge dimensions) */
+/* Store buttons — all three share one box style; icon + label instead of fixed-size vendor badge art */
 .store-row {
   display: flex;
   flex-wrap: wrap;
@@ -103,35 +103,31 @@ header { margin-bottom: 48px; }
   margin-top: 24px;
 }
 .store-btn {
-  flex: 0 0 206px;
+  flex: 1 1 200px;
+  min-width: 180px;
   height: 58px;
-  padding: 0;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: opacity 0.15s ease, border-color 0.15s ease;
-}
-.store-btn:hover { opacity: 0.85; }
-/* Vendor artwork keeps its own aspect ratio, centred in the shared box */
-.store-badge {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
-  display: block;
-}
-/* "Try in browser" is ours, so it fills the box and matches the badge styling */
-.store-btn-try {
   gap: 10px;
-  padding: 0 16px;
+  border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
+  text-decoration: none;
+  overflow: hidden;
+  transition: opacity 0.15s ease, border-color 0.15s ease;
 }
-.store-btn-try:hover { opacity: 1; border-color: var(--accent); }
+.store-btn:hover { opacity: 1; border-color: var(--accent); }
 .store-btn-icon { width: 26px; height: 26px; flex-shrink: 0; color: var(--accent); }
+.store-btn-icon-img { object-fit: contain; }
+.store-btn-firefox { background: #109ad6; border-color: #109ad6; color: #ffffff; }
+.store-btn-firefox:hover { border-color: #ffffff; }
+.store-btn-firefox .store-btn-text small { color: rgba(255, 255, 255, 0.8); }
+.store-btn-chrome { background: #ffffff; border-color: #e2e5ea; color: #1a1d24; }
+.store-btn-chrome:hover { border-color: #94a3b8; }
+.store-btn-chrome .store-btn-text small { color: #5c6270; }
 .store-btn-text {
   display: flex;
   flex-direction: column;
@@ -139,14 +135,19 @@ header { margin-bottom: 48px; }
   font-size: 0.95rem;
   font-weight: 600;
   line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .store-btn-text small {
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 400;
   color: var(--text-muted);
   letter-spacing: 0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-@media (max-width: 500px) {
+@media (max-width: 400px) {
   .store-btn { flex: 1 1 100%; }
 }
 
