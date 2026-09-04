@@ -247,7 +247,7 @@ header { margin-bottom: 48px; }
   object-fit: contain;
 }
 header h1 { font-size: 1.6rem; margin: 0; }
-.tagline { color: var(--text-muted); font-size: 1.05rem; margin-top: 4px; }
+.tagline { color: var(--text-muted); font-size: 1rem; margin-top: 4px; }
 section { margin-bottom: 40px; }
 h2 { font-size: 1.1rem; margin-bottom: 12px; }
 ul { padding-left: 20px; margin: 0; }
