@@ -2,6 +2,12 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/). Versioning: SemVer. Minor bumps mark architecture/feature milestones; patch bumps mark fixes/polish within a milestone.
 
+## [1.21.1] — New grid favicon/icon
+
+- New extension icon and favicon: the purple 3×3 grid mark (no wordmark), replacing the plain logo — used for the extension icon (toolbar, `chrome://extensions`/`about:addons`, Web Store thumbnail), the new-tab page's own tab favicon, and the docs site favicon at vinzenz-dev.de/startgrid
+- Grid lines get a soft white halo behind the purple stroke so the icon stays legible on darker browser-tab backgrounds (barely visible on light backgrounds, where the plain purple already had enough contrast)
+- Store listing assets (Firefox AMO) keep the grid + "VA" logo mark combined, unchanged
+
 ## [1.21.0] — New Google Services widget & faster Weather/RSS on new tab
 
 - **New Google Services widget**: a Quicklinks-style grid of shortcuts to Google apps (Gmail, Calendar, Drive, Docs, Sheets, Slides, Photos, Maps, Meet, Keep by default, with Forms, Contacts, Translate, News, Chat, YouTube, Earth, and Google Account available as opt-in extras), reorderable via the same drag-and-drop as Quicklinks. Each tile can personalize its link with an `authuser` parameter — either from the Google Account already connected via the Calendar/To-Do widgets, or a different address typed directly into this widget's settings (unverified, just used for the link). No new permissions required

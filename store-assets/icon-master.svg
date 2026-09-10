@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <style>
+    .logo{fill:#ffffff;}
+    @media (prefers-color-scheme: light){.logo{fill:#0a0a0a;}}
+  </style>
+  <g stroke="#a855f7" stroke-width="2"><line x1="0" y1="128" x2="512" y2="128"/><line x1="0" y1="256" x2="512" y2="256"/><line x1="0" y1="384" x2="512" y2="384"/><line x1="128" y1="0" x2="128" y2="512"/><line x1="256" y1="0" x2="256" y2="512"/><line x1="384" y1="0" x2="384" y2="512"/></g>
+  <g class="logo" transform="translate(46, 176) scale(0.216)">
+    <path d="M 1075 0 L 105.81 0 A 70 70 0 0 0 41.39 97.38 L 383.6 902.58 A 160 160 0 0 0 530.85 1000 L 650 1000 Z"/>
+    <path d="M 875 1000 L 1844.19 1000 A 70 70 0 0 0 1908.61 902.62 L 1566.4 97.42 A 160 160 0 0 0 1419.15 0 L 1300 0 Z"/>
+  </g>
+</svg>
