@@ -1,53 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Page not found — StartGrid</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
+<title>Page not found — StartGrid</title>
 <link rel="icon" type="image/x-icon" href="/startgrid/icons/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/startgrid/icons/favicon-32.png">
 <link rel="apple-touch-icon" href="/startgrid/icons/apple-touch-icon.png">
 <style>
+  /* Inlined deliberately, not linked to style.css: a custom 404 can render
+     for an arbitrary path, and a relative stylesheet href resolves against
+     that URL, not this file's real location — see readme.md. */
+  :root {
+    --bg: #020617;
+    --heading: #ffffff;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --accent: #34d399;
+    --accent-soft: rgba(52, 211, 153, .1);
+    --accent-border: rgba(52, 211, 153, .2);
+    --dur: 150ms;
+    --ease: cubic-bezier(.4, 0, .2, 1);
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f7f8fa;
+      --heading: #1a1d24;
+      --text: #1a1d24;
+      --text-muted: #5c6270;
+      --accent: #3b6fe0;
+      --accent-soft: rgba(59, 111, 224, .1);
+      --accent-border: rgba(59, 111, 224, .2);
+    }
+  }
   * { box-sizing: border-box; margin: 0; }
+  a { color: inherit; text-decoration: none; }
   body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    -webkit-font-smoothing: antialiased;
     min-height: 100vh;
     display: flex;
-    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    padding: 24px;
-    background: #020617;
-    color: #e2e8f0;
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-    -webkit-font-smoothing: antialiased;
+    padding: 1.5rem;
   }
-  main { max-width: 36rem; margin: 0 auto; width: 100%; text-align: center; }
-  .error-code { font-size: 4rem; font-weight: 700; letter-spacing: -0.025em; color: #34d399; margin-bottom: 8px; }
-  h1 { font-size: 1.875rem; font-weight: 700; letter-spacing: -0.025em; color: #ffffff; margin-bottom: 8px; }
-  p { color: #94a3b8; font-size: 1rem; line-height: 1.625; margin-bottom: 40px; }
-  a.home-link {
+  main {
+    max-width: 32rem;
+    text-align: center;
+  }
+  .error-code {
+    font-size: 4rem;
+    font-weight: 700;
+    letter-spacing: -.025em;
+    color: var(--accent);
+    margin-bottom: .5rem;
+  }
+  h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    letter-spacing: -.025em;
+    color: var(--heading);
+    margin-bottom: .5rem;
+  }
+  p {
+    font-size: 1rem;
+    line-height: 1.625;
+    color: var(--text-muted);
+    margin-bottom: 2.5rem;
+  }
+  .back-link {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-radius: 8px;
-    border: 1px solid rgba(16, 185, 129, 0.2);
-    background: rgba(16, 185, 129, 0.1);
-    color: #34d399;
-    font-size: 0.875rem;
+    gap: .5rem;
+    padding: .65rem 1.1rem;
+    border-radius: .5rem;
+    border: 1px solid var(--accent-border);
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: .875rem;
     font-weight: 500;
-    text-decoration: none;
-    transition: background-color 150ms, border-color 150ms;
+    transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease);
   }
-  a.home-link:hover { background: #1e293b; border-color: #334155; }
+  .back-link:hover {
+    background: rgba(15, 23, 42, .5);
+    border-color: #334155;
+  }
 </style>
 </head>
 <body>
-  <main>
-    <p class="error-code">404</p>
-    <h1>This page doesn't exist.</h1>
-    <p>The link may be outdated, or the page was moved.</p>
-    <a class="home-link" href="/">Back to home</a>
-  </main>
+
+<main>
+  <div class="error-code">404</div>
+  <h1>This page doesn't exist.</h1>
+  <p>The link may be outdated, or the page was moved.</p>
+  <a href="/" class="back-link">Back to home</a>
+</main>
+
 </body>
 </html>
